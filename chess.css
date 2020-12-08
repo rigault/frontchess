@@ -1,0 +1,180 @@
+body {
+   font-family: arial, verdana, sans-serif;
+   font-size: 12px;
+   color: gray;
+}
+
+label#titre {
+   font-size: 20px;
+   font-weight: bold;
+   margin: 0 0 0 300px;
+}
+
+a {
+  float: right;
+  color: white;
+}
+
+h2 {
+   color: red;
+   font-weight: bold;
+   font-size: 20px;
+}
+
+header {
+   background: black;
+   margin: 0 0 10px 0;
+   padding: 5px;
+   color: white;
+}
+
+header div input {
+   margin: 0 30px 0 2px;
+}
+
+#timePlayer, #timeComputer {
+   color: red;
+}
+
+#conteneur {
+   overflow: hidden;
+}
+
+#conteneur div {
+   border-color: gray;
+   margin: 0px;
+   display: inline-block;
+}
+
+div#gauche {
+   margin: 0 0 0 10px;
+   float: left;
+   width: 25%;
+}
+
+div#milieu {
+   float: left;
+   text-align: center;
+   margin: 0 0 0 50px;
+}
+
+div#droite {
+   margin: 0 10px 0 0;
+   float: right;
+}
+
+div#dump {
+   margin: 5px 0 0 0;
+   border: 1px;
+   width: 150px;
+}
+
+div#FEN {
+   margin: 5px 0 0 0;
+   border: 1px;
+   width: 150px;
+}
+
+#gauche textarea {
+   color: gray;
+   margin: 5px 0 0 0;
+}
+
+#droite textarea {
+   color: red;
+   font-weight: bold;
+   margin: 5px 0 0 0;
+}
+
+#niveauValeur {
+   font-size: 12px;
+   width: 20px; 
+   height: 20px; 
+   padding: 0px;
+}
+
+#piecePrise, #lastTake {
+   font-size: 20px;
+   width: 200px; 
+   height: 50px; 
+   color: black;
+   background: white;
+   border: 1px;
+   border-color: red;
+   padding: 2px;
+}
+
+input[type=range] {
+   color: red;
+   width: 200px;
+   cursor: pointer;
+   background: transparent;
+   border-color: transparent;
+   /* color: transparent;*/
+}
+
+footer input {
+   width: 50px;
+   cursor: pointer;
+   background: crimson; 
+   border-color: gray;
+   color: white;
+}
+
+button { 
+   display:inline-block; 
+   border: 0px;
+   width: 60px; 
+   height: 60px; 
+   padding: 0px;
+   font-size: 40px;
+   margin: 1px 0px; 
+   font-weight: bold;
+   cursor: pointer;
+   font-family: arial, Courier;
+}
+
+.noirJoueur:hover, .blancJoueur:hover {
+   background-color: white;
+   color: orange; 
+}
+
+.deco {
+   background-color: black;
+   color:white;
+}
+
+.noirOrdi {
+   background-color: crimson;
+   color: black;
+}
+
+.noirJoueur {
+   background-color: crimson;
+   color: white;
+}
+
+.noirVide {
+   background-color: crimson;
+   color: crimson;
+}
+
+.blancOrdi {
+   background-color: gray;
+   color: black;
+}
+
+.blancJoueur {
+   background-color: gray;
+   color: white;
+}
+
+.blancVide {
+   background-color: gray;
+   color: gray;
+}
+
+footer {
+   text-align: left;
+   margin: 10px 0 0 500px;
+}

@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang = "fr">
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>Chess</title>
+   <link rel="icon" type="image/ico" href="favicon.ico">
+   <link rel="stylesheet" type="text/css" href="chessdoc.css" />
+</head>
+
+<body>
+<header>
+Documentation sur le jeu d'echec, René Rigault, 2020
+</header>
+<h1>Sommaire </h1>
+<ol>
+<li><a href="#Introduction"> Introduction </a> </li>
+<li><a href="#API"> API </a> </li>
+<li><a href="#Serveur">Application côté serveur </a> </li>
+<li><a href="#Client">Côté client</a> </li>
+<li><a href="#Annexe">Annexe</a> </li>
+</ol>
+
+<h1 id="Introduction">1. Introduction </h1>
+Ce jeu d'échec s'exécute sur un serveur. Il est écrit en langage C. Une API est publiée permettant à quiconque de développer la partie cliente indépendemment du serveur.
+<p>
+Côté client, un ensemble HTML5, CSS et JavaScript est proposé. Son rôle est de gérer l'affichage du jeu, de contrôler la saisie du joueur, de lancer vers le serveur la requête XMLHTTPRequest conforme à l'API.
+
+<h1 id="API">2. API </h1>
+Une API restful est définie et exposée par le serveur.
+La requête est de type GET avec les paramètres apparents dans l'URL.
+La réponse est au format Jason.
+Le serveur ne gère pas d'état. Il répond aux requêtes sans utiliser d'informations en mémoires.
+La requête un type, la totalité du jeu d'échecs au format ASCII FEN, et un niveau de profondeur de jeu.
+
+<h2>requêtes</h2>
+
+Il y a trois éléments, tous optionnel, dans les requêtes.
+En cas d'absence d'éléments, il existe des valeurs par défaut.
+<p>
+
+<table>
+   <tbody><tr><th>Attribut</th><th>valeur</th><th>type</th></tr>
+   <tr><td>reqType</td><td>0, 1, 2</td><td>int</td></tr>
+   <tr><td>fen</td><td>chaine décrivant le jeu au format FEN</td><td>string</td></tr>
+   <tr><td>level</td><td>niveau de profondeur demandé</td><td>int</td></tr>
+   </tbody>
+</table>
+
+<h3>reqType </h3>
+
+La valeur par défaut est 2 (si rien de spécifié dans la requête).
+
+<ol start ="0">
+   <li>requête de vérification d'accesibilité</li>
+   <li>requête standard</li>
+   <li>requete donnant des valeurs de variables internes au serveur</li>
+</ol>
+
+Une requête 2 est un sur-ensemble de la requête 1 qui est un sur-ensemble de la requête 0.
+
+Sauf cas particulier, utiliser la requête 1.
+
+<h3>game </h3>
+
+Le jeu dans les echanges externes (API) est représenté par la notation Forsyth–Edwards Notation (FEN). 
+Le codage est le suivant :
+
+<p>
+<table>
+   <tbody><tr><th>Pièce</th><th>Noirs</th><th>Blancs</th></tr>
+   <tr><td>Pawn</td><td>p</td><td>P</td></tr>
+   <tr><td>kNight</td><td>n</td><td>N</td></tr>
+   <tr><td>Bishop</td><td>b</td><td>B</td></tr>         
+   <tr><td>Rook</td><td>r</td><td>R</td></tr>      
+   <tr><td>Queen</td><td>q</td><td>Q</td></tr>
+   <tr><td>King</td><td>k</td><td>K</td></tr>
+   </tbody>
+</table>
+
+<h3>level </h3>
+Profondeur de la recherche demandée au serveur.
+<p>
+<h2>Exemple de requête complète</h2>
+<br>
+http://&lt;server name&gt;/cgi-bin/chess.cgi?&amp;reqType=2&amp;level=3&amp;fen=rnbqkbnr/pppp1ppp8/4p3/8/8/PPPPPPPP/RNBQKBNR+b+KQkq
+<p>
+Note : les espaces sont remplacés par des "+".
+
+<h2> Réponses</h2>
+
+Le format Jason est utilisé.
+Les paires (attribut, valeur) sont les suivantes :
+<p>
+<table>
+   <tbody><tr><th>Attribut</th><th>valeur</th><th>type</th></tr>
+   <tr><td>description</td><td>Chess Rene Rigault 2019</td><td>string</td></tr>
+   <tr><td>compilation-date</td><td>Dec  8 2020</td><td>string</td></tr>
+   <tr><td>version</td><td>2.0</td><td>string</td></tr>
+   <tr><td>time</td><td>temps en secondes</td><td>int</td></tr>
+   <tr><td>note</td><td>evaluation du jeu courant</td><td>int</td></tr>         
+   <tr><td>eval</td><td>evaluation rendue par le minimax</td><td>int</td></tr> 
+   <tr><td>computerStatus</td><td>Etat du roi ordinateur</td><td>int</td></tr>     
+   <tr><td>playerStatus</td><td>Etat du Roi joueur</td><td>int</td></tr>
+   <tr><td>fen</td><td>Jeu au format FEN</td><td>string</td></tr>
+   <tr><td>lastTake</td><td>dernière prise ordi</td><td>int</td></tr>
+   <tr><td>openingName</td><td>Nom de l'ouverture utilisée (si pertinent)</td><td>string</td></tr>
+   <tr><td>endName</td><td>Non implemente</td><td>string</td></tr>
+   <tr><td>computePlay</td><td>deplacement ordinateur au format Xa1-b2</td><td>string</td></tr>
+   <tr><td>dump</td><td>dump de variables internes au serveur</td><td>string</td></tr>
+   </tbody>
+</table>
+
+<h3>Réponse à une requete reqType=0</h3>
+Seuls trois attributs sont présent : description, compilation-date et version.
+<pre>
+{
+"description" : "Chess Rene Rigault 2020",
+"compilation-date": "Dec  8 2020",
+"version" : "2.1"
+}
+</pre>
+
+<h3>Réponse à une requete reqType=1</h3>
+<pre>
+{
+"description" : "Chess Rene Rigault 2020",
+"compilation-date": "Dec  8 2020",
+"version" : "2.0",
+"clockTime": "0",
+"time" : "0",
+"note" : "-132",
+"eval" : "0",
+"computerStatus" : "1",
+"playerStatus" : "1",
+"fen : "RNBQKBNR/PPPPPPPP/8/8/8/5n2/pppppppprnbqkb1r+w+KQkq",
+"lastTake" : "0",
+"openingName" : "Default-Coup1",
+"endName" : "",
+"computePlay" : "Ng8-f6"
+}
+</pre>
+
+<h3>Réponse à une requete reqType=2</h3>
+L'attribut dump est ajouté.
+<pre>
+{
+"description" : "Chess Rene Rigault 2020",
+"compilation-date": "Dec  8 2020",
+"version" : "2.0",
+"clockTime": "0",
+"time" : "0",
+"note" : "-132",
+"eval" : "0",
+"computerStatus" : "1",
+"playerStatus" : "1",
+"fen" : "RNBQKBNR/PPPPPPPP/8/8/8/5n2/pppppppprnbqkb1r+w+KQkq",
+"lastTake" : "0",
+"openingName" : "Default-Coup1",
+"endName" : "",
+"computePlay" : "Ng8-f6"
+"dump" : "maxDepth=4 nEval=2 nLCKingInCheck=19 nBuildList=15 nValidComputerPos=29 nValidPlayerPos=29"
+}
+
+</pre>
+<h1 id="Serveur">3. L'application côté serveur </h1>
+<h2>Introduction </h2>
+L'application est écrite uniquement en langage C et compatible cgi.
+Elle est multiphread et tire partie des architectures à plusieurs coeurs afin de paralléliser la recherche.
+Elle est basée sur la méthode du Minimax consistant à construire l'arbre des possibilités à une profondeur définie.
+Au niveau de chaque feuille de l'arbre, la fonction d'évaluation est appelée. Elle se base sur quelques heuristiques et retourne une valeur qualifiant la position choisie. 
+Afin de réduire la recherche aux seuls cas pertinents, la méthode Alpha-Bêta est utilisée.
+
+<p>Conventions :
+<ul>
+   <li>Les blancs sont identifiés par des valeurs négatives et des caractères en majuscules.</li>
+   <li>Les noirs sont identifiés par des valeur positive et des caractères en minuscules.</li>
+   <li>Les cases vides ont une valeur nulle (0)</li>
+   <li>Le jeu est représenté par un tableau de 64 octets.</li>
+   <li>La liste des jeux est représentée par un tableau de jeux et un entier qui est l’index du prochain jeu à stocker.</li>
+   <li>Les lignes et colonnes d’une pièces sont représentées par un couple d'entiers (l, c) en interne.</li>
+   <li>La notation algébrique complète est utilisée pour préciser les déplacements. </li>
+</ul>
+
+<h2>Structures de données essentielles</h2>
+<ul>
+   <li>Le jeu est représenté dans un tableau à 2 dimensions de type TGAME. </li>
+   <li>Une liste de jeux est un tableau de jeux. Type TLIST.</li>
+   <li>nextL est un entier pointant sur le prochain jeux a insérer dans la liste</li>
+   <li>info est la structure rassemblant un ensemble de données de contrôles et d’état du jeux.</li>
+</ul>
+
+<h2>La recherche</h2>
+La fonction buildList construit la liste de toutes les positions possibles jouables.
+<p>La fonction find part du sommet de l’arbre (position courante du jeu) et appelle buildList.
+<p> Quatrecomportements :
+
+<ul>
+   <li>si niveau choisi -1, choix aléatoire,</li>
+   <li>recherche dans la bibliothèque d'ouvertures,</li>
+   <li>recherche dans le tables de fin de jeux</li>
+   <li>sinon pour toutes les positions possibles, génération d’un thread qui va lancer alphabeta,
+récupération des évaluations dans le tableau tEval, puis choix au hasard d’un des jeux ayant obtenu la meilleure note </li></ul>
+
+La fonction Alphabeta implémente l’algorithme Minimax avec élagage Alphabeta.
+
+<h2>Le CLI Command Line Interface </h2>
+<pre>
+mode CLI sortie JSON : ./chess.cgi -i [&lt;jeuAuFormaFEN&gt;]
+mode CLI sortie raw : ./chess.cgi -r [&lt;jeuAuFormaFEN&gt;]
+mode CLI test unitaire : ./chess.cgi -t 
+mode CLI help: ./chess.cgi -h 
+</pre>
+
+<h2>Les Threads</h2>
+La recherche est multithread, permettant de multiplier la vitesse si le processeur est multicore.
+La fonction "find" lance autant de thread qu’il y a de possibilité de jeux au sommet de l’arbre de recherche.
+Un thread est donc associé au lancement de alphaBeta sur chaque fils de la racine de l’arbre.
+
+<h2>Quelques astuces</h2>
+Soit (l, c) une case et (lDest, cDest) une autre case.
+<p>
+Pour déterminer si un cavalier a le droit d’aller de (l, c) à  (lDest, cDest), il suffit que :
+<pre>abs ((lDest-l) * (cDest-c)) == 2</pre>
+<p>
+Pour aller de la case (l, c) à la case (lDest, cDest), comme on ne peut qu’aller sur une case vide ou contenant une pièce adverse, la condition nécessaire suivante doit être satisfaite :
+<pre>jeu [l][c] * jeu [lDest][cDest] &lt;= 0</pre>
+Attention au cas du Roque.
+<p>Pour vérifier qu’on est sur la même diagonale, la condition suivante doit être satisfaite:
+<pre>abs (lDes-l) == abs (cDest-c)</pre>
+<p>Un roi qui a le trait, qui est échec au roi et qui en se déplaçant sur toutes les cases jouable reste échec au roi est echec et mat.
+<p>Un roi a le trait, qui n’est pas échec au roi et qui en se déplaçant sur toutes les cases jouable reste échec au roi est pat (en supposant bien sûr qu'il n'existe pas d'autres possibilités de jouer).
+<h2>Un peu de théorie</h2>
+<p>Soit n (resp. m) le nombre de coups possibles pour le joueur (resp. ordinateur).
+<p>Soit p le nombre de coups à évaluer à l’avance. 2p est le nombre de demi-coups (joueur ou ordinateur).
+<p>Soit MAX le nombre de combinaisons à ne pas dépasser (pour le temps) correspondant à un niveau donné.
+
+<pre>nm puissance (2p) &lt; MAX 
+2p &lt; log (MAX) / log (nm)
+p &lt; log (MAX) / 2 log (nm)
+</pre>
+
+<h2>Optimisation de performances</h2>
+<p>
+Quelques particularitées liées au langage C, constatées avec le compilateur gcc sous Linux.
+<p>
+<pre>z = x * qui </pre> (avec qui = -1) est plus efficace que <pre>z = abs (x)</pre>
+<p>Contrairement à ce qu’on pourrait croire faire 
+<br>
+<pre>if ((w = jeu [l][c]) == w1 || w == w2) return TRUE;
+</pre>
+est plus lent que :
+<pre>
+w = jeu [l][c];	
+if (w == w1 || w == w2) return TRUE;
+</pre>
+<p>De même 
+<pre>pt = &amp;jeu[0][0]
+*(pt + 5*N + 7) = ROI;
+</pre>
+est plus lent que
+<br>
+<pre>jeu [5][7] = ROI;
+</pre>
+
+Comme indice de boucle, préférer le type "int" au type "char" car plus rapide.
+
+<h2>Bibliothèque d'ouverture </h2>
+
+Avant de lancer la recherche dans l'arbre, une bibliothèque d'ouverture est utilisée.
+<p>Les fichiers "chessB.fen" et 'chessW.fen" sont au format textuel CSV et contiennet la liste des ouvertures au format FEN vus des noirs et vus des blancs.
+<p> Format CSV : FENstring ; dep ; commentaires
+<p> dep contient le deplacement en notation algebrique complete Xe2:e4[=Y] | 0-0 | 0-0-0
+<p> X : piece joue. Y : promotion,  0-0 : petit roque,  0-0-0 : grand roque
+<p> Exemple
+<pre>
+rnbqkbnr/pppppppp8/8/4P3/8/PPPP1PPP/RNBQKBNR b e7:e5; Classique-Ouvert-ou-Alekhine-Coup1; RR
+rnbqkbnr/pppppppp8/8/3P4/8/PPP1PPPP/RNBQKBNR b d7:d5; Classique-ferme-Coup1; RR
+</pre>
+<p> les indication de couleurs b|w sont ingorées car l'ordinateur connait deja sa couleur
+
+<h2>Fin de partie </h2>
+La fonction syzygy renvoie la meilleure solution.
+Voir documentation sur les tables de fin de partie sur le Web.
+La solution choisie est bases sur les tables syzygy stockées en local sur le serveur.
+
+<h2>Gestion du CGI </h2>
+<h3>Lire la requête GET </h3>
+On utilise "getenv" avec "QUERY_STRING" en paramètre pour lire les paramètres de l'URL.
+<pre>
+ env = getenv ("QUERY_STRING"); // Les variables
+   if (env == NULL) return 0;
+
+   if ((ch = strstr (env, "fen=")) != NULL)
+      sscanf (ch, "gen=%64s", getInfo.gameString);
+   if ((ch = strstr (env, "level=")) != NULL)
+      sscanf (ch, "level=%d", &amp;getInfo.level);
+   if ((ch = strstr (env, "reqType=")) != NULL)
+      sscanf (ch, "reqType=%d", &amp;getInfo.reqType);
+
+</pre>
+
+<h3>Envoi du jeu </h3>
+Dans sendGame, on formate le Jason avec printf...
+Ne pas oublier (très important) l'envoie de
+<pre>Access-Control-Allow-Origin: *</pre>
+Extrait de la fonction "SendGame" :
+<pre>
+   printf ("Access-Control-Allow-Origin: *\n");
+   printf ("Content-Type: text/html\n\n");
+   printf ("{\n");
+   printf ("\"description\" : \"%s\",\n", DESCRIPTION);
+
+</pre>
+
+<h2>Aspects pratiques </h2>
+<p>
+Pour compiler, l'option pthread" est nécessaire pour la gestion multithread.
+Il est possible de lancer chess en mode CLI (Command Line Interface) à partir de la console.
+<br/>
+<pre>
+mode CLI (Interface API): sudo ./chess.cgi -i [&lt;jeuAFormatFEN&gt;]
+mode CLI (Interface Raw): sudo ./chess.cgi -r [&lt;jeuAFormatFEN&gt;]
+mode test : sudo ./chess -t
+help : sudo ./chess.cgi -h
+</pre>
+Les pièces ordinateurs, noires sont positives en interne et représentées par des caractères minuscule pour l'API.
+<br>
+Les pièces joueurs, blanches, sont négatives en internes et représentées par des caractères majuscules pour l'API.
+<p>
+
+<table>
+   <tr><th>Fichier côté serveur</th><th>dans ...cgi-bin</th><th>type</th></tr>
+   <tr><td>chess.c, chessUtil.c, syzygy.c</td><td>code source</td><td>texte</td></tr>
+   <tr><td>tbprobe.c, tbcore.c </td><td>code source pour l'access au tables de fin de jeux</td><td>texte</td></tr>
+   <tr><td>chess.cgi</td><td>code exécutable</td><td>exec</td></tr>
+   <tr><td>../chessopenings/chessB.fen</td><td>bibliothèque d'ouvertures vue des noirs</td><td>texte</td></tr>
+   <tr><td>../chessopenings/chessW.fen</td><td>bibliothèque d'ouvertures vue des blancs</td><td>texte</td></tr>
+   <tr><td>../chessdata ou chessdata345</td><td>repertoire contenant les tables de fin de jeux</td><td>texte</td></tr>
+   <tr><td>chess.log</td><td>log</td><td>texte</td></tr>   
+</table>
+<p>
+Le fichier chess.log enregistre les requetes (dates, identification du type de poste).
+
+<h2>Les fonctions et les commentaires associés </h2>
+<pre>
+
+Fichier chess.c
+----------------
+
+/*   Pour produire la doc sur les fonctions : grep "\/\*" chess.c | sed 's/^\([a-zA-Z]\)/\n\1/' */
+/*   Jeu d'echec */
+/*   Noirs : 1 (Minuscules) */
+/*   Blancs : -1 (Majuscules) */
+/*   case libre 0 */
+/*   mode CLI API : chess -i [FENgame] */
+/*   mode CLI Raw : chess -r [FENgame] */
+/*   mode CLI Test : chess -t */
+/*   script CGI gérant une API restful (GET) avec les réponses au format JSON */
+/*   fichiers associes : chess.log, chessB.fen, chessW.fen, chessUtil.c, syzygy.c, tbprobes.c tbcore.c et .h associes  */
+/*   Structures de donnees essentielles */
+/*     - jeu represente dans un table a 2 dimensions : TGAME sq64 */
+/*     - liste de jeux qui est un tableau de jeux :  TLIST list */
+/*     - nextL est un entier pointant sur le prochain jeux a inserer dans la liste */
+
+int fMaxDepth (int level, struct sinfo info) { /* */
+   /* renvoie la profondeur du jeu en fonction du niveau choisi et */
+   /* de l'etat du jeu */
+
+bool LCkingInCheck (TGAME sq64, register int who, register int l, register int c) { /* */
+   /* vrai si le roi situe case l, c est echec au roi */
+   /*'who' est la couleur du roi who est attaque */
+
+bool fKingInCheck (TGAME sq64, int who) { /* */
+   /* retourne vrai si 'who' est en echec */
+
+int buildList (TGAME refJeu, register int who, TLIST list) { /* */
+   /* construit la liste des jeux possibles a partir de jeu. */
+   /* 'who' joue */
+
+bool kingCannotMove (TGAME sq64, register int who) { /* */
+   /* vrai si le roi du joueur 'who' est ne peut plus bouger sans se mettre echec au roi */
+   /* 'who' est la couleur du roi who est attaque */
+   /* on essaye tous les jeux possibles. Si dans tous les cas on est echec au roi */
+   /* c'est perdu. Noter que si le roi a le trait et qu'il n'est pas echec au roi il est Pat */
+   /* si le roi est echec au roi il est mat */
+
+void updateInfo (TGAME sq64) { /* */
+   /* met a jour l'objet info a partir de l'objet jeu */
+
+int evaluation (TGAME sq64, register int who) { /* */
+   /* fonction d'evaluation retournant MATE si Ordinateur gagne, */
+   /* -MATE si joueur gagne, 0 si nul,... */
+
+int alphaBeta (TGAME sq64, int turn, int p, int refAlpha, int refBeta) { /* */
+   /* le coeur du programme */
+
+void *fThread (void *arg) { /* */
+   /* association des thread a alphabeta */
+
+int find (TGAME sq64, TGAME bestSq64, int *bestNote, int color) { /* */
+   /* ordinateur joue renvoie le meilleur jeu possible et le nombre de jeux possibles */
+
+void test (TGAME sq64, TLIST list) { /* */
+   /* Pour tests unitaires */
+
+void computerPlay (TGAME sq64) { /* */
+   /* prepare le lancement de la recherche avec find */
+
+void cgi () { /* */
+   /* MODE CGI
+
+int main (int argc, char *argv[]) { /* */
+   /* lit la ligne de commande */
+   /* -i [FENGame] : CLI avec sortie JSON */
+   /* -r [FENGame] : CLI avec sortie raw */
+   /* -t : test unitaire */
+   /* -h : help */
+   /* autrement CGI */
+
+
+Fichier syzygy.c
+----------------
+
+/* inspire de Fathom, adapte par RENE RIGAULT */
+
+static bool parseFEN (struct pos *pos, const char *fen) { /* */
+   /* traduit la chaine fau format FEN en une structure pos */
+
+static void moveToStr (const struct pos *pos, unsigned move, char *str) { /* */
+   /* Convert un deplacement en une chaine str au format algebrique comme  Pe2-e4 */
+
+bool syzygyRR (const char* path, const char *fen, char *bestMove, char *comment) { /* */
+   /* recherche dans la tablebase sygyzy situee dans path le jeu decrit en notation */
+   /* FEN par fen. Renvoie le eplacement dans bestMove */
+   /* le commentaire contient ce deplacement et les valeur WIN WDL DTZ */
+   /* vrai si trouve, faux si erreur */
+
+
+Fichier ChessUtil.c
+-------------------
+
+static int charToInt (int c) { /* */
+   /* traduit la piece au format RNBQR... en nombre entier */
+
+void fenToGame (char *fenComplete, TGAME sq64, char *activeColor) { /* */
+   /* Forsyth–Edwards Notation */
+   /* le jeu est recu sous la forme d'une chaine de cCharacteres du navigateur */
+   /* FENToJeu traduit cette chaine et renvoie l'objet jeu ansi que la couleur */
+   /* 3kq3/8/8/8/8/3K4/+w+-- */
+
+void gameToFen (TGAME sq64, char *fen, int color, char sep, bool complete) { /* */
+   /* Forsyth–Edwards Notation */
+   /* le jeu est envoye sous la forme d'une chaine de cCharacteres au format FEN au navigateur */
+
+void moveGame (TGAME sq64, int color, char *move) { /* */
+   /* modifie jeu avec le deplacement move */
+   /* move en notation algébique Pa2-a4 ou Pa2xc3 */
+   /* non teste pour les blancs. Marche pour les noirs */
+
+bool opening (const char *fileName, char *gameFen, char *sComment, char *move) { /* */
+   /* lit le fichier des ouvertures et produit le jeu final */
+   /* ce fichier est au forma CSV : FENstring ; dep ; commentaire */
+   /* dep contient le deplacement en notation algebrique complete Xe2:e4[Y] | 0-0 | 0-0-0 */
+   /* X : piece joue. Y : promotion,  0-0 : petit roque,  0-0-0 : grand roque */
+   /* nom Ouverture contient le nom trouve */
+   /* renvoie vrai si ouverture trouvee dans le fichier, faux sinon */
+
+char *difference (TGAME sq64_1, TGAME sq64_2, int color, int *prise, char* temp) { /* */
+   /* coul = 1 (ordi) si le joueur a les blancs */
+   /* retrouve le coup joue par Ordi */
+   /* traite le roque. En dehors de ce cas */
+   /* suppose qu'il n' y a deux cases differentes (l1,c1) (l2, c2) */
+   /* renvoie la chaine decrivant la difference */
+   /* qui represente le deplacement au format a1:a1 */
+   /* prise est la valeur de la piece prise. 0 si pas de prise */
+
+void sendGame (TGAME sq64, struct sinfo info, int reqType) { /* */
+   /* envoie le jeu au format JSON */
+
+</pre>
+<h2>Aspects pratiques </h2>
+
+<table>
+   <tbody><tr><th>Fichier pour le client</th><th>Commentaire</th></tr>
+   <tr><td>chess.html</td><td>HTML5</td></tr>
+   <tr><td>chess.css</td><td>css</td></tr>
+   <tr><td>favicon.ico</td><td>icône</td></tr>
+   <tr><td>beep.wav</td><td>son pour retour serveur</td></tr>   
+   </tbody>
+</table>
+
+<h2>Les fonctions Javascript</h2>
+<pre>
+
+/* Forsyth–Edwards Notation */
+function gameToFen (jeu, color)
+  
+/* Forsyth–Edwards Notation */
+function fenToGame (fen, jeu)
+  
+/* verifie que le deplacement choisi est valide */
+/* renvoie ROCKING_GAMER ou vrai ou faux */
+function verification (jeu, l, c, lDest, cDest, who)
+  
+/* verifie que la case choisie par le joueur est valide */
+function choiceIsOK (jeu, l, c, who)
+  
+/* traduit des secondes au format HH:MM:SS */
+function secToHHMMSS(sec)
+  
+/* affiche le chrono joueur */
+function chronoGamer()
+  
+/* met a jour le niveau pour profondeur de la recherche */
+function updateLevel ()
+  
+/* provoque une requete vers le serveur */
+function pass ()
+  
+/* inverse l'affichage */
+function reverseDisplay ()
+  
+/* fait passer du mode normal au mode test */
+function reverseTest ()
+  
+/* va un coup en arrière */
+function back ()
+  
+/* repart un coup en avant */
+function forward ()
+  
+/* met à jour le jeu suite à saisie d'un chaîne FEN */
+function refresh ()
+  
+/* met à jour le jeu suite à saisie d'un chaîne FEN */
+function whoGetWhites ()
+  
+/* retourne false si on arrete le jeu, TRUE si on continue */
+/* affiche un message fonction des codes reçus du serveur */
+function statusAnalysis ()
+  
+/* saisie du deplacement par le joueur sans vérif pour test */
+function test (nom)
+  
+/* saisie du deplacement par le joueur */
+function moveRead (nom)
+  
+/* envoie requete asynchrone XMLHttpRequest au serveur */
+function serverRequest ()
+  
+/* met a jour l'objet info a partir de l'objet jeu */
+function infoUpdate (jeu)
+  
+/* met a jour la page */
+function displayUpdate ()
+  
+/* partie commune dans Display */
+function commonDisplay (l, c)
+  
+/* affiche l echiquier en page HTML */
+function display ()
+  
+/* programme principal */
+function main ()
+  
+</pre> 
+<h2>Codage des pièces</h2>
+<div id = "conteneur">
+<div id="gauche">
+<table>
+   <tbody><tr><th>Pièce Joueur</th><th>Char</th><th>Interne</th><th>Unicode</th></tr>
+   <tr><td>Void</td><td>-</td><td>0</td><td>-</td></tr>
+   <tr><td>Prawn</td><td>p</td><td>-1</td><td>&#x265F;</td></tr>
+   <tr><td>kNight</td><td>n</td><td>-2</td><td>&#x265E;</td></tr>
+   <tr><td>Bishop</td><td>b</td><td>-3</td><td>&#x265D;</td></tr>         
+   <tr><td>Rook</td><td>r</td><td>-4</td><td>&#x265C;</td></tr>      
+   <tr><td>Queen</td><td>q</td><td>-5</td><td>&#x265C;</td></tr>
+   <tr><td>King</td><td>k</td><td>-6</td><td>&#x265A;</td></tr>
+   </tbody>
+</table>
+</div>
+<div id="droite">
+<table>
+   <tbody><tr><th>Pièce Ordi</th><th>Char</th><th>Interne</th><th>Unicode</th></tr>
+   <tr><td>Void</td><td>-</td><td>0</td><td>-</td></tr>
+   <tr><td>Prawn</td><td>P</td><td>1</td><td>&#x265F;</td></tr>
+   <tr><td>kNight</td><td>N</td><td>2</td><td>&#x265E;</td></tr>
+   <tr><td>Bishop</td><td>B</td><td>3</td><td>&#x265D;</td></tr>         
+   <tr><td>Rook</td><td>R</td><td>4</td><td>&#x265C;</td></tr>      
+   <tr><td>Queen</td><td>Q</td><td>5</td><td>&#x265C;</td></tr>
+   <tr><td>King</td><td>K</td><td>6</td><td>&#x265A;</td></tr>
+   </tbody>
+</table>
+</div>
+</div>
+<h2>Codage des case</h2>
+
+Soit une case xn au format a1.
+<p>
+La ligne de la case xn est : n-1
+<p>
+La colonne de la case xn = CodeAscii (x) - CodeAscii ('a').
+<pre>
+a1 : l = 0, c = 0
+a2 : l = 1, c = 0
+...
+h7 : l = 6, c = 7
+h8 : l = 7, c = 7
+</pre>
+<p></p>
+<h2>Format FEN</h2>
+Voir Wikipedia
+<p>
+Un enregistrement FEN définit une position particulière, il est écrit sur une seule ligne en utilisant seulement les caractères ASCII. 
+L'extension du fichier est « .fen ».
+<p>
+Cette notation origine de l'anglais, où les pièces sont nommées rook (tour), knight (cavalier), bishop (fou), queen (dame), king (roi) et pawn (pion).
+<p>
+Chaque rangée est décrite de la rangée 8 à la rangée 1. Dans chaque rangée, 
+le contenu est décrit de la colonne a à la colonne h. 
+Les pièces blanches sont symbolisées par des lettres en majuscules (« KQRBNP »), 
+les noires par des lettres en minuscule (« kqrbnp »). 
+Le nombre de cases vides est noté par un nombre allant de 1 à 8, et une barre oblique « / » sépare les rangées.
+<p>
+« w » signifie que les blancs jouent, alors que « b » signifie que c'est le tour des noirs.
+<p>
+Roque possible : Si aucun des adversaires ne peut roquer, alors inscrire « - ».
+
+<pre>
+rnbqkbnr/pppppppp8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq
+
+Ceci est une figuration des 8 rangées de l'échiquier en commençant par le haut, séparées par des « / » :
+
+les pièces noires (« rnbqkbnr »)
+les pions noirs (« pppppppp »)
+4 rangées vides donc avec le nombre 8 pour 8 cases vides (« 8/8/8/8 »)
+pions blancs (« PPPPPPPP »)
+pièces blanches (« RNBQKBNR »)
+tour aux blancs (« w »)
+roques possibles (« KQkq »)
+</pre>
+
+<h2>Notation algébrique</h2>
+
+Les 8 colonnes sont « numérotées » de gauche à droite par les lettres minuscules allant de a à h et les 8 rangées numérotées de 1 à 8.
+
+Chaque case est alors désignée par l'intersection d'une lettre (pointant une colonne) et d'un chiffre (pointant une rangée). Par exemple, la toute première case en partant du bas, à gauche, se nomme a1. La seconde, en allant de la gauche vers la droite, se nomme alors b1, ainsi de suite. Et la dernière se nomme alors h8 (tout en haut à droite).
+
+Par ce système, on peut ainsi désigner des colonnes (vertical) et des rangées (horizontal). La colonne a comporte alors toutes les cases se trouvant visées par la coordonnée a, à savoir a1, a2, a3, a4, a5, a6, a7 et a8. Et la 4e rangée comporte alors toutes les cases se trouvant visées par la coordonnées 4, à savoir a4, b4, c4, d4, e4, f4, g4 et h4.
+
+Chaque joueur doit avoir à sa droite une case blanche (a8 et h1). C'est le repère généralement utilisé pour vérifier, avant d'entamer la partie, que l'échiquier est bien orienté.
+<p>
+Pour noter le coup d'un joueur, on indique la nature de la pièce (par son code ou rien pour le pion, voir plus haut), 
+les coordonnées de la case de départ, le déplacement (« - ») ou la prise (« x »), 
+les coordonnées de la case d'arrivée et la promotion éventuelle (« =Q », par exemple).
+<pre>
+Pe2-e4 : le pion, en e2 au départ, se déplace en e4 ;
+Pe7-e8C : le pion, en e7 au départ, se déplace en e8 et est promu en cavalier ;
+Nf6xe4 : le cavalier, en f6 au départ, va sur la case e4 en prenant la pièce située sur cette case.
+</pre>
+Le numéro d'ordre des coups est donné pour les Blancs et n'est pas répété pour les Noirs dont le coup s'inscrit à la suite après une seule espace :
+<pre>
+1. Pe2-e4 Ng8-f6
+2. Pd2-d4 Nf6xe4
+</pre>
+
+<h2>Notation algébrique abrégée</h2>
+
+Non utilisée. Pour information.
+<p>
+Lorsque la pièce jouée est un pion, on omet de noter l'initiale de la pièce (P).
+On ne mentionne pas la case de départ de la pièce lorsqu'il n'y a pas d'ambigüité ; en effet dans la majorité des cas, une seule pièce du type indiqué peut se rendre sur la case d'arrivée.
+En cas d'ambiguïté sur la pièce qui se déplace, on marque la lettre de la colonne où se trouve la bonne pièce 
+(exemple : un cavalier blanc en f3, un cavalier blanc en g4. Le cavalier en f3 se déplace en e5. Noter Ne5 est insuffisant, on note alors Nfe5).
+
+S'il y a encore ambiguïté, on remplace la lettre de la colonne par le numéro de la rangée.
+Prenons un cavalier blanc en f3 et un cavalier blanc en f7. Ne5 ou Nfe5 sont tous deux insuffisants pour identifier la pièce ; on doit noter N3e5).
+<pre>
+Exemple :
+
+1. e4 Nf6
+2. d4 Nxe4
+</pre>
+
+</body>
+</html>

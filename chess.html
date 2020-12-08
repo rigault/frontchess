@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang = "fr">
+<head>
+<meta charset='UTF-8' />
+<title>Chess</title>
+   <link rel='icon' type='image/ico' href='favicon.ico' />
+   <link rel="stylesheet" type="text/css" href="chess.css" />
+   <script src="chess.js"></script>
+</head>
+
+<body>
+<header>
+   <div> 
+      Note <input size='8' value = '0' id = "note"/>
+      Eval <input size='8' value = '0' id = "eval" />
+      No coup <input size='4' value = '0' id="noCoup" />
+      <label id = "titre" >Chess</label>
+      <a href="chessdoc.html"> Doc </a> 
+   </div>
+</header>
+
+<div id = 'conteneur'>
+   <div id = 'gauche'>
+      <p>
+      <h2>Joueur</h2>
+      <p>
+      <input size='7' value = '16' id = "nJoueur" /> <label>Pieces</label><p>
+      <input size='7' value = '' id = "dernierJoueur"/> <label>Dernier</label><p>
+      <input size='7' value = '00:00:00' name = 'timePlayer' id = 'timePlayer'> <label>&#x231A;</label><p>
+      <input size='7' value = '00:00:00' id = 'cumulTimePlayer'/> <label>Cumul temps</label><p>
+      <input size='7' value = 'Non' id = "joueurRoque"/> <label>Roque</label><p>
+      <button id = 'piecePrise'>  </button><p>
+      <textarea  readonly="readonly" rows='16' cols='28' id = "historique">
+      </textarea>
+      <input size='50' value = 'FEN Zone' id = "FEN" onchange = "refresh ()"/><p>
+   </div>
+   <div id = 'milieu'>
+   </div>
+   <div id = 'droite'>
+      <p>
+      <h2>Ordinateur</h2>
+      <p>
+      <input size='7' value = '16' id = "nOrdi"/> <label>Pieces</label><p>
+      <input size='7' value = '' id = "computePlay"/> <label>Dernier</label><p>
+      <input size='7' value = '00:00:00' name = 'timeComputer' id = 'timeComputer'> <label>&#x231A;</label><p>
+      <input size='7' value = '00:00:00' id = 'cumulTimeComputer'/> <label>Cumul Temps</label><p>
+      <input size='7' value = 'Non'  id = "ordiRoque"/> <label>Roque</label><p>
+      <button id = 'lastTake'>  </button> <p>
+      <textarea  readonly="readonly" rows='8' cols='22' id = "message">
+      </textarea>
+      <div id = "dump"> Dump Zone </div>
+   </div>
+</div>
+
+<footer>
+   <input type='range' id='niveau' onchange='updateLevel ()' min='-1' max='8' value = '3'>
+   <button name='niveauValeur' id = 'niveauValeur'> 3 </button>
+   <input onclick = 'window.location.reload();' value = 'RAZ'/>
+   <input onclick = 'reverseDisplay();' id = 'sens' value = 'INV'/>
+   <input onclick = 'back();' id = 'back' value = 'BACK'/>
+   <input onclick = 'forward();' id = 'forward' value = 'FWD'/>
+   <input onclick = 'reverseTest ()' id = 'test' value = 'NORM'/>
+   <input onclick = 'pass ()' id = 'pass' value = 'PASSE'/>
+   <input onclick = 'whoGetWhites ()' id = 'whoGetWhites' value = 'WHOGETWHITES'/>
+</footer>
+<script> main ();</script>
+</body>
+
+
+</html>

@@ -1,0 +1,74 @@
+body { 
+   font-family: arial,verdana,sans-serif; 
+   font-size: 15px;
+   color: black;
+   text-align: justify;
+   text-justify: inter-word;
+}
+pre {
+   font-size:12px;
+}
+
+a {
+   color:black;
+   text-decoration: none;
+}
+
+a:hover {
+  background-color: red;
+  color: white;
+}
+
+header {
+   background: black;
+   margin: 0 0 15px 0;
+   padding: 5px;
+   color: white;
+   font-size: 20px;
+}
+
+h1 {
+   color: red;
+   font-weight: bold;
+   font-size: 25px;
+}
+
+h2 {
+   color: black;
+   font-weight: bold;
+   font-size: 20px;
+}
+
+h3 {
+   color: black;
+   font-weight: bold;
+   font-size: 15px;
+}
+
+div#gauche {
+   margin: 0 0 0 10px;
+   float: left;
+   width: 40%;
+}
+
+div#droite {
+   margin: 0 10px 0 10px;
+   float: right;
+   width: 40%;
+}
+
+#conteneur {
+   overflow: hidden;
+}
+
+table {
+   border: 1px solid black;
+   text-align: left;
+   font-size: 10px;
+   color: gray
+}
+
+th {
+   text-align: left;
+}
+
