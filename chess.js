@@ -1,5 +1,6 @@
 /* jshint esversion: 6 */
 /* jshint -W097 */ // don't warn about "use strict"
+
 "use strict";
 const N = 8;
 const VOID = 0, PAWN = 1, KNIGHT = 2, BISHOP = 3, ROOK = 4, QUEEN = 5, KING = 6, CASTLE_KING = 7;
