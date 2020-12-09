@@ -137,6 +137,97 @@ function fenToGame (fen, jeu) {
    return jeu;
 }
 
+/* vrai si le roi situe case l, c est echec au roi */
+/* 'who' est la couleur du roi who est attaque */
+function LCkingInCheck (sq64, who, l, c) {
+   let w, w1, w2, i, j, k;
+
+   // pion menace
+   if (who == -1) {
+      if (l < 7) {
+         if (c < 7 && sq64 [l+1][c+1] == PAWN) return true;
+         if (c > 0 && sq64 [l+1][c-1] == PAWN) return true;
+      }
+   }
+   else { //  who == 1
+      if (l > 0) {
+         if (c < 7 && sq64 [l-1][c+1] == -PAWN) return true;
+         if (c > 0 && sq64 [l-1][c-1] == -PAWN) return true;
+      }
+   } // fin if (who...
+   w1 = -who * KING;
+   w2 = -who * CASTLE_KING;
+   // roi adverse  menace
+   if (l < 7 &&(sq64 [l+1][c] == w1 || sq64 [l+1][c] == w2)) return true;
+   if (l > 0 &&(sq64 [l-1][c] == w1 || sq64 [l-1][c] == w2)) return true;
+   if (c < 7 &&(sq64 [l][c+1] == w1 || sq64 [l][c+1] == w2)) return true;
+   if (c > 0 &&(sq64 [l][c-1] == w1 || sq64 [l][c-1] == w2)) return true;
+   if (l < 7 && c < 7 &&(sq64 [l+1][c+1] == w1 || sq64 [l+1][c+1] == w2)) return true;
+   if (l < 7 && c > 0 &&(sq64 [l+1][c-1] == w1 || sq64 [l+1][c-1] == w2)) return true;
+   if (l > 0 && c < 7 &&(sq64 [l-1][c+1] == w1 || sq64 [l-1][c+1] == w2)) return true;
+   if (l > 0 && c > 0 &&(sq64 [l-1][c-1] == w1 || sq64 [l-1][c-1] == w2)) return true;
+
+   w = -who * KNIGHT;
+   // cavalier menace
+   if (l < 7 && c < 6 && sq64 [l+1][c+2] == w) return true;
+   if (l < 7 && c > 1 && sq64 [l+1][c-2] == w) return true;
+   if (l < 6 && c < 7 && sq64 [l+2][c+1] == w) return true;
+   if (l < 6 && c > 0 && sq64 [l+2][c-1] == w) return true;
+   if (l > 0 && c < 6 && sq64 [l-1][c+2] == w) return true;
+   if (l > 0 && c > 1 && sq64 [l-1][c-2] == w) return true;
+   if (l > 1 && c < 7 && sq64 [l-2][c+1] == w) return true;
+   if (l > 1 && c > 0 && sq64 [l-2][c-1] == w) return true;
+
+   w1 = -who * QUEEN;
+   w2 = -who * ROOK;
+   // tour ou reine menace
+   for (i = l+1; i < N; i++) {
+      w = sq64 [i][c];
+      if (w == w1 || w == w2) return true;
+      if (w != 0) break;
+   }
+   for (i = l-1; i >= 0; i--) {
+      w = sq64 [i][c];
+      if (w == w1 || w == w2) return true;
+      if (w != 0) break;
+   }
+   for (j = c+1; j < N; j++) {
+      w = sq64 [l][j];
+      if (w == w1 || w == w2) return true;
+      if (w != 0) break;
+   }
+   for (j = c-1; j >= 0; j--) {
+      w = sq64 [l][j];
+      if (w == w1 || w == w2) return true;
+      if (w != 0) break;
+   }
+
+   // fou ou reine menace
+   w2 = -who * BISHOP;
+   for (k = 0; k < Math.min (7-l, 7-c); k++) { // vers haut droit
+      w = sq64 [l+k+1][c+k+1];
+      if (w == w1 || w == w2) return true;
+      if (w != 0) break;
+   }
+   for (k = 0; k < Math.min (7-l, c); k++) {// vers haut gauche
+      w = sq64 [l+k+1][c-k-1];
+      if (w == w1 || w == w2) return true;
+      if (w != 0) break;
+   }
+   for (k = 0; k < Math.min (l, 7-c); k++) { // vers bas droit
+      w = sq64 [l-k-1][c+k+1];
+      if (w == w1 || w == w2) return true;
+      if (w != 0) break;
+   }
+   for (k = 0; k < Math.min (l, c); k++) { // vers bas gauche
+      w = sq64 [l-k-1] [c-k-1];
+      if (w == w1 || w == w2) return true;
+      if (w != 0) break;
+   }
+
+   return false;
+}
+
 /* verifie que le deplacement choisi est valide */
 /* renvoie ROCKING_GAMER ou vrai ou faux */
 function verification (jeu, l, c, lDest, cDest, who) {
@@ -145,26 +236,30 @@ function verification (jeu, l, c, lDest, cDest, who) {
    let v = jeu[l][c];
    let w = jeu[lDest][cDest];
 
-   // pour roquer le roi ne doit pas etre en echec (etat = EXIST), il ne doit pas avoir bouge et la tour 
-   // vers lequel il permute ne doit pas avoir bougee
+   // pour roquer le roi ne doit pas etre en echec (etat = EXIST), il ne doit pas avoir bouge et les
+   // cases intemédiaires ne doivet pas etre echec au roi
    if (who == 1 && v == KING && w == ROOK && l == 7 && c == 4 && lDest == 7 && cDest == 1 && 
       jeu[7][3] == 0 && jeu [7][2] == 0 && jeu [7][1] == 0 && 
-      info.leftCastleGamerOK && info.kingStateGamer == kingState.EXIST)
+      info.leftCastleGamerOK && info.kingStateGamer == kingState.EXIST &&
+      ! LCkingInCheck (jeu, who, 7,3) && ! LCkingInCheck (jeu, who, 7,2) && ! LCkingInCheck (jeu, who, 7,1))
       return ROCKING_GAMER;
 
    if (who == 1 && v == KING && w == ROOK && l == 7 && c == 4 && lDest == 7 && cDest == 7 && 
       jeu[7][5] == 0 && jeu [7][6] == 0 && 
-      info.rightCastleGamerOK && info.kingStateGamer == kingState.EXIST) 
+      info.rightCastleGamerOK && info.kingStateGamer == kingState.EXIST &&
+      ! LCkingInCheck (jeu, who, 7, 5) && ! LCkingInCheck (jeu, who, 7, 6))
       return ROCKING_GAMER;
 
    if (who == -1 && v == -KING && w == -ROOK && l == 0 && c == 4 && lDest == 0 && cDest == 0 && 
       jeu[0][3] == 0 && jeu [0][2] == 0 && jeu[0][1] == 0 && 
-      info.leftCastleGamerOK && info.kingStateGamer == kingState.EXIST) 
+      info.leftCastleGamerOK && info.kingStateGamer == kingState.EXIST && 
+      ! LCkingInCheck (jeu, who, 0, 3) && ! LCkingInCheck (jeu, who, 0, 2) && ! LCkingInCheck (jeu, who, 0, 1))
       return ROCKING_GAMER;
    
    if (who == -1 && v == -KING && w == -ROOK && l == 0 && c == 4 && lDest == 0 && cDest == 7 && 
       jeu[0][5] == 0 && jeu [0][6] == 0 && 
-      info.rightCastleGamerOK && info.kingStateGamer == kingState.EXIST)
+      info.rightCastleGamerOK && info.kingStateGamer == kingState.EXIST &&
+      ! LCkingInCheck (jeu, who, 0, 5) && ! LCkingInCheck (jeu, who, 0, 6))
       return ROCKING_GAMER;
    
    if  (v*w > 0) return false;
