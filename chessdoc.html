@@ -60,7 +60,7 @@ Une requête 2 est un sur-ensemble de la requête 1 qui est un sur-ensemble de l
 
 Sauf cas particulier, utiliser la requête 1.
 
-<h3>game </h3>
+<h3>fen </h3>
 
 Le jeu dans les echanges externes (API) est représenté par la notation Forsyth–Edwards Notation (FEN). 
 Le codage est le suivant :
@@ -478,12 +478,21 @@ void sendGame (TGAME sq64, struct sinfo info, int reqType) { /* */
    /* envoie le jeu au format JSON */
 
 </pre>
+
+<h1 id="Client">4. Côté client </h1>
+
+Le front, côté client est composé d'un fichier HTML, un CSS et de fonctions écrites en Javascipt.
+main () est la fonction appelée dans le code HTML.
+
+La javascript contrôle que l'entrée du joueur est valide, envoie le jeu via une requete XMLhttp request au format décrit dans la section API, reçoit la réponse du serveur JSON. Il interprête uniquement l'attribut fen et affiche le jeu.
+
 <h2>Aspects pratiques </h2>
 
 <table>
    <tbody><tr><th>Fichier pour le client</th><th>Commentaire</th></tr>
    <tr><td>chess.html</td><td>HTML5</td></tr>
    <tr><td>chess.css</td><td>css</td></tr>
+   <tr><td>chess.js</td><td>fonctions Javascript</td></tr>
    <tr><td>favicon.ico</td><td>icône</td></tr>
    <tr><td>beep.wav</td><td>son pour retour serveur</td></tr>   
    </tbody>
@@ -608,6 +617,10 @@ h7 : l = 6, c = 7
 h8 : l = 7, c = 7
 </pre>
 <p></p>
+
+
+<h1 id="Annexe">5. Annexe </h1>
+
 <h2>Format FEN</h2>
 Voir Wikipedia
 <p>
