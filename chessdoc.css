@@ -1,12 +1,14 @@
 body { 
-   font-family: arial,verdana,sans-serif; 
+   font-family: arial, verdana, sans-serif; 
    font-size: 15px;
    color: black;
    text-align: justify;
    text-justify: inter-word;
 }
+
 pre {
-   font-size:12px;
+   font-size: 12px;
+   font-family: courier, sans-serif; 
 }
 
 a {
@@ -27,6 +29,14 @@ header {
    font-size: 20px;
 }
 
+nav {
+   background: lightgray;
+}
+
+#main {
+   width: 70%;
+}
+   
 h1 {
    color: red;
    font-weight: bold;

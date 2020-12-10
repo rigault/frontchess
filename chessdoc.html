@@ -11,6 +11,7 @@
 <header>
 Documentation sur le jeu d'echec, René Rigault, 2020
 </header>
+<nav>
 <h1>Sommaire </h1>
 <ol>
 <li><a href="#Introduction"> Introduction </a> </li>
@@ -19,6 +20,8 @@ Documentation sur le jeu d'echec, René Rigault, 2020
 <li><a href="#Client">Côté client</a> </li>
 <li><a href="#Annexe">Annexe</a> </li>
 </ol>
+</nav>
+<div id = "main">
 
 <h1 id="Introduction">1. Introduction </h1>
 Ce jeu d'échec s'exécute sur un serveur. Il est écrit en langage C. Une API est publiée permettant à quiconque de développer la partie cliente indépendemment du serveur.
@@ -28,9 +31,9 @@ Côté client, un ensemble HTML5, CSS et JavaScript est proposé. Son rôle est 
 <h1 id="API">2. API </h1>
 Une API restful est définie et exposée par le serveur.
 La requête est de type GET avec les paramètres apparents dans l'URL.
-La réponse est au format Jason.
+La réponse est au format JSON.
 Le serveur ne gère pas d'état. Il répond aux requêtes sans utiliser d'informations en mémoires.
-La requête un type, la totalité du jeu d'échecs au format ASCII FEN, et un niveau de profondeur de jeu.
+La requête contient un type, la totalité du jeu d'échecs au format ASCII FEN (Forsyth–Edwards Notation, voir Annexe), et un niveau de profondeur de jeu.
 
 <h2>requêtes</h2>
 
@@ -81,9 +84,10 @@ Le codage est le suivant :
 Profondeur de la recherche demandée au serveur.
 <p>
 <h2>Exemple de requête complète</h2>
-<br>
+<pre>
 http://&lt;server name&gt;/cgi-bin/chess.cgi?&amp;reqType=2&amp;level=3&amp;fen=rnbqkbnr/pppp1ppp8/4p3/8/8/PPPPPPPP/RNBQKBNR+b+KQkq
-<p>
+</pre>
+
 Note : les espaces sont remplacés par des "+".
 
 <h2> Réponses</h2>
@@ -621,7 +625,7 @@ h8 : l = 7, c = 7
 
 <h1 id="Annexe">5. Annexe </h1>
 
-<h2>Format FEN</h2>
+<h2>Format FEN : Forsyth–Edwards Notation</h2>
 Voir Wikipedia
 <p>
 Un enregistrement FEN définit une position particulière, il est écrit sur une seule ligne en utilisant seulement les caractères ASCII. 
@@ -694,6 +698,7 @@ Exemple :
 1. e4 Nf6
 2. d4 Nxe4
 </pre>
+<div> <!-- "main"-->
 
 </body>
 </html>

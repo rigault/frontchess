@@ -743,7 +743,10 @@ function commonDisplay (l, c) {
    let istr = String.fromCharCode(97+c) + String.fromCharCode(49+l);
    let v = jeu [l][c];
    let sBut = "<button class = '";
-   sBut += ((c + l) % 2) ? "blanc" : "noir";
+   let lastComputerPos = document.getElementById ('computePlay').value.slice (-2);
+   if (lastComputerPos == istr && v > 0) sBut += "last";
+   else sBut += ((c + l) % 2) ? "blanc" : "noir";
+   
    sBut += (v > 0) ? "Ordi" : ((v < 0) ? "Joueur" : "Vide");
    sBut += "' onclick = 'moveRead (";
    sBut += '"' + istr + '"';
