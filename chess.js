@@ -48,6 +48,7 @@ let gamerCount; // pour chrono Joueur
 let responseServer = {}; // objet JSON
 
 let info = {
+   indicator: false,
    nb: 1,
    level: 3,
    normal: true,             // pour representation "normale" avec blanc joueur en bas. Sinon on inverse. Cf display ()
@@ -549,6 +550,7 @@ function moveRead (nom) {
    let spaces;
    let gamerColor = ((computerColor == "b") ? -1 : 1);
    let elem = document.getElementById (nom);
+   display ();
 
    if ((info.kingStateGamer == kingState.NOEXIST) || (info.kingStateGamer == kingState.IS_MATE)) return;
 
@@ -646,8 +648,9 @@ function serverRequest () {
             spaces = (info.nb < 10) ? "  ": ((info.nb < 100) ? " " : "");
             info.story += (gamerColor == 1) ? info.nb + spaces : "";
             info.story += "   " + responseServer.computePlay;
-            new Audio('beep.wav').play ();
-            info.nb +=1;
+            new Audio ('beep.wav').play ();
+            info.indicator = true;
+            info.nb += 1;
             infoUpdate (jeu);
             displayUpdate ();
             info.lastGamerPlay = '';
@@ -743,10 +746,16 @@ function commonDisplay (l, c) {
    let istr = String.fromCharCode(97+c) + String.fromCharCode(49+l);
    let v = jeu [l][c];
    let sBut = "<button class = '";
-   let lastComputerPos = document.getElementById ('computePlay').value.slice (-2);
-   if (lastComputerPos == istr && v > 0) sBut += "last";
+   let lastComputerPos = document.getElementById ('computePlay').value;
+   if ((lastComputerPos.indexOf("0-0") != -1) && (v > 0) && info.indicator) { // cas du roque
+      info.indicator = false;
+      alert ("Roque !");
+   }
+   if (lastComputerPos.slice (4, 6) == istr && v > 0 && info.indicator) {
+       info.indicator = false;
+       sBut += "last";
+   }
    else sBut += ((c + l) % 2) ? "blanc" : "noir";
-   
    sBut += (v > 0) ? "Ordi" : ((v < 0) ? "Joueur" : "Vide");
    sBut += "' onclick = 'moveRead (";
    sBut += '"' + istr + '"';
