@@ -134,9 +134,44 @@ button {
    font-family: arial, Courier;
 }
 
-.lastOrdi {
-   background-color: yellow;
-   color: black; 
+.lastblancOrdi {
+   color: black;
+   background-color: green;
+}
+
+.lastblancJoueur {
+   color: white;
+   background-color: green;
+}
+
+.lastnoirOrdi {
+   color: black;
+   background-color: green;
+}
+
+.lastnoirJoueur {
+   color: white;
+   background-color: green;
+}
+
+.noirOrdi {
+   background-color: crimson;
+   color: black;
+}
+
+.blancOrdi {
+   background-color: gray;
+   color: black;
+}
+
+.blancJoueur {
+   background-color: gray;
+   color: white;
+}
+
+.noirJoueur {
+   background-color: crimson;
+   color: white;
 }
 
 .noirJoueur:hover, .blancJoueur:hover {
@@ -149,29 +184,9 @@ button {
    color:white;
 }
 
-.noirOrdi {
-   background-color: crimson;
-   color: black;
-}
-
-.noirJoueur {
-   background-color: crimson;
-   color: white;
-}
-
 .noirVide {
    background-color: crimson;
    color: crimson;
-}
-
-.blancOrdi {
-   background-color: gray;
-   color: black;
-}
-
-.blancJoueur {
-   background-color: gray;
-   color: white;
 }
 
 .blancVide {

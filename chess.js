@@ -50,7 +50,7 @@ let responseServer = {}; // objet JSON
 let info = {
    indicator: false,
    nb: 1,
-   level: 3,
+   level: 4,
    normal: true,             // pour representation "normale" avec blanc joueur en bas. Sinon on inverse. Cf display ()
    nGamerPieces: 16,         // nombre de pieces Joueur
    nComputerPieces: 16,      // nombre de pieces Ordi
@@ -747,15 +747,15 @@ function commonDisplay (l, c) {
    let v = jeu [l][c];
    let sBut = "<button class = '";
    let lastComputerPos = document.getElementById ('computePlay').value;
-   if ((lastComputerPos.indexOf("0-0") != -1) && (v > 0) && info.indicator) { // cas du roque
+   if ((lastComputerPos.indexOf ("0-0") != -1) && info.indicator) { // cas du roque
       info.indicator = false;
       alert ("Roque !");
    }
-   if (lastComputerPos.slice (4, 6) == istr && v > 0 && info.indicator) {
+   if ((lastComputerPos.slice (4, 6) == istr) && info.indicator) {
        info.indicator = false;
        sBut += "last";
    }
-   else sBut += ((c + l) % 2) ? "blanc" : "noir";
+   sBut += ((c + l) % 2) ? "blanc" : "noir";
    sBut += (v > 0) ? "Ordi" : ((v < 0) ? "Joueur" : "Vide");
    sBut += "' onclick = 'moveRead (";
    sBut += '"' + istr + '"';

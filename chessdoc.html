@@ -209,8 +209,8 @@ La fonction Alphabeta implémente l’algorithme Minimax avec élagage Alphabeta
 
 <h2>Le CLI Command Line Interface </h2>
 <pre>
-mode CLI sortie JSON : ./chess.cgi -i [&lt;jeuAuFormaFEN&gt;]
-mode CLI sortie raw : ./chess.cgi -r [&lt;jeuAuFormaFEN&gt;]
+mode CLI sortie JSON : ./chess.cgi -i [&lt;jeuAuFormaFEN&gt;] [profondeur]
+mode CLI sortie raw : ./chess.cgi -r [&lt;jeuAuFormaFEN&gt;] [profondeur]
 mode CLI test unitaire : ./chess.cgi -t 
 mode CLI help: ./chess.cgi -h 
 </pre>
@@ -322,8 +322,8 @@ Pour compiler, l'option pthread" est nécessaire pour la gestion multithread.
 Il est possible de lancer chess en mode CLI (Command Line Interface) à partir de la console.
 <br/>
 <pre>
-mode CLI (Interface API): sudo ./chess.cgi -i [&lt;jeuAFormatFEN&gt;]
-mode CLI (Interface Raw): sudo ./chess.cgi -r [&lt;jeuAFormatFEN&gt;]
+mode CLI (Interface API): sudo ./chess.cgi -i [&lt;jeuAFormatFEN&gt;] [profondeur]
+mode CLI (Interface Raw): sudo ./chess.cgi -r [&lt;jeuAFormatFEN&gt;] [profondeur]
 mode test : sudo ./chess -t
 help : sudo ./chess.cgi -h
 </pre>
@@ -356,8 +356,8 @@ Fichier chess.c
 /*   Noirs : 1 (Minuscules) */
 /*   Blancs : -1 (Majuscules) */
 /*   case libre 0 */
-/*   mode CLI API : chess -i [FENgame] */
-/*   mode CLI Raw : chess -r [FENgame] */
+/*   mode CLI API : chess -i [FENgame] [profondeur] */
+/*   mode CLI Raw : chess -r [FENgame] [profondeur] */
 /*   mode CLI Test : chess -t */
 /*   script CGI gérant une API restful (GET) avec les réponses au format JSON */
 /*   fichiers associes : chess.log, chessB.fen, chessW.fen, chessUtil.c, syzygy.c, tbprobes.c tbcore.c et .h associes  */
@@ -376,6 +376,9 @@ bool LCkingInCheck (TGAME sq64, register int who, register int l, register int c
 
 bool fKingInCheck (TGAME sq64, int who) { /* */
    /* retourne vrai si 'who' est en echec */
+
+bool findKing (TGAME refJeu, int who, int *lKing, int *cKing) { /* */
+   /* recherche du roi */
 
 int buildList (TGAME refJeu, register int who, TLIST list) { /* */
    /* construit la liste des jeux possibles a partir de jeu. */
@@ -415,8 +418,8 @@ void cgi () { /* */
 
 int main (int argc, char *argv[]) { /* */
    /* lit la ligne de commande */
-   /* -i [FENGame] : CLI avec sortie JSON */
-   /* -r [FENGame] : CLI avec sortie raw */
+   /* -i [FENGame] [profondeur] : CLI avec sortie JSON */
+   /* -r [FENGame] [profondeur] : CLI avec sortie raw */
    /* -t : test unitaire */
    /* -h : help */
    /* autrement CGI */
@@ -445,6 +448,9 @@ Fichier ChessUtil.c
 
 static int charToInt (int c) { /* */
    /* traduit la piece au format RNBQR... en nombre entier */
+
+void printGame (TGAME jeu) { /* */
+   /* imprime le jeu a la conole pour Debug */
 
 void fenToGame (char *fenComplete, TGAME sq64, char *activeColor) { /* */
    /* Forsyth–Edwards Notation */
