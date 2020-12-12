@@ -99,7 +99,8 @@ Les paires (attribut, valeur) sont les suivantes :
    <tr><td>description</td><td>Chess Rene Rigault 2019</td><td>string</td></tr>
    <tr><td>compilation-date</td><td>Dec  8 2020</td><td>string</td></tr>
    <tr><td>version</td><td>2.0</td><td>string</td></tr>
-   <tr><td>time</td><td>temps en secondes</td><td>int</td></tr>
+   <tr><td>clocktime</td><td>temps utilisation processeur en secondes</td><td>string</td></tr>
+   <tr><td>time</td><td>temps de reponse serveur en secondes</td><td>int</td></tr>
    <tr><td>note</td><td>evaluation du jeu courant</td><td>int</td></tr>         
    <tr><td>eval</td><td>evaluation rendue par le minimax</td><td>int</td></tr> 
    <tr><td>computerStatus</td><td>Etat du roi ordinateur</td><td>int</td></tr>     
@@ -108,6 +109,7 @@ Les paires (attribut, valeur) sont les suivantes :
    <tr><td>lastTake</td><td>dernière prise ordi</td><td>int</td></tr>
    <tr><td>openingName</td><td>Nom de l'ouverture utilisée (si pertinent)</td><td>string</td></tr>
    <tr><td>endName</td><td>Non implemente</td><td>string</td></tr>
+   <tr><td>wdl</td><td>retour win-draw-loss des tables de fin de jeux syzygy</td><td>string</td></tr>
    <tr><td>computePlay</td><td>deplacement ordinateur au format Xa1-b2</td><td>string</td></tr>
    <tr><td>dump</td><td>dump de variables internes au serveur</td><td>string</td></tr>
    </tbody>
@@ -138,6 +140,7 @@ Seuls trois attributs sont présent : description, compilation-date et version.
 "fen : "RNBQKBNR/PPPPPPPP/8/8/8/5n2/pppppppprnbqkb1r+w+KQkq",
 "lastTake" : "0",
 "openingName" : "Default-Coup1",
+"wdl" : "0",
 "endName" : "",
 "computePlay" : "Ng8-f6"
 }
@@ -160,6 +163,7 @@ L'attribut dump est ajouté.
 "lastTake" : "0",
 "openingName" : "Default-Coup1",
 "endName" : "",
+"wdl" : "0",
 "computePlay" : "Ng8-f6"
 "dump" : "maxDepth=4 nEval=2 nLCKingInCheck=19 nBuildList=15 nValidComputerPos=29 nValidPlayerPos=29"
 }
