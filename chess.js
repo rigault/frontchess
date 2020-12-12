@@ -9,7 +9,7 @@ const REQ_TYPE = 2;
 // const MYURL = "http://23.251.143.190/cgi-bin/chess.cgi?";
 // const MYURL = "http://192.168.1.100/cgi-bin/chess.cgi?";
 const MYURL = "http://127.0.0.1/cgi-bin/chess.cgi?";
-
+const EVALTHRESHOLD = 900000;
 // Pawn, kNight, Bishop, Rook, Queen, King, rOckking
 // FEN notation
 // White : minuscules. Black: Majuscules
@@ -50,7 +50,7 @@ let responseServer = {}; // objet JSON
 let info = {
    indicator: false,
    nb: 1,
-   level: 3,
+   level: 4,
    normal: true,             // pour representation "normale" avec blanc joueur en bas. Sinon on inverse. Cf display ()
    nGamerPieces: 16,         // nombre de pieces Joueur
    nComputerPieces: 16,      // nombre de pieces Ordi
@@ -409,7 +409,7 @@ function pass () {
    displayUpdate ();
    display ();
    clearInterval (gamerCount);
-   document.getElementById ('message').value = "Le serveur pense... !\n";
+   document.getElementById ('info').value = "Le serveur pense... !\n";
    document.getElementById ('FEN').value = gameToFen (jeu, computerColor);
    serverRequest ();
 }
@@ -430,6 +430,7 @@ function reverseTest () {
 /* va un coup en arrière */
 function back () {
    if (indexHistory > 0) {
+      document.getElementById ('info').value = '';
       indexHistory -= 1;
       jeu = JSON.parse(historyGame [indexHistory]);
       infoUpdate (jeu);
@@ -467,45 +468,48 @@ function whoGetWhites () {
 }
 
 /* retourne false si on arrete le jeu, TRUE si on continue */
-/* affiche un message fonction des codes reçus du serveur */
+/* affiche un info fonction des codes reçus du serveur */
 function statusAnalysis () {
    switch (parseInt (responseServer.playerStatus)) {
    case kingState.NOEXIST:
-      document.getElementById ('message').value = "Il n'y a pas de roi joueur\n";
+      document.getElementById ('info').value = "Il n'y a pas de roi joueur\n";
       return false;
    case kingState.IS_IN_CHECK:
-      document.getElementById ('message').value = "Tu es echec au Roi !\n";
+      document.getElementById ('info').value = "Tu es echec au Roi !\n";
       break;
    case kingState.UNVALID_IN_CHECK:
-      document.getElementById ('message').value = "Tu es echec au Roi, tu n'as pas le droit, c'est fini !\n";
+      document.getElementById ('info').value = "Tu es echec au Roi, tu n'as pas le droit, c'est fini !\n";
       return false;
    case kingState.IS_MATE:
-      document.getElementById ('message').value = "Tu es MAT, c'est fini !\n";
+      document.getElementById ('info').value = "Tu es MAT, c'est fini !\n";
       return false;
    case kingState.IS_PAT:
-      document.getElementById ('message').value = "Jeu Pat !, c'est fini.\n";
+      document.getElementById ('info').value = "Jeu Pat !, c'est fini.\n";
       return false;
    default: break;
    }
 
    switch (parseInt (responseServer.computerStatus)) {
    case kingState.NOEXIST:
-      document.getElementById ('message').value = "Il n'y a pas de roi Ordi\n";
+      document.getElementById ('info').value = "Il n'y a pas de roi Ordi\n";
       return false;
    case kingState.IS_IN_CHECK:
-      document.getElementById ('message').value = "Je suis echec au Roi !. Bizarre\n";
+      document.getElementById ('info').value = "Je suis echec au Roi !. Bizarre\n";
       return false;
    case kingState.UNVALID_IN_CHECK:
-      document.getElementById ('message').value = "Etat bizarre !\n";
+      document.getElementById ('info').value = "Etat bizarre !\n";
       return false;
    case kingState.IS_MATE:
-      document.getElementById ('message').value = "Je suis MAT, c'est fini !\n";
+      document.getElementById ('info').value = "Je suis MAT, c'est fini !\n";
       return false;
    case kingState.IS_PAT:
-      document.getElementById ('message').value = "Jeu Pat !. C'est fini.\n";
+      document.getElementById ('info').value = "Jeu Pat !. C'est fini.\n";
       return false;
    default: break;
    }
+   let intComputerColor = (computerColor == "b") ? 1 : -1;
+   if (document.getElementById ('eval').value * intComputerColor >= EVALTHRESHOLD)
+      document.getElementById ('info').value += "Je vais gagner, c'est certain !.\n";
    return true;
 }
 
@@ -618,7 +622,7 @@ function moveRead (nom) {
          displayUpdate ();
          display ();
          clearInterval (gamerCount);
-         document.getElementById ('message').value = "Le serveur pense... !\n";
+         document.getElementById ('info').value = "Le serveur pense... !\n";
          document.getElementById ('FEN').value = gameToFen (jeu, computerColor);
          serverRequest ();
       }
@@ -648,6 +652,7 @@ function serverRequest () {
             info.story += (gamerColor == 1) ? info.nb + spaces : "";
             info.story += "   " + responseServer.computePlay;
             new Audio ('beep.wav').play ();
+            document.getElementById ('info').value = "A toi de jouer\n";
             info.indicator = true;
             info.nb += 1;
             infoUpdate (jeu);
@@ -704,8 +709,9 @@ function displayUpdate () {
       document.getElementById ('dump').innerHTML = responseServer.dump;
    if (responseServer.note != null)
       document.getElementById ('note').value = parseInt (responseServer.note);
-   if (responseServer.eval != null)
+   if (responseServer.eval != null) {
       document.getElementById ('eval').value = parseInt (responseServer.eval);
+   }
    if (responseServer.computePlay != null)
       document.getElementById ('computePlay').value = responseServer.computePlay;
    if (responseServer.openingName != null)

@@ -81,9 +81,16 @@ div#FEN {
 }
 
 #droite textarea {
+   color: gray;
+   margin: 5px 0 0 0;
+}
+
+footer textarea {
    color: red;
+   font-size: 25px;
    font-weight: bold;
    margin: 5px 0 0 0;
+   text-align: center;
 }
 
 #niveauValeur {
@@ -111,6 +118,11 @@ input[type=range] {
    background: transparent;
    border-color: transparent;
    /* color: transparent;*/
+}
+
+footer {
+   margin-left: auto;
+   margin-right: auto;
 }
 
 footer input {
