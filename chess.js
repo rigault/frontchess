@@ -50,7 +50,7 @@ let responseServer = {}; // objet JSON
 let info = {
    indicator: false,
    nb: 1,
-   level: 4,
+   level: 3,
    normal: true,             // pour representation "normale" avec blanc joueur en bas. Sinon on inverse. Cf display ()
    nGamerPieces: 16,         // nombre de pieces Joueur
    nComputerPieces: 16,      // nombre de pieces Ordi
@@ -242,25 +242,25 @@ function verification (jeu, l, c, lDest, cDest, who) {
    if (who == 1 && v == KING && w == ROOK && l == 7 && c == 4 && lDest == 7 && cDest == 1 && 
       jeu[7][3] == 0 && jeu [7][2] == 0 && jeu [7][1] == 0 && 
       info.leftCastleGamerOK && info.kingStateGamer == kingState.EXIST &&
-      ! LCkingInCheck (jeu, who, 7,3) && ! LCkingInCheck (jeu, who, 7,2) && ! LCkingInCheck (jeu, who, 7,1))
+      ! LCkingInCheck (jeu, who, 7,4) && ! LCkingInCheck (jeu, who, 7,3) && ! LCkingInCheck (jeu, who, 7,2))
       return ROCKING_GAMER;
 
    if (who == 1 && v == KING && w == ROOK && l == 7 && c == 4 && lDest == 7 && cDest == 7 && 
       jeu[7][5] == 0 && jeu [7][6] == 0 && 
       info.rightCastleGamerOK && info.kingStateGamer == kingState.EXIST &&
-      ! LCkingInCheck (jeu, who, 7, 5) && ! LCkingInCheck (jeu, who, 7, 6))
+      ! LCkingInCheck (jeu, who, 7, 4) && ! LCkingInCheck (jeu, who, 7, 5) && ! LCkingInCheck (jeu, who, 7,4))
       return ROCKING_GAMER;
 
    if (who == -1 && v == -KING && w == -ROOK && l == 0 && c == 4 && lDest == 0 && cDest == 0 && 
       jeu[0][3] == 0 && jeu [0][2] == 0 && jeu[0][1] == 0 && 
       info.leftCastleGamerOK && info.kingStateGamer == kingState.EXIST && 
-      ! LCkingInCheck (jeu, who, 0, 3) && ! LCkingInCheck (jeu, who, 0, 2) && ! LCkingInCheck (jeu, who, 0, 1))
+      ! LCkingInCheck (jeu, who, 0, 4) && ! LCkingInCheck (jeu, who, 0, 3) && ! LCkingInCheck (jeu, who, 0, 2))
       return ROCKING_GAMER;
    
    if (who == -1 && v == -KING && w == -ROOK && l == 0 && c == 4 && lDest == 0 && cDest == 7 && 
       jeu[0][5] == 0 && jeu [0][6] == 0 && 
       info.rightCastleGamerOK && info.kingStateGamer == kingState.EXIST &&
-      ! LCkingInCheck (jeu, who, 0, 5) && ! LCkingInCheck (jeu, who, 0, 6))
+      ! LCkingInCheck (jeu, who, 0, 4) && ! LCkingInCheck (jeu, who, 0, 5) && ! LCkingInCheck (jeu, who, 0,6))
       return ROCKING_GAMER;
    
    if  (v*w > 0) return false;
@@ -550,7 +550,6 @@ function moveRead (nom) {
    let spaces;
    let gamerColor = ((computerColor == "b") ? -1 : 1);
    let elem = document.getElementById (nom);
-   display ();
 
    if ((info.kingStateGamer == kingState.NOEXIST) || (info.kingStateGamer == kingState.IS_MATE)) return;
 
