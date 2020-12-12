@@ -35,7 +35,7 @@ let jeu = [
    [1,1,1,1,1,1,1,1],
    [4,2,3,5,6,3,2,4]
    ];
-// let jeu = [[0,0,0,0,-6,0,0,0],[0,0,-5,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,1,0,0],[0,0,0,0,6,0,0,4]];
+//let jeu = [[0,0,0,0,-6,0,0,0],[0,0,-5,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,1,0,0],[0,0,0,0,6,0,0,4]];
 // let jeu = [[0,-2,0,0,-6,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,-1,0,0,1,0,0,0],[0,0,0,0,6,0,0,4]];
 let historyGame = [JSON.stringify(jeu)];
 let indexHistory = 0;
@@ -248,7 +248,7 @@ function verification (jeu, l, c, lDest, cDest, who) {
    if (who == 1 && v == KING && w == ROOK && l == 7 && c == 4 && lDest == 7 && cDest == 7 && 
       jeu[7][5] == 0 && jeu [7][6] == 0 && 
       info.rightCastleGamerOK && info.kingStateGamer == kingState.EXIST &&
-      ! LCkingInCheck (jeu, who, 7, 4) && ! LCkingInCheck (jeu, who, 7, 5) && ! LCkingInCheck (jeu, who, 7,4))
+      ! LCkingInCheck (jeu, who, 7, 4) && ! LCkingInCheck (jeu, who, 7, 5) && ! LCkingInCheck (jeu, who, 7,6))
       return ROCKING_GAMER;
 
    if (who == -1 && v == -KING && w == -ROOK && l == 0 && c == 4 && lDest == 0 && cDest == 0 && 
@@ -508,8 +508,10 @@ function statusAnalysis () {
    default: break;
    }
    let intComputerColor = (computerColor == "b") ? 1 : -1;
-   if (document.getElementById ('eval').value * intComputerColor >= EVALTHRESHOLD)
-      document.getElementById ('info').value += "Je vais gagner, c'est certain !.\n";
+   if ((parseInt (responseServer.eval) * intComputerColor >= EVALTHRESHOLD) ||
+       (parseInt (responseServer.wdl) == 4 && intComputerColor == 1) ||
+       (parseInt (responseServer.wdl) == 0 && intComputerColor == -1))
+      document.getElementById ('info').value += "Je vais gagner, c'est certain !\n";
    return true;
 }
 
@@ -569,6 +571,11 @@ function moveRead (nom) {
    else {                                                        // saisie de la case destination
       lDest = parseInt (nom [1]) - 1;
       cDest =  nom.charCodeAt(0) - 'a'.charCodeAt(0);
+      if (lSource == lDest && cSource == cDest) {                //+ on annule tout
+         info.lastGamerPlay = '';
+         display ();
+         return;
+      }
       res = verification(jeu, lSource, cSource, lDest, cDest, gamerColor);
       if (Math.abs(jeu [lSource][cSource]) == KING) 
          info.leftCastleGamerOK = info.rightCastleGamerOK = false;
