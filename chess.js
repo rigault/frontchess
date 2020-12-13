@@ -557,7 +557,8 @@ function moveRead (nom) {
    let gamerColor = ((computerColor == "b") ? -1 : 1);
    let elem = document.getElementById (nom);
 
-   if ((info.kingStateGamer == kingState.NOEXIST) || (info.kingStateGamer == kingState.IS_MATE)) return;
+   if ((info.kingStateGamer == kingState.NOEXIST) || (info.kingStateGamer == kingState.IS_MATE))
+      return;
 
    if (info.lastGamerPlay == '') {                               // saisie de la case source
       lSource = parseInt (nom [1]) - 1;
@@ -567,72 +568,73 @@ function moveRead (nom) {
          elem.style.background = 'olive';
          elem.style.color = 'white';
       }
+      return;
    }
-   else {                                                        // saisie de la case destination
-      lDest = parseInt (nom [1]) - 1;
-      cDest =  nom.charCodeAt(0) - 'a'.charCodeAt(0);
-      if (lSource == lDest && cSource == cDest) {                //+ on annule tout
-         info.lastGamerPlay = '';
-         display ();
-         return;
-      }
-      res = verification(jeu, lSource, cSource, lDest, cDest, gamerColor);
-      if (Math.abs(jeu [lSource][cSource]) == KING) 
-         info.leftCastleGamerOK = info.rightCastleGamerOK = false;
-	   
-      if (Math.abs(jeu [lDest][cDest]) == ROOK) {
-         if (cDest == 7) info.rightCastleGamerOK = false;
-         else if (cDest == 0) info.leftCastleGamerOK = false;
-      }
-      if (res == ROCKING_GAMER) {
-         spaces = (info.nb < 10) ? "  ": ((info.nb < 100) ? " " : "");
-         info.rightCastleGamerOK = info.leftCastleGamerOK = false;
-         if (cDest == 0) {           // grand Roque
-            jeu [lSource][0] = 0;
-            jeu [lSource][2] = -CASTLE_KING;
-            jeu [lSource][3] = -ROOK;
-            jeu [lSource][4] = 0;
-            info.lastGamerPlay = "0-0-0";
-            info.story += "\n" + info.nb + spaces + "    0-0-0";
-         }
-         else if (cDest == 7) {       //petit Roque
-            jeu [lSource][4] = 0;
-            jeu [lSource][5] = -ROOK;
-            jeu [lSource][6] = -CASTLE_KING;
-            jeu [lSource][7] = 0;
-            info.lastGamerPlay = "0-0";
-            info.story += "\n" + info.nb + spaces + "      0-0";
-         }
-      }
-      else if (res == true) {
-         v = Math.abs (jeu [lDest][cDest]);
-         info.lastTakenByGamer = (v != 0)? unicode [v]: '';  // prise de piece
-         prise = (v != 0)? 'x' : '-';
-         v = Math.abs(jeu [lSource][cSource]);
-         carPiece = dict [v];
-         info.lastGamerPlay = carPiece + info.lastGamerPlay + prise + nom; // source + destination
-         if ((info.story != '') && (gamerColor == -1)) info.story += '\n';
-         spaces = (info.nb < 10) ? "  ": ((info.nb < 100) ? " " : "");
-         if (gamerColor == -1) info.story += info.nb + spaces + "   " + info.lastGamerPlay;
-         else info.story += "   " + info.lastGamerPlay;
 
-         if (((jeu [lSource][cSource] == -PAWN) && (lDest == 7)) || 
-            ((jeu [lSource][cSource] == PAWN) && (lDest == 0)))  {
-            jeu [lDest][cDest] = gamerColor * QUEEN; // promotion
-            info.story += "=Q";
-         }
-         else jeu [lDest][cDest] = jeu [lSource][cSource];
-         jeu [lSource][cSource] = 0;
+   lDest = parseInt (nom [1]) - 1;
+   cDest =  nom.charCodeAt(0) - 'a'.charCodeAt(0);
+   if (lSource == lDest && cSource == cDest) {                //+ on annule tout
+      info.lastGamerPlay = '';
+      display ();
+      return;
+   }
+
+   res = verification(jeu, lSource, cSource, lDest, cDest, gamerColor);
+   if (Math.abs(jeu [lSource][cSource]) == KING) 
+      info.leftCastleGamerOK = info.rightCastleGamerOK = false;
+	   
+   if (Math.abs(jeu [lDest][cDest]) == ROOK) {
+      if (cDest == 7) info.rightCastleGamerOK = false;
+      else if (cDest == 0) info.leftCastleGamerOK = false;
+   }
+   if (res == ROCKING_GAMER) {
+      spaces = (info.nb < 10) ? "  ": ((info.nb < 100) ? " " : "");
+      info.rightCastleGamerOK = info.leftCastleGamerOK = false;
+      if (cDest == 0) {           // grand Roque
+         jeu [lSource][0] = 0;
+         jeu [lSource][2] = -CASTLE_KING;
+         jeu [lSource][3] = -ROOK;
+         jeu [lSource][4] = 0;
+         info.lastGamerPlay = "0-0-0";
+         info.story += "\n" + info.nb + spaces + "    0-0-0";
       }
-      if (res == ROCKING_GAMER || res == true) {
-         infoUpdate (jeu);
-         displayUpdate ();
-         display ();
-         clearInterval (gamerCount);
-         document.getElementById ('info').value = "Le serveur pense... !\n";
-         document.getElementById ('FEN').value = gameToFen (jeu, computerColor);
-         serverRequest ();
+      else if (cDest == 7) {       //petit Roque
+         jeu [lSource][4] = 0;
+         jeu [lSource][5] = -ROOK;
+         jeu [lSource][6] = -CASTLE_KING;
+         jeu [lSource][7] = 0;
+         info.lastGamerPlay = "0-0";
+         info.story += "\n" + info.nb + spaces + "      0-0";
       }
+   }
+   else if (res == true) {
+      v = Math.abs (jeu [lDest][cDest]);
+      info.lastTakenByGamer = (v != 0)? unicode [v]: '';  // prise de piece
+      prise = (v != 0)? 'x' : '-';
+      v = Math.abs(jeu [lSource][cSource]);
+      carPiece = dict [v];
+      info.lastGamerPlay = carPiece + info.lastGamerPlay + prise + nom; // source + destination
+      if ((info.story != '') && (gamerColor == -1)) info.story += '\n';
+      spaces = (info.nb < 10) ? "  ": ((info.nb < 100) ? " " : "");
+      if (gamerColor == -1) info.story += info.nb + spaces + "   " + info.lastGamerPlay;
+      else info.story += "   " + info.lastGamerPlay;
+
+      if (((jeu [lSource][cSource] == -PAWN) && (lDest == 7)) || 
+         ((jeu [lSource][cSource] == PAWN) && (lDest == 0)))  {
+         jeu [lDest][cDest] = gamerColor * QUEEN; // promotion
+         info.story += "=Q";
+      }
+      else jeu [lDest][cDest] = jeu [lSource][cSource];
+      jeu [lSource][cSource] = 0;
+   }
+   if (res == ROCKING_GAMER || res == true) {
+      infoUpdate (jeu);
+      displayUpdate ();
+      display ();
+      clearInterval (gamerCount);
+      document.getElementById ('info').value = "Le serveur pense... !\n";
+      document.getElementById ('FEN').value = gameToFen (jeu, computerColor);
+      serverRequest ();
    }
 }
 
@@ -708,7 +710,6 @@ function infoUpdate (jeu) {
 
 /* met a jour la page */
 function displayUpdate () {
-   let v = 0;
    // info.noJoueur = info.noOrdi = 0;
    if (responseServer.gameFEN != null)
       document.getElementById ('FEN').value = responseServer.gameFEN;
@@ -726,10 +727,8 @@ function displayUpdate () {
    if (responseServer.endName != null && responseServer.endName != '')
       document.getElementById ('message').value = responseServer.endName;
 
-   if (responseServer.lastTake != null && responseServer.lastTake != '' && responseServer.lastTake != '0') {
-      v = parseInt (responseServer.lastTake);
-      info.lastTake = unicode [Math.abs(v)];
-   }
+   if (responseServer.lastTake != null && responseServer.lastTake != '' && responseServer.lastTake != ' ') 
+      info.lastTake = unicode [translate [responseServer.lastTake]];
    else info.lastTake = '';
 
    document.getElementById ('lastTake').innerHTML += info.lastTake;
