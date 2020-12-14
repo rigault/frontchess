@@ -6,24 +6,26 @@ const N = 8;
 const VOID = 0, PAWN = 1, KNIGHT = 2, BISHOP = 3, ROOK = 4, QUEEN = 5, KING = 6, CASTLE_KING = 7;
 const ROCKING_GAMER = 9999; // signale que le joueur tente le roque
 const REQ_TYPE = 2;
+
 // const MYURL = "http://23.251.143.190/cgi-bin/chess.cgi?";
 // const MYURL = "http://192.168.1.100/cgi-bin/chess.cgi?";
 const MYURL = "http://127.0.0.1/cgi-bin/chess.cgi?";
+
 const EVALTHRESHOLD = 900000;
 // Pawn, kNight, Bishop, Rook, Queen, King, rOckking
 // FEN notation
 // White : minuscules. Black: Majuscules
 // Le roi qui roque est code 7. Si non 6.
-const dict = ['-', 'P', 'N', 'B', 'R', 'Q', 'K', 'K' ];
+const DICT = ['-', 'P', 'N', 'B', 'R', 'Q', 'K', 'K' ];
 
-const translate = {"-": 0, "P":PAWN, "N": KNIGHT, "B": BISHOP, "R":ROOK, "Q":QUEEN, "K": KING};
+const TRANSLATE = {"-": 0, "P":PAWN, "N": KNIGHT, "B": BISHOP, "R":ROOK, "Q":QUEEN, "K": KING};
 
 // representation HTML des pieces Ordi dans l'ordre  VOID ... CASTLE_KING
-// const unicode = ["-", "&#x265F", "&#x265E", "&#x265D", "&#x265C", "&#x265B", "&#x265A", "&#x265A"];
-// const unicode = ["-", " &#x2659", "&#x2658", "&#x2657", "&#x2656", "&#x2655", "&#x2654", "&#x2654"];
-const unicode = ["-", " &#x265F", "&#x2658", "&#x2657", "&#x2656", "&#x2655", "&#x2654", "&#x2654"];
+// const UNICODE = ["-", "&#x265F", "&#x265E", "&#x265D", "&#x265C", "&#x265B", "&#x265A", "&#x265A"];
+// const UNICODE = ["-", " &#x2659", "&#x2658", "&#x2657", "&#x2656", "&#x2655", "&#x2654", "&#x2654"];
+const UNICODE = ["-", " &#x265F", "&#x2658", "&#x2657", "&#x2656", "&#x2655", "&#x2654", "&#x2654"];
 
-const kingState = {NOEXIST:0, EXIST:1, IS_IN_CHECK:2, UNVALID_IN_CHECK:3, IS_MATE:4, IS_PAT:5};
+const KINGSTATE = {NOEXIST:0, EXIST:1, IS_IN_CHECK:2, UNVALID_IN_CHECK:3, IS_MATE:4, IS_PAT:5};
 
 let jeu = [
    [-4,-2,-3,-5,-6,-3,-2,-4],
@@ -79,15 +81,15 @@ let lSource, cSource;
 function gameToFen (jeu, color) {
    let n, v;
    let sFen = "";
-   let bCastleB = false;
-   let bCastleW = false;
+   let bCastleB = (computerColor == 'w' && (! info.leftCastleGamerOK || ! info.rightCastleGamerOK)); // gamer a les noirs
+   let bCastleW = (computerColor == 'b' && (! info.leftCastleGamerOK || ! info.rightCastleGamerOK)); // gamer a les blancs
    for (let l = N-1; l >= 0; l -= 1) {
       for (let c = 0; c < N; c += 1) {
          v = jeu [l][c];
          if (v != VOID) {
             if (v == CASTLE_KING) bCastleB = true;
             if (v == -CASTLE_KING) bCastleW = true;
-            sFen += ((v >= 0)? dict [v].toLowerCase () : dict [-v]);
+            sFen += ((v >= 0)? DICT [v].toLowerCase () : DICT [-v]);
          }
          else {
             for (n = 0; (c+n < N) && (jeu [l][c+n] == VOID); n += 1);
@@ -108,11 +110,15 @@ function fenToGame (fen, jeu) {
    let l = 7;
    let c = 0;
    let cChar;
-   let list = fen.split ("+");
+   let fenNorm = fen.replaceAll (' ', '+');   
+   let list = fenNorm.split ("+");
    let sFen = list [0];
-   let bCastleW =  (list [2][0] == '-') ;
-   let bCastleB = (bCastleW ? (list [2][1] == '-') : (list [2][2] == '-'));
-   
+   let bCastleW = false;
+   let bCastleB = false; 
+   if (list [2] != null) {
+      bCastleW =  (list [2][0] == '-') ;
+      bCastleB = (bCastleW ? (list [2][1] == '-') : (list [2][2] == '-'));
+   }
    for (let i = 0; i < sFen.length ; i += 1) {
       cChar = sFen [i];
       if (cChar == ' ' || cChar == '\t' || cChar == '\n') break;
@@ -125,7 +131,7 @@ function fenToGame (fen, jeu) {
       }
       else {
          sign = ((cChar == cChar.toUpperCase())? -1 : 1);
-         jeu [l][c] = sign * translate [cChar.toUpperCase()];
+         jeu [l][c] = sign * TRANSLATE [cChar.toUpperCase()];
          if ((cChar == 'K') && (bCastleW)) jeu [l][c] = -CASTLE_KING; // roi blanc a deja roque
          if ((cChar == 'k') && (bCastleB)) jeu [l][c] = CASTLE_KING; // roi noir a deja roque
          c += 1;
@@ -241,25 +247,25 @@ function verification (jeu, l, c, lDest, cDest, who) {
    // cases intemédiaires ne doivet pas etre echec au roi
    if (who == 1 && v == KING && w == ROOK && l == 7 && c == 4 && lDest == 7 && cDest == 1 && 
       jeu[7][3] == 0 && jeu [7][2] == 0 && jeu [7][1] == 0 && 
-      info.leftCastleGamerOK && info.kingStateGamer == kingState.EXIST &&
+      info.leftCastleGamerOK && info.kingStateGamer == KINGSTATE.EXIST &&
       ! LCkingInCheck (jeu, who, 7,4) && ! LCkingInCheck (jeu, who, 7,3) && ! LCkingInCheck (jeu, who, 7,2))
       return ROCKING_GAMER;
 
    if (who == 1 && v == KING && w == ROOK && l == 7 && c == 4 && lDest == 7 && cDest == 7 && 
       jeu[7][5] == 0 && jeu [7][6] == 0 && 
-      info.rightCastleGamerOK && info.kingStateGamer == kingState.EXIST &&
+      info.rightCastleGamerOK && info.kingStateGamer == KINGSTATE.EXIST &&
       ! LCkingInCheck (jeu, who, 7, 4) && ! LCkingInCheck (jeu, who, 7, 5) && ! LCkingInCheck (jeu, who, 7,6))
       return ROCKING_GAMER;
 
    if (who == -1 && v == -KING && w == -ROOK && l == 0 && c == 4 && lDest == 0 && cDest == 0 && 
       jeu[0][3] == 0 && jeu [0][2] == 0 && jeu[0][1] == 0 && 
-      info.leftCastleGamerOK && info.kingStateGamer == kingState.EXIST && 
+      info.leftCastleGamerOK && info.kingStateGamer == KINGSTATE.EXIST && 
       ! LCkingInCheck (jeu, who, 0, 4) && ! LCkingInCheck (jeu, who, 0, 3) && ! LCkingInCheck (jeu, who, 0, 2))
       return ROCKING_GAMER;
    
    if (who == -1 && v == -KING && w == -ROOK && l == 0 && c == 4 && lDest == 0 && cDest == 7 && 
       jeu[0][5] == 0 && jeu [0][6] == 0 && 
-      info.rightCastleGamerOK && info.kingStateGamer == kingState.EXIST &&
+      info.rightCastleGamerOK && info.kingStateGamer == KINGSTATE.EXIST &&
       ! LCkingInCheck (jeu, who, 0, 4) && ! LCkingInCheck (jeu, who, 0, 5) && ! LCkingInCheck (jeu, who, 0,6))
       return ROCKING_GAMER;
    
@@ -470,47 +476,36 @@ function whoGetWhites () {
 /* retourne false si on arrete le jeu, TRUE si on continue */
 /* affiche un info fonction des codes reçus du serveur */
 function statusAnalysis () {
-   switch (parseInt (responseServer.playerStatus)) {
-   case kingState.NOEXIST:
-      document.getElementById ('info').value = "Il n'y a pas de roi joueur\n";
-      return false;
-   case kingState.IS_IN_CHECK:
-      document.getElementById ('info').value = "Tu es echec au Roi !\n";
-      break;
-   case kingState.UNVALID_IN_CHECK:
-      document.getElementById ('info').value = "Tu es echec au Roi, tu n'as pas le droit, c'est fini !\n";
-      return false;
-   case kingState.IS_MATE:
-      document.getElementById ('info').value = "Tu es MAT, c'est fini !\n";
-      return false;
-   case kingState.IS_PAT:
-      document.getElementById ('info').value = "Jeu Pat !, c'est fini.\n";
-      return false;
-   default: break;
-   }
+   // NO_EXIT = 0, EXIST = 1, IS_IN_CHECK = 2, UNVALID_IN_CHECK = 3, IS_MATE = 4, IS_PAT = 5;
+   const stateMessagePlayer = [
+      "Il n'y a pas de roi joueur\n", 
+      "", 
+      "Tu es echec au Roi !\n" , 
+      "Tu es echec au Roi, tu n'as pas le droit, c'est fini !\n", 
+      "Tu es MAT, c'est fini !\n", 
+      "Jeu Pat !, c'est fini.\n" 
+   ];
+   const stateMessageComputer = [
+      "Il n'y a pas de roi Ordi\n", 
+      "", 
+      "Je suis echec au Roi !. Bizarre\n", 
+      "Etat bizarre !\n", 
+      "Je suis MAT, c'est fini !\n", 
+      "Jeu Pat !, c'est fini.\n" 
+   ];
+   let r = parseInt (responseServer.playerStatus);
+   document.getElementById ('info').value = stateMessagePlayer [r]; 
 
-   switch (parseInt (responseServer.computerStatus)) {
-   case kingState.NOEXIST:
-      document.getElementById ('info').value = "Il n'y a pas de roi Ordi\n";
-      return false;
-   case kingState.IS_IN_CHECK:
-      document.getElementById ('info').value = "Je suis echec au Roi !. Bizarre\n";
-      return false;
-   case kingState.UNVALID_IN_CHECK:
-      document.getElementById ('info').value = "Etat bizarre !\n";
-      return false;
-   case kingState.IS_MATE:
-      document.getElementById ('info').value = "Je suis MAT, c'est fini !\n";
-      return false;
-   case kingState.IS_PAT:
-      document.getElementById ('info').value = "Jeu Pat !. C'est fini.\n";
-      return false;
-   default: break;
-   }
+   if (r != KINGSTATE.EXIST && r != KINGSTATE.IS_IN_CHECK) return false;
+   
+   r = parseInt (responseServer.computerStatus);
+   document.getElementById ('info').value += stateMessagePlayer [r]; 
+   if (r != KINGSTATE.EXIST) return false;
+
    let intComputerColor = (computerColor == "b") ? 1 : -1;
    if ((parseInt (responseServer.eval) * intComputerColor >= EVALTHRESHOLD) ||
-       (parseInt (responseServer.wdl) == 4 && intComputerColor == 1) ||
-       (parseInt (responseServer.wdl) == 0 && intComputerColor == -1))
+      (parseInt (responseServer.wdl) == 4 && intComputerColor == 1) ||
+      (parseInt (responseServer.wdl) == 0 && intComputerColor == -1))
       document.getElementById ('info').value += "Je vais gagner, c'est certain !\n";
    return true;
 }
@@ -557,7 +552,7 @@ function moveRead (nom) {
    let gamerColor = ((computerColor == "b") ? -1 : 1);
    let elem = document.getElementById (nom);
 
-   if ((info.kingStateGamer == kingState.NOEXIST) || (info.kingStateGamer == kingState.IS_MATE))
+   if ((info.kingStateGamer == KINGSTATE.NOEXIST) || (info.kingStateGamer == KINGSTATE.IS_MATE))
       return;
 
    if (info.lastGamerPlay == '') {                               // saisie de la case source
@@ -609,10 +604,10 @@ function moveRead (nom) {
    }
    else if (res == true) {
       v = Math.abs (jeu [lDest][cDest]);
-      info.lastTakenByGamer = (v != 0)? unicode [v]: '';  // prise de piece
+      info.lastTakenByGamer = (v != 0)? UNICODE [v]: '';  // prise de piece
       prise = (v != 0)? 'x' : '-';
       v = Math.abs(jeu [lSource][cSource]);
-      carPiece = dict [v];
+      carPiece = DICT [v];
       info.lastGamerPlay = carPiece + info.lastGamerPlay + prise + nom; // source + destination
       if ((info.story != '') && (gamerColor == -1)) info.story += '\n';
       spaces = (info.nb < 10) ? "  ": ((info.nb < 100) ? " " : "");
@@ -684,7 +679,7 @@ function serverRequest () {
 /* met a jour l'objet info a partir de l'objet jeu */
 function infoUpdate (jeu) {
    let v;
-   info.kingStateGamer = info.kingStateComputer = kingState.NOEXIST;
+   info.kingStateGamer = info.kingStateComputer = KINGSTATE.NOEXIST;
    info.castleComputer = info.castleGamer = "Non";
    info.nGamerPieces = info.nComputerPieces = 0;
    for (let l = 0; l < N; l += 1) {
@@ -695,13 +690,13 @@ function infoUpdate (jeu) {
          if (v == KING || v == CASTLE_KING) {
             info.lComputerKing = l;
             info.cComputerKing = c;
-            info.kingStateComputer = kingState.EXIST;
+            info.kingStateComputer = KINGSTATE.EXIST;
          }
          if (v == CASTLE_KING) info.castleComputer = "Oui";
          if (v == -KING || v == -CASTLE_KING) {
             info.lGamerKing = l;
             info.cGamerKing = c;
-            info.kingStateGamer = kingState.EXIST;
+            info.kingStateGamer = KINGSTATE.EXIST;
          }
          if (v == -CASTLE_KING) info.castleGamer = "Oui";
       }
@@ -728,7 +723,7 @@ function displayUpdate () {
       document.getElementById ('message').value = responseServer.endName;
 
    if (responseServer.lastTake != null && responseServer.lastTake != '' && responseServer.lastTake != ' ') 
-      info.lastTake = unicode [translate [responseServer.lastTake]];
+      info.lastTake = UNICODE [TRANSLATE [responseServer.lastTake]];
    else info.lastTake = '';
 
    document.getElementById ('lastTake').innerHTML += info.lastTake;
@@ -772,7 +767,7 @@ function commonDisplay (l, c) {
    sBut += '"' + istr + '"';
    sBut += ")' ";
    sBut += 'id = ' + istr + '>';
-   sBut += (v > 0) ? unicode [v] : unicode [-v];
+   sBut += (v > 0) ? UNICODE [v] : UNICODE [-v];
    sBut += '</button>\n';
    return sBut;
 }
@@ -826,4 +821,3 @@ function main () {
    document.getElementById ('niveau').value = info.level;
    document.getElementById ('niveauValeur').innerHTML = document.getElementById ('niveau').value;
 }
-
