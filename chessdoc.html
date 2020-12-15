@@ -353,7 +353,7 @@ Le fichier chess.log enregistre les requetes (dates, identification du type de p
 <pre>
 
 Fichier chess.c
-----------------
+---------------
 
 /*   Pour produire la doc sur les fonctions : grep "\/\*" chess.c | sed 's/^\([a-zA-Z]\)/\n\1/' */
 /*   Jeu d'echec */
@@ -407,7 +407,7 @@ void *fThread (void *arg) { /* */
 int find (TGAME sq64, TGAME bestSq64, int *bestNote, int color) { /* */
    /* ordinateur joue renvoie le meilleur jeu possible et le nombre de jeux possibles */
 
-void computerPlay (TGAME sq64) { /* */
+bool computerPlay (TGAME sq64) { /* */
    /* prepare le lancement de la recherche avec find */
 
 void cgi () { /* */
@@ -421,10 +421,12 @@ int main (int argc, char *argv[]) { /* */
    /* -p [FENGame] [profondeur] : play mode CLI */
    /* -h : help */
    /* autrement CGI */
-/* inspire de Fathom, adapte par RENE RIGAULT */
+
 
 Fichier syzygy.c
 ----------------
+
+/* inspire de Fathom, adapte par RENE RIGAULT */
 
 static bool parseFEN (struct pos *pos, const char *fen) { /* */
    /* traduit la chaine fau format FEN en une structure pos */
@@ -438,6 +440,7 @@ bool syzygyRR (const char* path, const char *fen, unsigned *wdl, char *bestMove,
    /* le commentaire contient ce deplacement et les valeur WIN WDL DTZ */
    /* vrai si trouve, faux si erreur */
 
+
 Fichier chessUtil.c
 -------------------
 
@@ -447,11 +450,13 @@ int charToInt (int c) { /* */
 void printGame (TGAME jeu, int eval) { /* */
    /* imprime le jeu a la conole pour Debug */
 
-void fenToGame (char *fenComplete, TGAME sq64, char *activeColor) { /* */
+int fenToGame (char *fenComplete, TGAME sq64) { /* */
    /* Forsyth–Edwards Notation */
-   /* le jeu est recu sous la forme d'une chaine de cCharacteres du navigateur */
-   /* FENToJeu traduit cette chaine et renvoie l'objet jeu ansi que la couleur */
+   /* le jeu est recu sous la forme d'une chaine de caracteres du navigateur au format fen*/
+   /* FENToJeu traduit cette chaine et renvoie l'objet jeu ainsi que la couleur */
    /* 3kq3/8/8/8/8/3K4/+w+-- */
+   /* retour 1 si noir -1 si blanc */
+   /* le roque est contenu dans la valeur u roi : ROI ou ROIROQUE */
 
 char *gameToFen (TGAME sq64, char *fen, int color, char sep, bool complete) { /* */
    /* Forsyth–Edwards Notation */
@@ -479,16 +484,17 @@ char *difference (TGAME sq64_1, TGAME sq64_2, int color, char *prise, char* temp
    /* qui represente le deplacement au format a1:a1 */
    /* prise est la valeur de la piece prise toujour en majuscule. ' ' si pas de prise */
 
-void sendGame (TGAME sq64, struct sinfo info, int reqType) { /* */
+void sendGame (const char *fen, struct sinfo info, int reqType) { /* */
    /* envoie le jeu au format JSON */
 
 
-Fichier bbuildlistsimple.c
----------------------------
+Fichier buildlistsimple.c
+-------------------------
 
 int buildList (TGAME refJeu, register int who, TLIST list) { /* */
    /* construit la liste des jeux possibles a partir de jeu. */
    /* 'who' joue */
+
 
 </pre>
 
