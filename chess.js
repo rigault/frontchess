@@ -7,11 +7,11 @@ const VOID = 0, PAWN = 1, KNIGHT = 2, BISHOP = 3, ROOK = 4, QUEEN = 5, KING = 6,
 const ROCKING_GAMER = 9999; // signale que le joueur tente le roque
 const REQ_TYPE = 2;
 
-// const MYURL = "http://23.251.143.190/cgi-bin/chess.cgi?";
-// const MYURL = "http://192.168.1.100/cgi-bin/chess.cgi?";
-const MYURL = "http://127.0.0.1/cgi-bin/chess.cgi?";
+// const MY_URL = "http://23.251.143.190/cgi-bin/chess.cgi?";
+// const MY_URL = "http://192.168.1.100/cgi-bin/chess.cgi?";
+const MY_URL = "http://127.0.0.1/cgi-bin/chess.cgi?";
 
-const EVALTHRESHOLD = 900000;
+const EVAL_THRESHOLD = 900000;
 // Pawn, kNight, Bishop, Rook, Queen, King, rOckking
 // FEN notation
 // White : minuscules. Black: Majuscules
@@ -477,7 +477,7 @@ function whoGetWhites () {
 /* affiche un info fonction des codes reçus du serveur */
 function statusAnalysis () {
    // NO_EXIT = 0, EXIST = 1, IS_IN_CHECK = 2, UNVALID_IN_CHECK = 3, IS_MATE = 4, IS_PAT = 5;
-   const stateMessagePlayer = [
+   const STATE_MESSAGE_PLAYER = [
       "Il n'y a pas de roi joueur\n", 
       "", 
       "Tu es echec au Roi !\n" , 
@@ -494,16 +494,17 @@ function statusAnalysis () {
       "Jeu Pat !, c'est fini.\n" 
    ];
    let r = parseInt (responseServer.playerStatus);
-   document.getElementById ('info').value = stateMessagePlayer [r]; 
+   document.getElementById ('info').value = STATE_MESSAGE_PLAYER [r]; 
 
    if (r != KINGSTATE.EXIST && r != KINGSTATE.IS_IN_CHECK) return false;
    
    r = parseInt (responseServer.computerStatus);
-   document.getElementById ('info').value += stateMessagePlayer [r]; 
+   document.getElementById ('info').value += STATE_MESSAGE_PLAYER [r]; 
    if (r != KINGSTATE.EXIST) return false;
 
    let intComputerColor = (computerColor == "b") ? 1 : -1;
-   if ((parseInt (responseServer.eval) * intComputerColor >= EVALTHRESHOLD) ||
+
+   if ((parseInt (responseServer.eval) * intComputerColor >= EVAL_THRESHOLD) ||
       (parseInt (responseServer.wdl) == 4 && intComputerColor == 1) ||
       (parseInt (responseServer.wdl) == 0 && intComputerColor == -1))
       document.getElementById ('info').value += "Je vais gagner, c'est certain !\n";
@@ -604,7 +605,7 @@ function moveRead (nom) {
    }
    else if (res == true) {
       v = Math.abs (jeu [lDest][cDest]);
-      info.lastTakenByGamer = (v != 0)? UNICODE [v]: '';  // prise de piece
+      info.lastTakenByGamer = (v != 0) ? UNICODE [v]: '';  // prise de piece
       prise = (v != 0)? 'x' : '-';
       v = Math.abs(jeu [lSource][cSource]);
       carPiece = DICT [v];
@@ -623,6 +624,7 @@ function moveRead (nom) {
       jeu [lSource][cSource] = 0;
    }
    if (res == ROCKING_GAMER || res == true) {
+      if (computerColor != 'b') info.nb += 1; // computer a les blancs
       infoUpdate (jeu);
       displayUpdate ();
       display ();
@@ -639,9 +641,10 @@ function serverRequest () {
    let http = new XMLHttpRequest ();
    let gamerColor = ((computerColor == "b") ? -1 : 1);
    let spaces;
-   let url = MYURL + "reqType=" + REQ_TYPE + "&level=" + info.level + "&fen=" + gameToFen (jeu, computerColor);
+   let url = MY_URL + "reqType=" + REQ_TYPE + "&level=" + info.level + "&fen=" + gameToFen (jeu, computerColor);
    console.log ("\nurl: %s\n", url);
    // alert (url);
+   
    http.onreadystatechange = function (event) {
    // XMLHttpRequest.DONE === 4
       if (this.readyState === XMLHttpRequest.DONE) {
@@ -658,7 +661,7 @@ function serverRequest () {
             new Audio ('beep.wav').play ();
             document.getElementById ('info').value = "A toi de jouer\n";
             info.indicator = true;
-            info.nb += 1;
+            if (computerColor == 'b') info.nb += 1; // computer a les noirs
             infoUpdate (jeu);
             displayUpdate ();
             info.lastGamerPlay = '';
@@ -723,18 +726,20 @@ function displayUpdate () {
       document.getElementById ('message').value = responseServer.endName;
 
    if (responseServer.lastTake != null && responseServer.lastTake != '' && responseServer.lastTake != ' ') 
-      info.lastTake = UNICODE [TRANSLATE [responseServer.lastTake]];
+      info.lastTake = UNICODE [TRANSLATE [responseServer.lastTake.toUpperCase()]];
    else info.lastTake = '';
 
    document.getElementById ('lastTake').innerHTML += info.lastTake;
    responseServer.lastTake = '';
 
    if (responseServer.time != null) {
-      document.getElementById ('timeComputer').value = secToHHMMSS (parseInt(responseServer.time));
-      info.totalComputerTime += parseInt (responseServer.time);
+      document.getElementById ('timeComputer').value = secToHHMMSS (parseFloat(responseServer.time));
+      info.totalComputerTime += parseFloat (responseServer.time);
       document.getElementById ('cumulTimeComputer').value = secToHHMMSS (info.totalComputerTime);
    }
 
+   //b : black. Inversion car joueur
+   document.getElementById ('votreCouleur').value = (computerColor == 'b') ? "blanche" : "noire"; 
    document.getElementById ('noCoup').value = info.nb;
    document.getElementById ('dernierJoueur').value = info.lastGamerPlay; // dernier coup du joueur
    document.getElementById ('nJoueur').value = info.nGamerPieces;             // nb de pieces

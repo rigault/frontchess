@@ -100,15 +100,15 @@ Les paires (attribut, valeur) sont les suivantes :
    <tr><td>compilation-date</td><td>Dec  8 2020</td><td>string</td></tr>
    <tr><td>version</td><td>2.0</td><td>string</td></tr>
    <tr><td>clocktime</td><td>temps utilisation processeur en secondes</td><td>string</td></tr>
-   <tr><td>time</td><td>temps de reponse serveur en secondes</td><td>int</td></tr>
+   <tr><td>time</td><td>temps de reponse serveur en secondes</td><td>float</td></tr>
    <tr><td>note</td><td>evaluation du jeu courant</td><td>int</td></tr>         
    <tr><td>eval</td><td>evaluation rendue par le minimax</td><td>int</td></tr> 
    <tr><td>computerStatus</td><td>Etat du roi ordinateur</td><td>int</td></tr>     
    <tr><td>playerStatus</td><td>Etat du Roi joueur</td><td>int</td></tr>
    <tr><td>fen</td><td>Jeu au format FEN</td><td>string</td></tr>
-   <tr><td>lastTake</td><td>dernière prise ordi</td><td>int</td></tr>
+   <tr><td>lastTake</td><td>dernière prise ordi</td><td>char</td></tr>
    <tr><td>openingName</td><td>Nom de l'ouverture utilisée (si pertinent)</td><td>string</td></tr>
-   <tr><td>endName</td><td>Non implemente</td><td>string</td></tr>
+   <tr><td>endName</td><td>commentaires de fin de jeux avec dtz et wdl</td><td>string</td></tr>
    <tr><td>wdl</td><td>retour win-draw-loss des tables de fin de jeux syzygy</td><td>string</td></tr>
    <tr><td>computePlay</td><td>deplacement ordinateur au format Xa1-b2</td><td>string</td></tr>
    <tr><td>dump</td><td>dump de variables internes au serveur</td><td>string</td></tr>
@@ -138,9 +138,9 @@ Seuls trois attributs sont présent : description, compilation-date et version.
 "computerStatus" : "1",
 "playerStatus" : "1",
 "fen : "RNBQKBNR/PPPPPPPP/8/8/8/5n2/pppppppprnbqkb1r+w+KQkq",
-"lastTake" : "0",
+"lastTake" : " ",
 "openingName" : "Default-Coup1",
-"wdl" : "0",
+"wdl" : "9",
 "endName" : "",
 "computePlay" : "Ng8-f6"
 }
@@ -160,10 +160,10 @@ L'attribut dump est ajouté.
 "computerStatus" : "1",
 "playerStatus" : "1",
 "fen" : "RNBQKBNR/PPPPPPPP/8/8/8/5n2/pppppppprnbqkb1r+w+KQkq",
-"lastTake" : "0",
+"lastTake" : " ",
 "openingName" : "Default-Coup1",
 "endName" : "",
-"wdl" : "0",
+"wdl" : "9",
 "computePlay" : "Ng8-f6"
 "dump" : "maxDepth=4 nEval=2 nLCKingInCheck=19 nBuildList=15 nValidComputerPos=29 nValidPlayerPos=29"
 }
@@ -214,7 +214,8 @@ La fonction Alphabeta implémente l’algorithme Minimax avec élagage Alphabeta
 <pre>
 mode CLI sortie JSON : ./chess.cgi -i [&lt;jeuAuFormaFEN&gt;] [profondeur]
 mode CLI sortie raw : ./chess.cgi -r [&lt;jeuAuFormaFEN&gt;] [profondeur]
-mode CLI test unitaire : ./chess.cgi -t 
+mode CLI play : ./chess.cgi -p [&lt;jeuAuFormaFEN&gt;] [profondeur]
+mode CLI : ./chess.cgi -t 
 mode CLI help: ./chess.cgi -h 
 </pre>
 
@@ -274,7 +275,7 @@ Comme indice de boucle, préférer le type "int" au type "char" car plus rapide.
 <h2>Bibliothèque d'ouverture </h2>
 
 Avant de lancer la recherche dans l'arbre, une bibliothèque d'ouverture est utilisée.
-<p>Les fichiers "chessB.fen" et 'chessW.fen" sont au format textuel CSV et contiennet la liste des ouvertures au format FEN vus des noirs et vus des blancs.
+<p>Les fichiers "chessB.fen" et 'chessW.fen" sont au format textuel CSV et contiennent la liste des ouvertures au format FEN vus des noirs et vus des blancs.
 <p> Format CSV : FENstring ; dep ; commentaires
 <p> dep contient le deplacement en notation algebrique complete Xe2:e4[=Y] | 0-0 | 0-0-0
 <p> X : piece joue. Y : promotion,  0-0 : petit roque,  0-0-0 : grand roque
@@ -356,39 +357,35 @@ Fichier chess.c
 
 /*   Pour produire la doc sur les fonctions : grep "\/\*" chess.c | sed 's/^\([a-zA-Z]\)/\n\1/' */
 /*   Jeu d'echec */
-/*   Noirs : 1 (Minuscules) */
-/*   Blancs : -1 (Majuscules) */
 /*   case libre 0 */
-/*   mode CLI API : chess -i [FENgame] [profondeur] */
-/*   mode CLI Raw : chess -r [FENgame] [profondeur] */
-/*   mode CLI Test : chess -t */
+/*   ./chess.cgi -i [FENGame] [profondeur] : CLI avec sortie JSON */
+/*   ./chess.cgi -r [FENGame] [profondeur] : CLI avec sortie raw */
+/*   ./chess.cgi -t : test unitaire */
+/*   ./chess.cgi -p [FENGame] [profondeur] : play mode CLI */
+/*   ./chess.cgi -h : help */
+/*   autrement CGI */
 /*   script CGI gérant une API restful (GET) avec les réponses au format JSON */
 /*   fichiers associes : chess.log, chessB.fen, chessW.fen, chessUtil.c, syzygy.c, tbprobes.c tbcore.c et .h associes  */
 /*   Structures de donnees essentielles */
 /*     - jeu represente dans un table a 2 dimensions : TGAME sq64 */
 /*     - liste de jeux qui est un tableau de jeux :  TLIST list */
 /*     - nextL est un entier pointant sur le prochain jeux a inserer dans la liste */
+/*   Noirs : 1 (Minuscules) */
+/*   Blancs : -1 (Majuscules) */
 
-int fMaxDepth (int level, struct sinfo info) { /* */
+int fMaxDepth (int lev, struct sinfo info) { /* */
    /* renvoie la profondeur du jeu en fonction du niveau choisi et */
    /* de l'etat du jeu */
 
 bool LCkingInCheck (TGAME sq64, register int who, register int l, register int c) { /* */
    /* vrai si le roi situe case l, c est echec au roi */
-   /*'who' est la couleur du roi who est attaque */
+   /*'who' est la couleur du roi qui est attaque */
 
 bool fKingInCheck (TGAME sq64, int who) { /* */
    /* retourne vrai si 'who' est en echec */
 
-bool findKing (TGAME refJeu, int who, int *lKing, int *cKing) { /* */
-   /* recherche du roi */
-
-int buildList (TGAME refJeu, register int who, TLIST list) { /* */
-   /* construit la liste des jeux possibles a partir de jeu. */
-   /* 'who' joue */
-
 bool kingCannotMove (TGAME sq64, register int who) { /* */
-   /* vrai si le roi du joueur 'who' est ne peut plus bouger sans se mettre echec au roi */
+   /* vrai si le roi du joueur 'who' ne peut plus bouger sans se mettre echec au roi */
    /* 'who' est la couleur du roi who est attaque */
    /* on essaye tous les jeux possibles. Si dans tous les cas on est echec au roi */
    /* c'est perdu. Noter que si le roi a le trait et qu'il n'est pas echec au roi il est Pat */
@@ -410,9 +407,6 @@ void *fThread (void *arg) { /* */
 int find (TGAME sq64, TGAME bestSq64, int *bestNote, int color) { /* */
    /* ordinateur joue renvoie le meilleur jeu possible et le nombre de jeux possibles */
 
-void test (TGAME sq64, TLIST list) { /* */
-   /* Pour tests unitaires */
-
 void computerPlay (TGAME sq64) { /* */
    /* prepare le lancement de la recherche avec find */
 
@@ -424,14 +418,13 @@ int main (int argc, char *argv[]) { /* */
    /* -i [FENGame] [profondeur] : CLI avec sortie JSON */
    /* -r [FENGame] [profondeur] : CLI avec sortie raw */
    /* -t : test unitaire */
+   /* -p [FENGame] [profondeur] : play mode CLI */
    /* -h : help */
    /* autrement CGI */
-
+/* inspire de Fathom, adapte par RENE RIGAULT */
 
 Fichier syzygy.c
 ----------------
-
-/* inspire de Fathom, adapte par RENE RIGAULT */
 
 static bool parseFEN (struct pos *pos, const char *fen) { /* */
    /* traduit la chaine fau format FEN en une structure pos */
@@ -439,20 +432,19 @@ static bool parseFEN (struct pos *pos, const char *fen) { /* */
 static void moveToStr (const struct pos *pos, unsigned move, char *str) { /* */
    /* Convert un deplacement en une chaine str au format algebrique comme  Pe2-e4 */
 
-bool syzygyRR (const char* path, const char *fen, char *bestMove, char *comment) { /* */
+bool syzygyRR (const char* path, const char *fen, unsigned *wdl, char *bestMove, char *comment) { /* */
    /* recherche dans la tablebase sygyzy situee dans path le jeu decrit en notation */
-   /* FEN par fen. Renvoie le eplacement dans bestMove */
+   /* FEN par fen. Renvoie le deplacement dans bestMove */
    /* le commentaire contient ce deplacement et les valeur WIN WDL DTZ */
    /* vrai si trouve, faux si erreur */
 
-
-Fichier ChessUtil.c
+Fichier chessUtil.c
 -------------------
 
-static int charToInt (int c) { /* */
+int charToInt (int c) { /* */
    /* traduit la piece au format RNBQR... en nombre entier */
 
-void printGame (TGAME jeu) { /* */
+void printGame (TGAME jeu, int eval) { /* */
    /* imprime le jeu a la conole pour Debug */
 
 void fenToGame (char *fenComplete, TGAME sq64, char *activeColor) { /* */
@@ -461,7 +453,7 @@ void fenToGame (char *fenComplete, TGAME sq64, char *activeColor) { /* */
    /* FENToJeu traduit cette chaine et renvoie l'objet jeu ansi que la couleur */
    /* 3kq3/8/8/8/8/3K4/+w+-- */
 
-void gameToFen (TGAME sq64, char *fen, int color, char sep, bool complete) { /* */
+char *gameToFen (TGAME sq64, char *fen, int color, char sep, bool complete) { /* */
    /* Forsyth–Edwards Notation */
    /* le jeu est envoye sous la forme d'une chaine de cCharacteres au format FEN au navigateur */
 
@@ -478,17 +470,25 @@ bool opening (const char *fileName, char *gameFen, char *sComment, char *move) {
    /* nom Ouverture contient le nom trouve */
    /* renvoie vrai si ouverture trouvee dans le fichier, faux sinon */
 
-char *difference (TGAME sq64_1, TGAME sq64_2, int color, int *prise, char* temp) { /* */
+char *difference (TGAME sq64_1, TGAME sq64_2, int color, char *prise, char* temp) { /* */
    /* coul = 1 (ordi) si le joueur a les blancs */
    /* retrouve le coup joue par Ordi */
    /* traite le roque. En dehors de ce cas */
    /* suppose qu'il n' y a deux cases differentes (l1,c1) (l2, c2) */
    /* renvoie la chaine decrivant la difference */
    /* qui represente le deplacement au format a1:a1 */
-   /* prise est la valeur de la piece prise. 0 si pas de prise */
+   /* prise est la valeur de la piece prise toujour en majuscule. ' ' si pas de prise */
 
 void sendGame (TGAME sq64, struct sinfo info, int reqType) { /* */
    /* envoie le jeu au format JSON */
+
+
+Fichier bbuildlistsimple.c
+---------------------------
+
+int buildList (TGAME refJeu, register int who, TLIST list) { /* */
+   /* construit la liste des jeux possibles a partir de jeu. */
+   /* 'who' joue */
 
 </pre>
 
@@ -519,6 +519,10 @@ function gameToFen (jeu, color)
   
 /* Forsyth–Edwards Notation */
 function fenToGame (fen, jeu)
+  
+/* vrai si le roi situe case l, c est echec au roi */
+/* 'who' est la couleur du roi who est attaque */
+function LCkingInCheck (sq64, who, l, c)
   
 /* verifie que le deplacement choisi est valide */
 /* renvoie ROCKING_GAMER ou vrai ou faux */
@@ -558,7 +562,7 @@ function refresh ()
 function whoGetWhites ()
   
 /* retourne false si on arrete le jeu, TRUE si on continue */
-/* affiche un message fonction des codes reçus du serveur */
+/* affiche un info fonction des codes reçus du serveur */
 function statusAnalysis ()
   
 /* saisie du deplacement par le joueur sans vérif pour test */
