@@ -478,7 +478,7 @@ function whoGetWhites () {
 function statusAnalysis () {
    // NO_EXIT = 0, EXIST = 1, IS_IN_CHECK = 2, UNVALID_IN_CHECK = 3, IS_MATE = 4, IS_PAT = 5;
    const STATE_MESSAGE_PLAYER = [
-      "Il n'y a pas de roi joueur\n", 
+      "Il n'y a pas de roi joueur. C'est fini\n", 
       "", 
       "Tu es echec au Roi !\n" , 
       "Tu es echec au Roi, tu n'as pas le droit, c'est fini !\n", 
@@ -486,10 +486,10 @@ function statusAnalysis () {
       "Jeu Pat !, c'est fini.\n" 
    ];
    const stateMessageComputer = [
-      "Il n'y a pas de roi Ordi\n", 
+      "Il n'y a pas de roi Ordi. C'est fini\n", 
       "", 
-      "Je suis echec au Roi !. Bizarre\n", 
-      "Etat bizarre !\n", 
+      "Je suis echec au Roi !. Bizarre. C'est fini\n", 
+      "Etat bizarre !, cest finu\n", 
       "Je suis MAT, c'est fini !\n", 
       "Jeu Pat !, c'est fini.\n" 
    ];
@@ -672,6 +672,7 @@ function serverRequest () {
             historyGame.length = indexHistory + 1; // a garder meme si semble bizarre 
             if (statusAnalysis ())
                gamerCount = setInterval (chronoGamer,1000); //la fonction est relancee
+            else alert ("C'est fini : faire RAZ");
          }
       }
    };
