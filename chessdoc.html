@@ -354,7 +354,6 @@ Le fichier chess.log enregistre les requetes (dates, identification du type de p
 
 Fichier chess.c
 ---------------
-
 /*   Pour produire la doc sur les fonctions : grep "\/\*" chess.c | sed 's/^\([a-zA-Z]\)/\n\1/' */
 /*   Jeu d'echec */
 /*   case libre 0 */
@@ -407,7 +406,7 @@ void *fThread (void *arg) { /* */
 int find (TGAME sq64, TGAME bestSq64, int *bestNote, int color) { /* */
    /* ordinateur joue renvoie le meilleur jeu possible et le nombre de jeux possibles */
 
-bool computerPlay (TGAME sq64) { /* */
+bool computerPlay (TGAME sq64, int color) { /* */
    /* prepare le lancement de la recherche avec find */
 
 void cgi () { /* */
@@ -417,19 +416,19 @@ int main (int argc, char *argv[]) { /* */
    /* lit la ligne de commande */
    /* -i [FENGame] [profondeur] : CLI avec sortie JSON */
    /* -r [FENGame] [profondeur] : CLI avec sortie raw */
-   /* -t : test unitaire */
    /* -p [FENGame] [profondeur] : play mode CLI */
+   /* -t : test unitaire */
    /* -h : help */
    /* autrement CGI */
 
 
 Fichier syzygy.c
 ----------------
-
 /* inspire de Fathom, adapte par RENE RIGAULT */
 
 static bool parseFEN (struct pos *pos, const char *fen) { /* */
    /* traduit la chaine fau format FEN en une structure pos */
+   /* ATTENTION CASTLING NE MARCHE PAS */
 
 static void moveToStr (const struct pos *pos, unsigned move, char *str) { /* */
    /* Convert un deplacement en une chaine str au format algebrique comme  Pe2-e4 */
@@ -450,7 +449,7 @@ int charToInt (int c) { /* */
 void printGame (TGAME jeu, int eval) { /* */
    /* imprime le jeu a la conole pour Debug */
 
-int fenToGame (char *fenComplete, TGAME sq64) { /* */
+int fenToGame (char *fenComplete, TGAME sq64, int *cpt50, int *nb) { /* */
    /* Forsyth–Edwards Notation */
    /* le jeu est recu sous la forme d'une chaine de caracteres du navigateur au format fen*/
    /* FENToJeu traduit cette chaine et renvoie l'objet jeu ainsi que la couleur */
@@ -458,7 +457,7 @@ int fenToGame (char *fenComplete, TGAME sq64) { /* */
    /* retour 1 si noir -1 si blanc */
    /* le roque est contenu dans la valeur u roi : ROI ou ROIROQUE */
 
-char *gameToFen (TGAME sq64, char *fen, int color, char sep, bool complete) { /* */
+char *gameToFen (TGAME sq64, char *fen, int color, char sep, bool complete, int cpt50, int nb) { /* */
    /* Forsyth–Edwards Notation */
    /* le jeu est envoye sous la forme d'une chaine de cCharacteres au format FEN au navigateur */
 
@@ -495,7 +494,6 @@ int buildList (TGAME refJeu, register int who, TLIST list) { /* */
    /* construit la liste des jeux possibles a partir de jeu. */
    /* 'who' joue */
 
-
 </pre>
 
 <h1 id="Client">4. Côté client </h1>
@@ -520,8 +518,12 @@ La javascript contrôle que l'entrée du joueur est valide, envoie le jeu via un
 <h2>Les fonctions Javascript</h2>
 <pre>
 
+</pre> 
+
+/* jshint esversion: 6 */
+/* jshint -W097 */ // don't warn about "use strict"
 /* Forsyth–Edwards Notation */
-function gameToFen (jeu, color)
+function gameToFen (jeu, color, cpt50, noCoup)
   
 /* Forsyth–Edwards Notation */
 function fenToGame (fen, jeu)
@@ -595,7 +597,6 @@ function display ()
 /* programme principal */
 function main ()
   
-</pre> 
 <h2>Codage des pièces</h2>
 <div id = "conteneur">
 <div id="gauche">
