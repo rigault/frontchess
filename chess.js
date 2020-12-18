@@ -63,8 +63,6 @@ let info = {
    kingStateComputer: 0,
    castleComputer: "Non",
    castleGamer: "Non",
-   lGamerKing: 0,
-   cGamerKing: 0,
    story: "",                // historique du jeu
    gamerTime: 0,             // en secondes
    totalGamerTime: 0,
@@ -486,12 +484,12 @@ function statusAnalysis () {
       "Tu es MAT, c'est fini !\n", 
       "Jeu Pat !, c'est fini.\n" 
    ];
-   const stateMessageComputer = [
-      "Il n'y a pas de roi Ordi. C'est fini\n", 
+   const STATE_MESSAGE_COMPUTER = [
+      "Il n'y a pas de roi Ordi. C'est fini.\n", 
       "", 
-      "Je suis echec au Roi !. Bizarre. C'est fini\n", 
-      "Etat bizarre !, cest finu\n", 
-      "Je suis MAT, c'est fini !\n", 
+      "Je suis echec au Roi !. Bizarre. C'est fini.\n", 
+      "Etat bizarre !, cest fini.\n", 
+      "Je suis MAT, c'est fini.\n", 
       "Jeu Pat !, c'est fini.\n" 
    ];
    let r = parseInt (responseServer.playerStatus);
@@ -500,7 +498,7 @@ function statusAnalysis () {
    if (r != KINGSTATE.EXIST && r != KINGSTATE.IS_IN_CHECK) return false;
    
    r = parseInt (responseServer.computerStatus);
-   document.getElementById ('info').value += STATE_MESSAGE_PLAYER [r]; 
+   document.getElementById ('info').value += STATE_MESSAGE_COMPUTER [r]; 
    if (r != KINGSTATE.EXIST) return false;
 
    let intComputerColor = (computerColor == "b") ? 1 : -1;
