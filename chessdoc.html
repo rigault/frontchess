@@ -501,7 +501,7 @@ int buildList (TGAME refJeu, register int who, TLIST list) { /* */
 Le front, côté client est composé d'un fichier HTML, un CSS et de fonctions écrites en Javascipt.
 main () est la fonction appelée dans le code HTML.
 
-La javascript contrôle que l'entrée du joueur est valide, envoie le jeu via une requete XMLhttp request au format décrit dans la section API, reçoit la réponse du serveur JSON. Il interprête uniquement l'attribut fen et affiche le jeu.
+La javascript contrôle que l'entrée du joueur est valide, envoie le jeu via une requete XMLhttp request au format décrit dans la section API, reçoit la réponse du serveur JSON. Il interprête l'attribut fen et affiche le jeu.
 
 <h2>Aspects pratiques </h2>
 
@@ -517,8 +517,6 @@ La javascript contrôle que l'entrée du joueur est valide, envoie le jeu via un
 
 <h2>Les fonctions Javascript</h2>
 <pre>
-
-</pre> 
 
 /* jshint esversion: 6 */
 /* jshint -W097 */ // don't warn about "use strict"
@@ -597,6 +595,7 @@ function display ()
 /* programme principal */
 function main ()
   
+</pre> 
 <h2>Codage des pièces</h2>
 <div id = "conteneur">
 <div id="gauche">
