@@ -63,8 +63,6 @@ let info = {
    kingStateComputer: 0,
    castleComputer: "Non",
    castleGamer: "Non",
-   lComputerKing: 0,
-   cComputerKing: 0,
    lGamerKing: 0,
    cGamerKing: 0,
    story: "",                // historique du jeu
@@ -597,16 +595,16 @@ function moveRead (nom) {
       info.leftCastleGamerOK = false;
       if (cDest == 0) {           // grand Roque
          jeu [lSource][0] = 0;
-         jeu [lSource][2] = -CASTLE_KING;
-         jeu [lSource][3] = -ROOK;
+         jeu [lSource][2] = gamerColor * CASTLE_KING;
+         jeu [lSource][3] = gamerColor * ROOK;
          jeu [lSource][4] = 0;
          info.lastGamerPlay = "0-0-0";
          info.story += "\n" + info.nb + spaces + "    0-0-0";
       }
       else if (cDest == 7) {       //petit Roque
          jeu [lSource][4] = 0;
-         jeu [lSource][5] = -ROOK;
-         jeu [lSource][6] = -CASTLE_KING;
+         jeu [lSource][5] = gamerColor * ROOK;
+         jeu [lSource][6] = gamerColor * CASTLE_KING;
          jeu [lSource][7] = 0;
          info.lastGamerPlay = "0-0";
          info.story += "\n" + info.nb + spaces + "      0-0";
@@ -702,23 +700,20 @@ function serverRequest () {
 /* met a jour l'objet info a partir de l'objet jeu */
 function infoUpdate (jeu) {
    let v;
+   let color = (computerColor == 'b') ? 1 : -1;
    info.kingStateGamer = info.kingStateComputer = KINGSTATE.NOEXIST;
    info.castleComputer = info.castleGamer = "Non";
    info.nGamerPieces = info.nComputerPieces = 0;
    for (let l = 0; l < N; l += 1) {
       for (let c = 0; c < N; c += 1) {
-         v = jeu[l][c];
+         v = jeu[l][c] * color;
          if (v > 0) info.nComputerPieces += 1;
          else if (v < 0) info.nGamerPieces += 1;
          if (v == KING || v == CASTLE_KING) {
-            info.lComputerKing = l;
-            info.cComputerKing = c;
             info.kingStateComputer = KINGSTATE.EXIST;
          }
          if (v == CASTLE_KING) info.castleComputer = "Oui";
          if (v == -KING || v == -CASTLE_KING) {
-            info.lGamerKing = l;
-            info.cGamerKing = c;
             info.kingStateGamer = KINGSTATE.EXIST;
          }
          if (v == -CASTLE_KING) info.castleGamer = "Oui";
