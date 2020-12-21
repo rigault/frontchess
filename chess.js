@@ -596,16 +596,16 @@ function moveRead (nom) {
          jeu [lSource][2] = gamerColor * CASTLE_KING;
          jeu [lSource][3] = gamerColor * ROOK;
          jeu [lSource][4] = 0;
-         info.lastGamerPlay = "0-0-0";
-         info.story += "\n" + info.nb + spaces + "    0-0-0";
+         info.lastGamerPlay = "O-O-O";
+         info.story += "\n" + info.nb + spaces + "    O-O-O";
       }
       else if (cDest == 7) {       //petit Roque
          jeu [lSource][4] = 0;
          jeu [lSource][5] = gamerColor * ROOK;
          jeu [lSource][6] = gamerColor * CASTLE_KING;
          jeu [lSource][7] = 0;
-         info.lastGamerPlay = "0-0";
-         info.story += "\n" + info.nb + spaces + "      0-0";
+         info.lastGamerPlay = "O-O";
+         info.story += "\n" + info.nb + spaces + "      O-O";
       }
    }
    else if (res == true) {
@@ -772,7 +772,7 @@ function commonDisplay (l, c) {
    let v = jeu [l][c];
    let sBut = "<button class = '";
    let lastComputerPos = document.getElementById ('computePlay').value;
-   if ((lastComputerPos.indexOf ("0-0") != -1) && info.indicator) { // cas du roque
+   if ((lastComputerPos.indexOf ("O-O") != -1) && info.indicator) { // cas du roque
       info.indicator = false;
       alert ("Roque !");
    }
