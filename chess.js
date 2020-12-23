@@ -285,15 +285,10 @@ function verification (jeu, l, c, lDest, cDest, who) {
      break;
 
    case KING: case CASTLE_KING:
-      if ((Math.abs (lDest-l) == 1 && c == cDest) || 
-         (Math.abs (cDest - c) == 1 && l == lDest) || 
-         (Math.abs (lDest-l) == 1 && Math.abs (cDest-c) == 1))
-         return true;
-      break;
+      return ((Math.abs (cDest-c) * (lDest-l) <= 1) && (Math.abs (cDest - c) == 1 || (Math.abs (lDest - l) == 1)));
 
    case KNIGHT:
-      if (Math.abs((lDest-l)*(cDest-c)) == 2) return true;
-      break;
+      return (Math.abs((lDest-l) * (cDest-c)) == 2);
 
    case ROOK: case QUEEN:
       if (l == lDest) {
