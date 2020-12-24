@@ -54,11 +54,13 @@ let info = {
    indicator: false,
    nb: 1,
    cpt50: 0,
-   level: 4,
+   level: 3,
    normal: true,             // pour representation "normale" avec blanc joueur en bas. Sinon on inverse. Cf display ()
    nGamerPieces: 16,         // nombre de pieces Joueur
    nComputerPieces: 16,      // nombre de pieces Ordi
-   lastGamerPlay: '',        // dernier coup joueur au format Xa1-b1
+   lastGamerPlay: '',        // dernier coup joueur au format complet Xa1-b1
+   lastGamerPlayA: '',       // dernier coup joueur au format Alg abrege
+   lastComputerPos: '',      // dernier coup ordi ai format complet Xa1-b1
    kingStateGamer: 0,
    kingStateComputer: 0,
    castleComputer: "Non",
@@ -141,6 +143,88 @@ function fenToGame (fen, jeu) {
       }
    }
    return jeu;
+}
+
+function symetryV (sq64, l1, c1, cDest) { 
+   /* vraie si il y a une piece egale a l1, c1 dans le symetrique par rapport a la colonne cDest */
+   let cSym = cDest + cDest - c1;
+   return (cSym >= 0 && cSym < N) ? (sq64 [l1][c1] == sq64 [l1][cSym]): false;
+}
+
+function symetryH (sq64, l1, c1, lDest) { 
+   /* vraie si il y a une piece egale a l1, c1 dans le symetrique par rapport a la ligne lDest */
+   let lSym = lDest + lDest - l1;
+   return (lSym >= 0 && lSym < N) ? (sq64 [l1][c1] == sq64 [lSym][c1]): false;
+}
+
+function abbrev (sq64, complete) { /* */ 
+   /* transforme la specif algebriqe complete en abregee */
+   let l1 = parseInt (complete [2]) - 1;
+   let l2 = parseInt (complete [5]) - 1;
+   let c1 = complete.charCodeAt(1) - 'a'.charCodeAt(0);
+   let c2 = complete.charCodeAt(4) - 'a'.charCodeAt(0);
+   let cCharPiece = complete [0]; 
+   let prise = complete [3];
+   let sign = ((computerColor == "b") ? -1 : 1); // signe joueur
+   let v = sq64 [l1][c1];
+   let promotion = "";
+   let spec = "";                    // pour notation algebrique abrégée
+   let abbr = "";
+   if (complete.length >= 7) promotion = '=' + complete [7];
+   // calcul de la notation abregee
+   switch (Math.abs (v)) {                              
+   case PAWN:
+      cCharPiece = ""; 
+      if ((prise == 'x') && (symetryV (sq64, l1, c1, c2))) // il y a deux pions symetrique prenant en c2 a partir de la ligne l1
+         spec = String.fromCharCode(97+c1);              // on donne la colonne
+      break;
+   case KNIGHT:
+      if (symetryV (sq64, l1, c1, c2)) spec = String.fromCharCode(97+c1); //cavaliers symetrique par rapport à la col. dest
+      else if (symetryH (sq64, l1, c1, l2)) spec = String.fromCharCode(49+l1); //cavaliers symetrique par rapport à la ligne dest
+      break;
+      
+   case ROOK:
+      if ((l1 == l2) && (c1 < c2)) {               // meme ligne, recherche a droite  
+         for (let i = (c2 + 1); i < N; i++) {
+            if (sq64 [l1][i] == v) {// il y a une autre tour en position d'aller vers l2 c2
+               spec = String.fromCharCode(97+c1);   // Trouve. on donne la colonne
+               break;
+            }
+            if (sq64 [l2][i] != VOID) break;
+         }
+      }
+      if ((l1 == l2) && (c1 > c2)) {               // meme ligne, recherche a droite  
+         for (let i = (c2 - 1); i >= 0; i--) {
+            if (sq64 [l1][i] == v) {// il y a une autre tour en position d'aller vers l2 c2
+               spec = String.fromCharCode(97+c1);                    // Trouve. On donne la colonne
+               break;
+            }
+            if (sq64 [l2][i] != VOID) break;
+         }
+      }
+      if ((c1 == c2) && (l1 < l2)) {               // meme colonne, recherche en bas 
+         for (let i = (l2 + 1); i < N; i++) {
+            if (sq64 [i][c1] == v) {// il y a une autre tour en position d'aller vers l2 c2
+               spec = String.fromCharCode(49+l1);
+               break;
+            }
+            if (sq64 [i][c2] != VOID) break;
+         }
+      }
+      if ((c1 == c2) && (l1 > l2)) {               // meme colonne, recherce en haut  
+         for (let i = (l2 - 1); i >= 0; i--) {
+            if (sq64 [i][c1] == v) {// il y a une autre tour en position d'aller vers l2 c2
+               spec = String.fromCharCode(49+l1);
+               break;
+            }
+            if (sq64 [i][c2] != VOID) break;
+         }
+      }
+      break;
+   default: // BISHOP, QUEEN, KING
+   }
+   abbr = cCharPiece + spec + ((prise == 'x') ? "x" : "") + String.fromCharCode(97+c2) + String.fromCharCode(49+l2) + promotion;
+   return abbr;
 }
 
 /* vrai si le roi situe case l, c est echec au roi */
@@ -610,10 +694,11 @@ function moveRead (nom) {
       v = Math.abs(jeu [lSource][cSource]);
       carPiece = DICT [v];
       info.lastGamerPlay = carPiece + info.lastGamerPlay + prise + nom; // source + destination
+      info.lastGamerPlayA = abbrev (jeu, info.lastGamerPlay);
       if ((info.story != '') && (gamerColor == -1)) info.story += '\n';
       spaces = (info.nb < 10) ? "  ": ((info.nb < 100) ? " " : "");
-      if (gamerColor == -1) info.story += info.nb + spaces + "   " + info.lastGamerPlay;
-      else info.story += "   " + info.lastGamerPlay;
+      if (gamerColor == -1) info.story += info.nb + spaces + "   " + info.lastGamerPlayA.padStart(4, ' ');
+      else info.story += "   " + info.lastGamerPlayA.padStart(4, ' ');
       pawnMove = (Math.abs (jeu [lSource][cSource])) == PAWN;
 
       if (((jeu [lSource][cSource] == -PAWN) && (lDest == 7)) || 
@@ -664,12 +749,13 @@ function serverRequest () {
             if ((info.story != '') && (gamerColor == 1)) info.story += '\n';
             spaces = (info.nb < 10) ? "  ": ((info.nb < 100) ? " " : "");
             info.story += (gamerColor == 1) ? info.nb + spaces : "";
-            info.story += "   " + responseServer.computePlay;
+            info.story += "    " + responseServer.computePlayA.padStart(4, ' ');
+            info.lastComputerPos = responseServer.computePlayC;
             new Audio ('beep.wav').play ();
             document.getElementById ('info').value = "A toi de jouer\n";
             info.indicator = true;
             if (computerColor == 'b') info.nb += 1; // computer a les noirs
-            if (responseServer.computePlay [0] == 'P' || responseServer.computePlay [3] == 'x') 
+            if (responseServer.computePlayC [0] == 'P' || responseServer.computePlayC [3] == 'x') 
                info.cpt50 = 0;
             else info.cpt50 += 1;
             infoUpdate (jeu);
@@ -726,8 +812,8 @@ function displayUpdate () {
    if (responseServer.eval != null) {
       document.getElementById ('eval').value = parseInt (responseServer.eval);
    }
-   if (responseServer.computePlay != null)
-      document.getElementById ('computePlay').value = responseServer.computePlay;
+   if (responseServer.computePlayC != null)
+      document.getElementById ('computePlay').value = responseServer.computePlayA;
    if (responseServer.openingName != null)
       document.getElementById ('message').value = responseServer.openingName.trim();
    if (responseServer.endName != null && responseServer.endName != '')
@@ -750,7 +836,7 @@ function displayUpdate () {
    document.getElementById ('votreCouleur').value = (computerColor == 'b') ? "blanche" : "noire"; 
    document.getElementById ('noCoup').value = info.nb;
    document.getElementById ('cpt50').value = info.cpt50;
-   document.getElementById ('dernierJoueur').value = info.lastGamerPlay; // dernier coup du joueur
+   document.getElementById ('dernierJoueur').value = info.lastGamerPlayA; // dernier coup du joueur
    document.getElementById ('nJoueur').value = info.nGamerPieces;             // nb de pieces
    document.getElementById ('nOrdi').value = info.nComputerPieces;                 //nb de pieces
    document.getElementById ('joueurRoque').value = info.castleGamer;
@@ -766,12 +852,11 @@ function commonDisplay (l, c) {
    let istr = String.fromCharCode(97+c) + String.fromCharCode(49+l);
    let v = jeu [l][c];
    let sBut = "<button class = '";
-   let lastComputerPos = document.getElementById ('computePlay').value;
-   if ((lastComputerPos.indexOf ("O-O") != -1) && info.indicator) { // cas du roque
+   if ((info.lastComputerPos.indexOf ("O-O") != -1) && info.indicator) { // cas du roque
       info.indicator = false;
       alert ("Roque !");
    }
-   if ((lastComputerPos.slice (4, 6) == istr) && info.indicator) {
+   if ((info.lastComputerPos.slice (4, 6) == istr) && info.indicator) {
        info.indicator = false;
        sBut += "last";
    }

@@ -275,10 +275,13 @@ Comme indice de boucle, préférer le type "int" au type "char" car plus rapide.
 <h2>Bibliothèque d'ouverture </h2>
 
 Avant de lancer la recherche dans l'arbre, une bibliothèque d'ouverture est utilisée.
-<p>Les fichiers "chessB.fen" et 'chessW.fen" sont au format textuel CSV et contiennent la liste des ouvertures au format FEN vus des noirs et vus des blancs.
+<p> les fichiers utilisés sont places dans un repertoire specifique
+<p> Il sont listés dans l'ordre alphabétique. Ceci signifie que si deux configurations éligibles dont situées
+dans des fichiers différent, seule celle appartenant au premier fichier dans l'orde alphabétique sera considéré. 
+<p>Les fichiers suffixés par ".b.fen" et ".w.fen" sont au format textuel CSV et contiennent la liste des ouvertures au format FEN vus des noirs et vus des blancs.
 <p> Format CSV : FENstring ; dep ; commentaires
-<p> dep contient le deplacement en notation algebrique complete Xe2:e4[=Y] | 0-0 | 0-0-0
-<p> X : piece joue. Y : promotion,  0-0 : petit roque,  0-0-0 : grand roque
+<p> dep contient le deplacement en notation algebrique complete Xe2:e4[=Y] | O-O | O-O-O
+<p> X : piece joue. Y : promotion,  O-O : petit roque,  O-O-O : grand roque
 <p> Exemple
 <pre>
 rnbqkbnr/pppppppp8/8/4P3/8/PPPP1PPP/RNBQKBNR b e7:e5; Classique-Ouvert-ou-Alekhine-Coup1; RR
@@ -341,13 +344,12 @@ Les pièces joueurs, blanches, sont négatives en internes et représentées par
    <tr><td>chess.c, chessUtil.c, syzygy.c</td><td>code source</td><td>texte</td></tr>
    <tr><td>tbprobe.c, tbcore.c </td><td>code source pour l'access au tables de fin de jeux</td><td>texte</td></tr>
    <tr><td>chess.cgi</td><td>code exécutable</td><td>exec</td></tr>
-   <tr><td>../chessopenings/chessB.fen</td><td>bibliothèque d'ouvertures vue des noirs</td><td>texte</td></tr>
-   <tr><td>../chessopenings/chessW.fen</td><td>bibliothèque d'ouvertures vue des blancs</td><td>texte</td></tr>
-   <tr><td>../chessdata ou chessdata345</td><td>repertoire contenant les tables de fin de jeux</td><td>texte</td></tr>
-   <tr><td>chess.log</td><td>log</td><td>texte</td></tr>   
+   <tr><td>../repertoire ad-hoc/*.b.fen</td><td>bibliothèque d'ouvertures vue des noirs</td><td>texte</td></tr>
+   <tr><td>../repertoire ad-hoc/*.w.fen </td><td>bibliothèque d'ouvertures vue des blancs</td><td>texte</td></tr>
+   <tr><td>../autre repertoire ad-hoc/</td><td>repertoire contenant les tables de fin de jeux</td><td>texte</td></tr>
+   <tr><td>chess.log</td><td>log</td><td>enregistre les requetes (dates, identification du type de poste)</td></tr>   
 </table>
 <p>
-Le fichier chess.log enregistre les requetes (dates, identification du type de poste).
 
 <h2>Les fonctions et les commentaires associés </h2>
 <pre>
@@ -469,7 +471,7 @@ void moveGame (TGAME sq64, int color, char *move) { /* */
 bool opening (const char *fileName, char *gameFen, char *sComment, char *move) { /* */
    /* lit le fichier des ouvertures et produit le jeu final */
    /* ce fichier est au forma CSV : FENstring ; dep ; commentaire */
-   /* dep contient le deplacement en notation algebrique complete Xe2:e4[Y] | 0-0 | 0-0-0 */
+   /* dep contient le deplacement en notation algebrique complete Xe2:e4[Y] | O-O | O-O-O */
    /* X : piece joue. Y : promotion,  0-0 : petit roque,  0-0-0 : grand roque */
    /* nom Ouverture contient le nom trouve */
    /* renvoie vrai si ouverture trouvee dans le fichier, faux sinon */
