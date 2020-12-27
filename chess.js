@@ -165,7 +165,6 @@ function abbrev (sq64, complete) { /* */
    let c2 = complete.charCodeAt(4) - 'a'.charCodeAt(0);
    let cCharPiece = complete [0]; 
    let prise = complete [3];
-   let sign = ((computerColor == "b") ? -1 : 1); // signe joueur
    let v = sq64 [l1][c1];
    let promotion = "";
    let spec = "";                    // pour notation algebrique abrégée
@@ -182,7 +181,6 @@ function abbrev (sq64, complete) { /* */
       if (symetryV (sq64, l1, c1, c2)) spec = String.fromCharCode(97+c1); //cavaliers symetrique par rapport à la col. dest
       else if (symetryH (sq64, l1, c1, l2)) spec = String.fromCharCode(49+l1); //cavaliers symetrique par rapport à la ligne dest
       break;
-      
    case ROOK:
       if ((l1 == l2) && (c1 < c2)) {               // meme ligne, recherche a droite  
          for (let i = (c2 + 1); i < N; i++) {
@@ -221,7 +219,12 @@ function abbrev (sq64, complete) { /* */
          }
       }
       break;
-   default: // BISHOP, QUEEN, KING
+   case QUEEN: // cas ou il y aurait 2 reines apres une promotion
+      for (let l = 0; l < N; l++)
+         for (let c = 0; c < N; c ++)
+            if (l != l1 && c != c1 && sq64 [l][c] == v) spec = String.fromCharCode(97+c1) + String.fromCharCode(49+l1);
+      break;
+   default:; // BISHOP, KING
    }
    abbr = cCharPiece + spec + ((prise == 'x') ? "x" : "") + String.fromCharCode(97+c2) + String.fromCharCode(49+l2) + promotion;
    return abbr;
@@ -676,7 +679,7 @@ function moveRead (nom) {
          jeu [lSource][3] = gamerColor * ROOK;
          jeu [lSource][4] = 0;
          info.lastGamerPlay = "O-O-O";
-         info.story += "\n" + info.nb + spaces + "    O-O-O";
+         info.story += "\n" + info.nb + spaces + "  O-O-O";
       }
       else if (cDest == 7) {       //petit Roque
          jeu [lSource][4] = 0;
@@ -684,7 +687,7 @@ function moveRead (nom) {
          jeu [lSource][6] = gamerColor * CASTLE_KING;
          jeu [lSource][7] = 0;
          info.lastGamerPlay = "O-O";
-         info.story += "\n" + info.nb + spaces + "      O-O";
+         info.story += "\n" + info.nb + spaces + "    O-O";
       }
    }
    else if (res == true) {
