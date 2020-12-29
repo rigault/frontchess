@@ -9,7 +9,7 @@
 
 <body>
 <header>
-Documentation sur le jeu d'echec, René Rigault, 2020
+Documentation sur le jeu d'echec, René Rigault, 2021
 </header>
 <h1>Sommaire </h1>
 <ol>
@@ -36,7 +36,7 @@ La requête contient un type, la totalité du jeu d'échecs au format ASCII FEN 
 
 <h2>requêtes</h2>
 
-Il y a trois éléments, tous optionnel, dans les requêtes.
+Il y a trois éléments, tous optionnels, dans les requêtes.
 En cas d'absence d'éléments, il existe des valeurs par défaut.
 <p>
 
@@ -64,7 +64,7 @@ Sauf cas particulier, utiliser la requête 1.
 
 <h3>fen </h3>
 
-Le jeu dans les echanges externes (API) est représenté par la notation Forsyth–Edwards Notation (FEN). 
+Le jeu dans les echanges externes (API) est représenté par la notation iFEN (Forsyth–Edwards Notation). 
 Le codage est le suivant :
 
 <p>
@@ -110,7 +110,8 @@ Les paires (attribut, valeur) sont les suivantes :
    <tr><td>openingName</td><td>Nom de l'ouverture utilisée (si pertinent)</td><td>string</td></tr>
    <tr><td>endName</td><td>commentaires de fin de jeux avec dtz et wdl</td><td>string</td></tr>
    <tr><td>wdl</td><td>retour win-draw-loss des tables de fin de jeux syzygy</td><td>string</td></tr>
-   <tr><td>computePlay</td><td>deplacement ordinateur au format Xa1-b2</td><td>string</td></tr>
+   <tr><td>computePlayC</td><td>deplacement ordinateur au format algébrique complet. ex: Pe2-e4</td><td>string</td></tr>
+   <tr><td>computePlayA</td><td>deplacement ordinateur au format algébrique abrégé. ex: e4</td><td>string</td></tr>
    <tr><td>dump</td><td>dump de variables internes au serveur</td><td>string</td></tr>
    </tbody>
 </table>
@@ -127,23 +128,26 @@ Seuls trois attributs sont présent : description, compilation-date et version.
 
 <h3>Réponse à une requete reqType=1</h3>
 <pre>
+
 {
 "description" : "Chess Rene Rigault 2020",
-"compilation-date": "Dec  8 2020",
-"version" : "2.0",
-"clockTime": "0",
-"time" : "0",
-"note" : "-132",
+"compilation-date": "Dec 28 2020",
+"version" : "2.1",
+"clockTime": "0.000318",
+"time" : "0.000550",
+"note" : "71",
 "eval" : "0",
 "computerStatus" : "1",
 "playerStatus" : "1",
-"fen : "RNBQKBNR/PPPPPPPP/8/8/8/5n2/pppppppprnbqkb1r+w+KQkq",
+"fen" : "rnbqkbnr/pppppppp/8/8/2P5/8/PP1PPPPP/RNBQKBNR+b+KQkq+-+0+0",
 "lastTake" : " ",
-"openingName" : "Default-Coup1",
-"wdl" : "9",
+"openingName" : "chess.w.fen D69; Queen's Gambit Declined, Orthodox Defense, Classical Variation; GameN: 1; TourN: 1;",
 "endName" : "",
-"computePlay" : "Ng8-f6"
+"wdl" : "9",
+"computePlayC" : "Pc2-c4",
+"computePlayA" : "c4",
 }
+
 </pre>
 
 <h3>Réponse à une requete reqType=2</h3>
@@ -151,21 +155,22 @@ L'attribut dump est ajouté.
 <pre>
 {
 "description" : "Chess Rene Rigault 2020",
-"compilation-date": "Dec  8 2020",
-"version" : "2.0",
-"clockTime": "0",
-"time" : "0",
-"note" : "-132",
+"compilation-date": "Dec 28 2020",
+"version" : "2.1",
+"clockTime": "0.000318",
+"time" : "0.000550",
+"note" : "71",
 "eval" : "0",
 "computerStatus" : "1",
 "playerStatus" : "1",
-"fen" : "RNBQKBNR/PPPPPPPP/8/8/8/5n2/pppppppprnbqkb1r+w+KQkq",
+"fen" : "rnbqkbnr/pppppppp/8/8/2P5/8/PP1PPPPP/RNBQKBNR+b+KQkq+-+0+0",
 "lastTake" : " ",
-"openingName" : "Default-Coup1",
+"openingName" : "chess.w.fen D69; Queen's Gambit Declined, Orthodox Defense, Classical Variation; GameN: 1; TourN: 1;",
 "endName" : "",
 "wdl" : "9",
-"computePlay" : "Ng8-f6"
-"dump" : "maxDepth=4 nEval=2 nLCKingInCheck=19 nBuildList=15 nValidComputerPos=29 nValidPlayerPos=29"
+"computePlayC" : "Pc2-c4",
+"computePlayA" : "c4",
+"dump" : "  maxDepth=4  nEvalCall=2  nLCKingInCheck=19  nBuildList=15  nValidComputerPos=22  nValidPlayerPos=20"
 }
 
 </pre>
@@ -276,8 +281,8 @@ Comme indice de boucle, préférer le type "int" au type "char" car plus rapide.
 
 Avant de lancer la recherche dans l'arbre, une bibliothèque d'ouverture est utilisée.
 <p> les fichiers utilisés sont places dans un repertoire specifique
-<p> Il sont listés dans l'ordre alphabétique. Ceci signifie que si deux configurations éligibles dont situées
-dans des fichiers différent, seule celle appartenant au premier fichier dans l'orde alphabétique sera considéré. 
+<p> Il sont listés dans l'ordre alphabétique. Ceci signifie que si deux configurations éligibles sont situées
+dans des fichiers différent, seule celle appartenant au premier fichier dans l'orde alphabétique sera considérée. 
 <p>Les fichiers suffixés par ".b.fen" et ".w.fen" sont au format textuel CSV et contiennent la liste des ouvertures au format FEN vus des noirs et vus des blancs.
 <p> Format CSV : FENstring ; dep ; commentaires
 <p> dep contient le deplacement en notation algebrique complete Xe2:e4[=Y] | O-O | O-O-O
@@ -287,12 +292,36 @@ dans des fichiers différent, seule celle appartenant au premier fichier dans l'
 rnbqkbnr/pppppppp8/8/4P3/8/PPPP1PPP/RNBQKBNR b e7:e5; Classique-Ouvert-ou-Alekhine-Coup1; RR
 rnbqkbnr/pppppppp8/8/3P4/8/PPP1PPPP/RNBQKBNR b d7:d5; Classique-ferme-Coup1; RR
 </pre>
-<p> les indication de couleurs b|w sont ingorées car l'ordinateur connait deja sa couleur
+<p> les indication de couleurs b|w sont ingorées car l'ordinateur connait deja sa couleur et sélectionne le fichier ".b.fen" si noir, ".w.fen" si blanc en conséquence.
+
+<h2>Gestion En Passant </h2>
+
+La notion de En Passant est gérée dans l'API et dans la fonction difference qui sait reconnaître si en passant fourni par le joueur 
+(epGamer) est utilisable pour une prise et si il est nécessaire de renseigner en passant par l'ordinateur (epComputer).
+La fonction builList a un complement pour énumérer les prises potentielles associant au en passant. 
+Par contre, l'arbre (au dessous du premier niveau) ne prend pas en copte les possibiités offertes par En Passant. Il est donc possible que la proposition faite soit sous optimale.  
+
+<h2>Gestion des 50 coups </h2>
+
+La notion des 50 coups est gére dans l'API. Les 50 coups ont réinitialisés si un pion bouge ou si une pièces est prise.
+C'est au logiciel client de ne pas demander de jeu si les 50 coups sont atteints.
+Les 50 coups ne dont pas gérés dans l'arborescence des jeux possibles. La proposition faite par l'ordinateur peux donc être sous optimale.
+Les 50 coups sont en théorie gérée pour la find de partie (Syzygy).
 
 <h2>Fin de partie </h2>
-La fonction syzygy renvoie la meilleure solution.
+
+La fonction syzygy renvoie la meilleure solution dès lors que le nombre de pièces restant sur le jeu est inférieure ou égal à 6.
 Voir documentation sur les tables de fin de partie sur le Web.
-La solution choisie est bases sur les tables syzygy stockées en local sur le serveur.
+La solution choisie est basée sur les tables syzygy stockées en local sur le serveur.
+L'API donne un commentaire endgame incluant les valeur de :
+<ul>
+<li>WIN : 0-1 ou 1-0 ou 1/2-1/2 selon que le résultat attendu est victoire noire, blanche ou nulle.</li>
+<li>WDL : valeur de 0 à 4</li>
+<li>DTZ : distance to 0 </li>
+</ul>
+Le meilleur pouvement ("bestmove") est sélectionné afin de minimiser DTZ. Le DTZ n'et pas la valeur minimale permettant d'atteindre le Mat mais la valeur jusqu'à prochaine remise à zéro du compteur des 50 coups 
+(un pion bouge ou une pièce est prise). Le comportement de l'ordinateur est donc parfois surprenant, 
+conduisant à des séquences longues. Mais il est efficace.
 
 <h2>Gestion du CGI </h2>
 <h3>Lire la requête GET </h3>
@@ -311,7 +340,7 @@ On utilise "getenv" avec "QUERY_STRING" en paramètre pour lire les paramètres 
 </pre>
 
 <h3>Envoi du jeu </h3>
-Dans sendGame, on formate le Jason avec printf...
+Dans sendGame, on formate le JSON avec printf...
 Ne pas oublier (très important) l'envoie de
 <pre>Access-Control-Allow-Origin: *</pre>
 Extrait de la fonction "SendGame" :
@@ -399,7 +428,7 @@ int evaluation (TGAME sq64, register int who) { /* */
    /* fonction d'evaluation retournant MATE si Ordinateur gagne, */
    /* -MATE si joueur gagne, 0 si nul,... */
 
-int alphaBeta (TGAME sq64, int turn, int p, int refAlpha, int refBeta) { /* */
+int alphaBeta (TGAME sq64, int who, int p, int refAlpha, int refBeta) { /* */
    /* le coeur du programme */
 
 void *fThread (void *arg) { /* */
@@ -433,11 +462,11 @@ static bool parseFEN (struct pos *pos, const char *fen) { /* */
    /* ATTENTION CASTLING NE MARCHE PAS */
 
 static void moveToStr (const struct pos *pos, unsigned move, char *str) { /* */
-   /* Convert un deplacement en une chaine str au format algebrique comme  Pe2-e4 */
+   /* Converti un deplacement en une chaine str au format algebrique complet. Ex :  Pe2-e4 */
 
 bool syzygyRR (const char* path, const char *fen, unsigned *wdl, char *bestMove, char *comment) { /* */
    /* recherche dans la tablebase sygyzy situee dans path le jeu decrit en notation */
-   /* FEN par fen. Renvoie le deplacement dans bestMove */
+   /* FEN par fen. Renvoie le deplacement au format algebrique complet dans bestMove */
    /* le commentaire contient ce deplacement et les valeur WIN WDL DTZ */
    /* vrai si trouve, faux si erreur */
 
@@ -451,7 +480,7 @@ int charToInt (int c) { /* */
 void printGame (TGAME jeu, int eval) { /* */
    /* imprime le jeu a la conole pour Debug */
 
-int fenToGame (char *fenComplete, TGAME sq64, int *cpt50, int *nb) { /* */
+int fenToGame (char *fenComplete, TGAME sq64, char *ep, int *cpt50, int *nb) { /* */
    /* Forsyth–Edwards Notation */
    /* le jeu est recu sous la forme d'une chaine de caracteres du navigateur au format fen*/
    /* FENToJeu traduit cette chaine et renvoie l'objet jeu ainsi que la couleur */
@@ -459,7 +488,7 @@ int fenToGame (char *fenComplete, TGAME sq64, int *cpt50, int *nb) { /* */
    /* retour 1 si noir -1 si blanc */
    /* le roque est contenu dans la valeur u roi : ROI ou ROIROQUE */
 
-char *gameToFen (TGAME sq64, char *fen, int color, char sep, bool complete, int cpt50, int nb) { /* */
+char *gameToFen (TGAME sq64, char *fen, int color, char sep, bool complete, char *ep, int cpt50, int nb) { /* */
    /* Forsyth–Edwards Notation */
    /* le jeu est envoye sous la forme d'une chaine de cCharacteres au format FEN au navigateur */
 
@@ -467,23 +496,43 @@ void moveGame (TGAME sq64, int color, char *move) { /* */
    /* modifie jeu avec le deplacement move */
    /* move en notation algébique Pa2-a4 ou Pa2xc3 */
    /* non teste pour les blancs. Marche pour les noirs */
+   /* liste les fichier du reperdoire dir contenant la chaine filter */
+   /* fichier dans l'ordre alphabetique */
+   /* donc nommer les fichier les plus prioritaires en debut alphabet */
+   /* appelle opening sur les fichiers listes jusqu a trouver */
+   /* renvoie vraie si gameFen est trouvee dans l'un des fichiers faux sinon */
 
 bool opening (const char *fileName, char *gameFen, char *sComment, char *move) { /* */
    /* lit le fichier des ouvertures et produit le jeu final */
    /* ce fichier est au forma CSV : FENstring ; dep ; commentaire */
    /* dep contient le deplacement en notation algebrique complete Xe2:e4[Y] | O-O | O-O-O */
-   /* X : piece joue. Y : promotion,  0-0 : petit roque,  0-0-0 : grand roque */
+   /* X : piece joue. Y : promotion,  O-O : petit roque,  O-O-O : grand roque */
    /* nom Ouverture contient le nom trouve */
    /* renvoie vrai si ouverture trouvee dans le fichier, faux sinon */
 
-char *difference (TGAME sq64_1, TGAME sq64_2, int color, char *prise, char* temp) { /* */
+bool symetryV (TGAME sq64, int l1, int c1, int cDest) { /* */ 
+   /* vraie si il y a une piece egale a l1, c1 dans le symetrique par rapport a la colonne cDest */
+
+bool symetryH (TGAME sq64, int l1, int c1, int lDest) { /* */ 
+   /* vraie si il y a une piece egale a l1, c1 dans le symetrique par rapport a la ligne lDest */
+
+char *abbrev (TGAME sq64, char *complete, char *abbr) { /* */ 
+   /* transforme la specif algebriqe complete en abregee */
+
+char *enPassant (int color, char *complete, char *strEp) { /* */
+   /* renseigne les coordonness eventuelles de la case en passant */
+
+char *difference (TGAME sq64_1, TGAME sq64_2, int color, char *prise, char *complete, char *abbr, char *epGamer, char *epComputer) { /* */
    /* coul = 1 (ordi) si le joueur a les blancs */
    /* retrouve le coup joue par Ordi */
    /* traite le roque. En dehors de ce cas */
-   /* suppose qu'il n' y a deux cases differentes (l1,c1) (l2, c2) */
+   /* traite le en passant sugggere par le joueur */
+   /* en dehors de ces deux cas suppose qu'il n' y a que deux cases differentes (l1,c1) (l2, c2) */
    /* renvoie la chaine decrivant la difference */
-   /* qui represente le deplacement au format a1:a1 */
-   /* prise est la valeur de la piece prise toujour en majuscule. ' ' si pas de prise */
+   /* qui represente le deplacement au format complet Pe2:e4 et abbregé e4 */
+   /* prise est la valeur de la piece prise. ' ' si pas de prise */
+   /* epComputer - en passant - renseigne les coordonnees eventuelles de prise en passant sinon - */
+   /* epGamer - pour prendre en compte l'indication du gamer pour une prise possible */
 
 void sendGame (const char *fen, struct sinfo info, int reqType) { /* */
    /* envoie le jeu au format JSON */
@@ -492,11 +541,12 @@ void sendGame (const char *fen, struct sinfo info, int reqType) { /* */
 Fichier buildlistsimple.c
 -------------------------
 
+int buildListEnPassant (TGAME refJeu, register int who, char *epGamer, TLIST list, int nextL) { /* */
+   /* apporte le complement de positions avec en Passant */
+
 int buildList (TGAME refJeu, register int who, TLIST list) { /* */
    /* construit la liste des jeux possibles a partir de jeu. */
    /* 'who' joue */
-
-</pre>
 
 <h1 id="Client">4. Côté client </h1>
 
@@ -504,6 +554,8 @@ Le front, côté client est composé d'un fichier HTML, un CSS et de fonctions �
 main () est la fonction appelée dans le code HTML.
 
 La javascript contrôle que l'entrée du joueur est valide, envoie le jeu via une requete XMLhttp request au format décrit dans la section API, reçoit la réponse du serveur JSON. Il interprête l'attribut fen et affiche le jeu.
+
+</pre>
 
 <h2>Aspects pratiques </h2>
 
@@ -520,20 +572,27 @@ La javascript contrôle que l'entrée du joueur est valide, envoie le jeu via un
 <h2>Les fonctions Javascript</h2>
 <pre>
 
-/* jshint esversion: 6 */
-/* jshint -W097 */ // don't warn about "use strict"
 /* Forsyth–Edwards Notation */
-function gameToFen (jeu, color, cpt50, noCoup)
+function gameToFen (jeu, color, ep, cpt50, noCoup)
   
 /* Forsyth–Edwards Notation */
 function fenToGame (fen, jeu)
+  
+/* vraie si il y a une piece egale a l1, c1 dans le symetrique par rapport a la colonne cDest */
+function symetryV (sq64, l1, c1, cDest)
+   
+/* vraie si il y a une piece egale a l1, c1 dans le symetrique par rapport a la ligne lDest */
+function symetryH (sq64, l1, c1, lDest)
+   
+/* transforme la specif algebriqe complete en abregee */
+function abbrev (sq64, complete)
   
 /* vrai si le roi situe case l, c est echec au roi */
 /* 'who' est la couleur du roi who est attaque */
 function LCkingInCheck (sq64, who, l, c)
   
 /* verifie que le deplacement choisi est valide */
-/* renvoie ROCKING_GAMER ou vrai ou faux */
+/* renvoie CASTLING_GAMER ou EN_PASSANT ou vrai ou faux */
 function verification (jeu, l, c, lDest, cDest, who)
   
 /* verifie que la case choisie par le joueur est valide */
@@ -704,15 +763,14 @@ Le numéro d'ordre des coups est donné pour les Blancs et n'est pas répété p
 
 <h2>Notation algébrique abrégée</h2>
 
-Non utilisée. Pour information.
 <p>
 Lorsque la pièce jouée est un pion, on omet de noter l'initiale de la pièce (P).
 On ne mentionne pas la case de départ de la pièce lorsqu'il n'y a pas d'ambigüité ; en effet dans la majorité des cas, une seule pièce du type indiqué peut se rendre sur la case d'arrivée.
-En cas d'ambiguïté sur la pièce qui se déplace, on marque la lettre de la colonne où se trouve la bonne pièce 
-(exemple : un cavalier blanc en f3, un cavalier blanc en g4. Le cavalier en f3 se déplace en e5. Noter Ne5 est insuffisant, on note alors Nfe5).
+En cas d'ambiguïté sur la pièce qui se déplace, on marque la lettre de la colonne où se trouve la bonne pièce. 
+Exemple : un cavalier blanc en f3, un cavalier blanc en g4. Le cavalier en f3 se déplace en e5. Noter Ne5 est insuffisant, on note alors Nfe5).
 
-S'il y a encore ambiguïté, on remplace la lettre de la colonne par le numéro de la rangée.
-Prenons un cavalier blanc en f3 et un cavalier blanc en f7. Ne5 ou Nfe5 sont tous deux insuffisants pour identifier la pièce ; on doit noter N3e5).
+S'il y a encore ambiguïté, on remplace la lettre de la colonne par le numéro de la rangée. 
+Exemple: un cavalier blanc en f3 et un cavalier blanc en f7. Ne5 ou Nfe5 sont tous deux insuffisants pour identifier la pièce ; on doit noter N3e5).
 <pre>
 Exemple :
 
