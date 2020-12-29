@@ -146,7 +146,7 @@ function fenToGame (fen, jeu) {
          c = 0;
       }
    }
-   return jeu, ep;
+   return [jeu, ep];
 }
 
 /* vraie si il y a une piece egale a l1, c1 dans le symetrique par rapport a la colonne cDest */
@@ -552,7 +552,7 @@ function forward () {
 
 /* met à jour le jeu suite à saisie d'un chaîne FEN */
 function refresh () {
-   jeu, info.epComputer = fenToGame (document.getElementById ('FEN').value, jeu);
+   [jeu, info.epComputer] = fenToGame (document.getElementById ('FEN').value, jeu);
    infoUpdate (jeu);
    displayUpdate ();
    display ();
@@ -716,7 +716,7 @@ function moveRead (nom) {
       v = Math.abs(jeu [lSource][cSource]);
       carPiece = DICT [v];
       info.lastGamerPlay = carPiece + info.lastGamerPlay + prise + nom; // source + destination
-      if (res == EN_PASSANT) info.lastGamerPlay += "e.p."
+      if (res == EN_PASSANT) info.lastGamerPlay += "e.p.";
       info.lastGamerPlayA = abbrev (jeu, info.lastGamerPlay);
       if ((info.story != '') && (gamerColor == -1)) info.story += '\n';
       spaces = (info.nb < 10) ? "  ": ((info.nb < 100) ? " " : "");
@@ -769,7 +769,7 @@ function serverRequest () {
             response = this.responseText;
             // alert (response);
             responseServer = JSON.parse (response);
-            jeu, info.epComputer = fenToGame (responseServer.fen, jeu);
+            [jeu, info.epComputer] = fenToGame (responseServer.fen, jeu);
             if ((info.story != '') && (gamerColor == 1)) info.story += '\n';
             spaces = (info.nb < 10) ? "  ": ((info.nb < 100) ? " " : "");
             info.story += (gamerColor == 1) ? info.nb + spaces : "";
