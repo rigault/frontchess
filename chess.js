@@ -243,7 +243,7 @@ function abbrev (sq64, complete) {
 }
 
 /* vrai si le roi situe case l, c est echec au roi */
-/* 'who' est la couleur du roi who est attaque */
+/* "who" est la couleur du roi qui est attaque */
 function LCkingInCheck (sq64, who, l, c) {
    let w, w1, w2, i, j, k;
    // pion menace
@@ -640,10 +640,7 @@ function test (nom) {
 
 /* saisie du deplacement par le joueur */
 function moveRead (nom) {
-   if (testState) {
-      test (nom);
-      return;
-   }
+   if (testState) return test (nom);
    let lDest, cDest;
    let v;
    let carPiece;
