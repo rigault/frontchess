@@ -60,7 +60,7 @@ let info = {
    nComputerPieces: 16,      // nombre de pieces Ordi
    lastGamerPlay: '',        // dernier coup joueur au format complet Xa1-b1
    lastGamerPlayA: '',       // dernier coup joueur au format Alg abrege
-   lastComputerPos: '',      // dernier coup ordi ai format complet Xa1-b1
+   lastComputerPos: '',      // dernier coup ordi au format complet Xa1-b1
    kingStateGamer: 0,
    kingStateComputer: 0,
    castleComputer: "Non",
@@ -77,7 +77,7 @@ let info = {
    epGamer: "-"              // en passant Joueur
 };
 
-let lSource, cSource;
+let lSource, cSource;        // necessaire e variable globale pour moveread. 
 
 /* Code colonne au format a-h. c = 0, cToString = "a" */
 function cToString (c) {
@@ -90,6 +90,10 @@ function stringToLC (str) {
 }
 
 /* Forsyth–Edwards Notation */
+/* genere le jeu sous la forme d'une chaine de caracteres au format FEN */
+/* le separateur est : "+" */
+/* le roque est indiqué ainsi que "en passant" */
+/* le compteur des 50 coups et le nb de coups */
 function gameToFen (jeu, color, ep, cpt50, noCoup) {
    let n, v;
    let sFen = "";
@@ -118,6 +122,11 @@ function gameToFen (jeu, color, ep, cpt50, noCoup) {
 }
 
 /* Forsyth–Edwards Notation */
+/* fenToGame traduit une chaine de caracteres au format FEN et renvoie l'objet jeu ainsi que la couleur */
+/* 3kq3/8/8/8/8/3K4/+w+-- */
+/* retourne le jeu et la valeur de la case "en passant" */
+/* le roque est contenu dans la valeur du roi : KING ou CASTLEKING */
+/* les separateurs acceptes entre les differents champs sont : + et Espace */ 
 function fenToGame (fen, jeu) {
    let sign;
    let l = 7;
@@ -138,7 +147,7 @@ function fenToGame (fen, jeu) {
       if (cChar == ' ' || cChar == '\t' || cChar == '\n') break;
       if (cChar == '/') continue; 
       if ((cChar >= '1') && (cChar <= '8')) {
-         for (let k = 0; k < (cChar.charCodeAt(0) - 48); k += 1) {
+         for (let k = 0; k < parseInt (cChar); k += 1) {
             jeu [l][c] = VOID;
             c += 1;
          }
@@ -432,6 +441,7 @@ function verification (jeu, l, c, lDest, cDest, who) {
 }
 
 /* verifie que la case choisie par le joueur est valide */
+/* il est nécessaire que la pièce puisse bouger d'au moins une case */
 function choiceIsOK (jeu, l, c, who) {
    let v = jeu[l][c];
    if  (v*who <= 0) return false;
@@ -483,16 +493,13 @@ function choiceIsOK (jeu, l, c, who) {
 }
 
 /* traduit des secondes au format HH:MM:SS */
-function secToHHMMSS(sec) {
-   let sec_num = parseInt(sec);
-   let hours   = Math.floor(sec_num / 3600);
-   let minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-   let seconds = sec_num - (hours * 3600) - (minutes * 60);
+function secToHHMMSS (sec) {
+   sec = parseInt (sec);
+   let hours = Math.floor(sec / 3600).toString ().padStart (2, "0");
+   let minutes = Math.floor((sec - (hours * 3600)) / 60).toString ().padStart (2, "0");
+   let seconds = (sec - (hours * 3600) - (minutes * 60)).toString().padStart (2, "0");
 
-   if (hours   < 10) {hours   = "0"+hours;}
-   if (minutes < 10) {minutes = "0"+minutes;}
-   if (seconds < 10) {seconds = "0"+seconds;}
-   return hours+':'+minutes+':'+seconds;
+   return hours + ':' + minutes + ':' + seconds;
 }
 
 /* affiche le chrono joueur */
@@ -913,7 +920,7 @@ function display () {
       for (l = N-1; l >=0; l -=1) {
          sJeu+= "<br/><button class = 'deco'>" + (l+1).toString () + "</button>\n";
          for (c = 0; c < N; c +=1)
-	    sJeu += commonDisplay (l, c);
+	         sJeu += commonDisplay (l, c);
          sJeu+= "<button class = 'deco'>" + (l+1).toString () + "</button>\n";
       }
       sJeu+= "<br/>";
@@ -929,7 +936,7 @@ function display () {
       for (l = 0; l < N; l += 1) {
          sJeu+= "<br/><button class = 'deco'>" + (l+1).toString () + "</button>";
          for (c = N-1; c >= 0; c -= 1)
-	    sJeu += commonDisplay (l, c);
+	         sJeu += commonDisplay (l, c);
          sJeu+= "<button class = 'deco'>" + (l+1).toString () + "</button>\n";
       }
       sJeu+= ("<br/>");

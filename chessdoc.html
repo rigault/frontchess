@@ -64,7 +64,7 @@ Sauf cas particulier, utiliser la requête 1.
 
 <h3>fen </h3>
 
-Le jeu dans les echanges externes (API) est représenté par la notation iFEN (Forsyth–Edwards Notation). 
+Le jeu dans les echanges externes (API) est représenté par la notation FEN (Forsyth–Edwards Notation). 
 Le codage est le suivant :
 
 <p>
@@ -184,20 +184,20 @@ Afin de réduire la recherche aux seuls cas pertinents, la méthode Alpha-Bêta 
 
 <p>Conventions :
 <ul>
-   <li>Les blancs sont identifiés par des valeurs négatives et des caractères en majuscules.</li>
-   <li>Les noirs sont identifiés par des valeur positive et des caractères en minuscules.</li>
-   <li>Les cases vides ont une valeur nulle (0)</li>
-   <li>Le jeu est représenté par un tableau de 64 octets.</li>
-   <li>La liste des jeux est représentée par un tableau de jeux et un entier qui est l’index du prochain jeu à stocker.</li>
-   <li>Les lignes et colonnes d’une pièces sont représentées par un couple d'entiers (l, c) en interne.</li>
-   <li>La notation algébrique complète est utilisée pour préciser les déplacements. </li>
+   <li>Les blancs sont identifiés par des valeurs négatives et des caractères en majuscules,</li>
+   <li>les noirs sont identifiés par des valeurs positive et des caractères en minuscules,</li>
+   <li>les cases vides ont une valeur nulle (0),</li>
+   <li>le jeu est représenté par un tableau de 64 octets,</li>
+   <li>la liste des jeux est représentée par un tableau de jeux et un entier qui est l’index du prochain jeu à stocker,</li>
+   <li>les lignes et colonnes d’une pièces sont représentées par un couple d'entiers (l, c) en interne,</li>
+   <li>la notation algébrique complète est utilisée pour préciser les déplacements. </li>
 </ul>
 
 <h2>Structures de données essentielles</h2>
 <ul>
-   <li>Le jeu est représenté dans un tableau à 2 dimensions de type TGAME. </li>
-   <li>Une liste de jeux est un tableau de jeux. Type TLIST.</li>
-   <li>nextL est un entier pointant sur le prochain jeux a insérer dans la liste</li>
+   <li>Le jeu est représenté dans un tableau à 2 dimensions de type TGAME,</li>
+   <li>une liste de jeux est un tableau de jeux. Type TLIST,</li>
+   <li>nextL est un entier pointant sur le prochain jeux a insérer dans la liste,</li>
    <li>info est la structure rassemblant un ensemble de données de contrôles et d’état du jeux.</li>
 </ul>
 
@@ -207,13 +207,14 @@ La fonction buildList construit la liste de toutes les positions possibles jouab
 <p> Quatrecomportements :
 
 <ul>
-   <li>si niveau choisi -1, choix aléatoire,</li>
+   <li>Si niveau choisi -1, choix aléatoire,</li>
    <li>recherche dans la bibliothèque d'ouvertures,</li>
-   <li>recherche dans le tables de fin de jeux</li>
+   <li>recherche dans le tables de fin de jeux,</li>
    <li>sinon pour toutes les positions possibles, génération d’un thread qui va lancer alphabeta,
-récupération des évaluations dans le tableau tEval, puis choix au hasard d’un des jeux ayant obtenu la meilleure note </li></ul>
+récupération des évaluations dans le tableau tEval, puis choix au hasard d’un des jeux ayant obtenu la meilleure note.</li>
+</ul>
 
-La fonction Alphabeta implémente l’algorithme Minimax avec élagage Alphabeta.
+La fonction alphabeta implémente l’algorithme Minimax avec élagage Alphabeta.
 
 <h2>Le CLI Command Line Interface </h2>
 <pre>
@@ -280,8 +281,8 @@ Comme indice de boucle, préférer le type "int" au type "char" car plus rapide.
 <h2>Bibliothèque d'ouverture </h2>
 
 Avant de lancer la recherche dans l'arbre, une bibliothèque d'ouverture est utilisée.
-<p> les fichiers utilisés sont places dans un repertoire spécifique
-<p> Il sont listés dans l'ordre alphabétique. Ceci signifie que si deux configurations éligibles sont situées
+<p> Les fichiers utilisés sont placés dans un repertoire spécifique
+<p> Il sont évalués dans l'ordre alphabétique. Ceci signifie que si deux configurations éligibles sont situées
 dans des fichiers différent, seule celle appartenant au premier fichier dans l'orde alphabétique sera considérée. 
 <p>Les fichiers suffixés par ".b.fen" et ".w.fen" sont au format textuel CSV et contiennent la liste des ouvertures au format FEN vus des noirs et vus des blancs.
 <p> Format CSV : FENstring ; dep ; commentaires
@@ -292,7 +293,7 @@ dans des fichiers différent, seule celle appartenant au premier fichier dans l'
 rnbqkbnr/pppppppp8/8/4P3/8/PPPP1PPP/RNBQKBNR b Pe7-e5; Classique-Ouvert-ou-Alekhine-Coup1; RR
 rnbqkbnr/pppppppp8/8/3P4/8/PPP1PPPP/RNBQKBNR b Pd7-d5; Classique-ferme-Coup1; RR
 </pre>
-<p> Les indications de couleurs b|w sont igoorées car l'ordinateur connait déja sa couleur et sélectionne le fichier ".b.fen" si noir, ".w.fen" si blanc en conséquence.
+<p> Les indications de couleurs b|w sont ignorées car l'ordinateur connait déja sa couleur et sélectionne le fichier ".b.fen" si noir, ".w.fen" si blanc en conséquence.
 
 <h2>Gestion En Passant </h2>
 
@@ -440,7 +441,7 @@ bool computerPlay (TGAME sq64, int color) { /* */
    /* prepare le lancement de la recherche avec find */
 
 void cgi () { /* */
-   /* MODE CGI */
+   /* MODE CGI
 
 int main (int argc, char *argv[]) { /* */
    /* lit la ligne de commande */
@@ -482,7 +483,7 @@ void printGame (TGAME jeu, int eval) { /* */
 int fenToGame (char *fenComplete, TGAME sq64, char *ep, int *cpt50, int *nb) { /* */
    /* Forsyth–Edwards Notation */
    /* le jeu est recu sous la forme d'une chaine de caracteres du navigateur au format fen */
-   /* FENToJeu traduit cette chaine et renvoie l'objet jeu ainsi que la couleur */
+   /* fenToGame traduit cette chaine et renvoie l'objet jeu ainsi que la couleur */
    /* 3kq3/8/8/8/8/3K4/+w+-- */
    /* retour 1 si noir, -1 si blanc */
    /* le roque est contenu dans la valeur du roi : KING ou CASTLEKING */
@@ -562,7 +563,7 @@ int buildList (TGAME refJeu, register int who, TLIST list) { /* */
 Le front, côté client est composé d'un fichier HTML, un CSS et de fonctions écrites en Javascipt.
 main () est la fonction appelée dans le code HTML.
 
-La javascript contrôle que l'entrée du joueur est valide, envoie le jeu via une requete XMLhttp request au format décrit dans la section API, reçoit la réponse du serveur JSON. Il interprête l'attribut fen et affiche le jeu.
+Le code javascript contrôle que l'entrée du joueur est valide, envoie le jeu via une requete XMLhttp request au format décrit dans la section API, reçoit la réponse du serveur JSON. Il interprête l'attribut fen et affiche le jeu.
 
 <h2>Aspects pratiques </h2>
 
@@ -586,9 +587,18 @@ function cToString (c)
 function stringToLC (str)
   
 /* Forsyth–Edwards Notation */
+/* genere le jeu sous la forme d'une chaine de caracteres au format FEN */
+/* le separateur est : "+" */
+/* le roque est indiqué ainsi que "en passant" */
+/* le compteur des 50 coups et le nb de coups */
 function gameToFen (jeu, color, ep, cpt50, noCoup)
   
 /* Forsyth–Edwards Notation */
+/* fenToGame traduit une chaine de caracteres au format FEN et renvoie l'objet jeu ainsi que la couleur */
+/* 3kq3/8/8/8/8/3K4/+w+-- */
+/* retourne le jeu et la valeur de la case "en passant" */
+/* le roque est contenu dans la valeur du roi : KING ou CASTLEKING */
+/* les separateurs acceptes entre les differents champs sont : + et Espace */ 
 function fenToGame (fen, jeu)
   
 /* vraie si il y a une piece egale a l1, c1 dans le symetrique par rapport a la colonne cDest */
@@ -601,7 +611,7 @@ function symetryH (sq64, l1, c1, lDest)
 function abbrev (sq64, complete)
   
 /* vrai si le roi situe case l, c est echec au roi */
-/* 'who' est la couleur du roi who est attaque */
+/* "who" est la couleur du roi qui est attaque */
 function LCkingInCheck (sq64, who, l, c)
   
 /* verifie que le deplacement choisi est valide */
@@ -609,10 +619,11 @@ function LCkingInCheck (sq64, who, l, c)
 function verification (jeu, l, c, lDest, cDest, who)
   
 /* verifie que la case choisie par le joueur est valide */
+/* il est nécessaire que la pièce puisse bouger d'au moins une case */
 function choiceIsOK (jeu, l, c, who)
   
 /* traduit des secondes au format HH:MM:SS */
-function secToHHMMSS(sec)
+function secToHHMMSS (sec)
   
 /* affiche le chrono joueur */
 function chronoGamer()
@@ -669,6 +680,7 @@ function display ()
 /* programme principal */
 function main ()
   
+
 </pre> 
 <h2>Codage des pièces</h2>
 <div id = "conteneur">
@@ -725,40 +737,65 @@ Un enregistrement FEN définit une position particulière, il est écrit sur une
 L'extension du fichier est « .fen ».
 <p>
 Cette notation est en anglais, les pièces sont nommées rook (tour), knight (cavalier), bishop (fou), queen (dame), king (roi) et pawn (pion).
+<p>
+Un enregistrement contient 6 champs. Le séparateur est l'espace. 
+
+Note : Le "+" est utilisé dans nos programmes, pour être compatible avec le passage par URL et en liggne de commande.
+
+Les champs sont :
+
+<ol>
+<li>Position des pièces vue du côté des blancs. Chaque rangée est décrite de la rangée 8 à la rangée 1.
+Dans chaque rangée, le contenu est décrit de la colonne a à la colonne h.
+Les pièces blanches sont symbolisées par des lettres majuscules ("KQRBNP"), les noires par des minuscules ("kqrbnp"). Les cases vides successives sont notées par un nombre (de 1 à 8).
+Une barre oblique « / » sépare les rangées;</li>
+
+<li>Couleur devant jouer. « w » si blanc doit jouer, "b" si noir;</li>
+
+<li> Roques possibles. Utiliser une combinaison de plusieurs lettres : "K" (les blancs peuvent du côté roi [petit roque]), 
+« Q » (les blancs peuvent du côté dame [grand roque]), respectivement « k » et « q » pour les noirs. 
+Si aucun roque possible : « - »;</li>
+
+<li>Case d'une prise en passant possible en notation algébrique. Si un pion vient de se déplacer de 2 pas, c'est la position « derrière » le pion. Sinon inscrire « - »;</li>
+
+<li> Demi-coups : le nombre de demi-coups depuis la dernière capture ou le dernier mouvement de pion. Cela permet de savoir si la partie est nulle selon la règle des 50 coups; </li>
+
+<li> Coups : le nombre de coups complets. Il commence à 1 et est incrémenté de 1 après le coup des noirs. </li>
+</ol>
 
 <p>
-Chaque rangée est décrite de la rangée 8 à la rangée 1. Dans chaque rangée,
-<ul> 
-<li>le contenu est décrit de la colonne "a" à la colonne "h",</li>
-<li>les pièces blanches sont symbolisées par des lettres en majuscules ("KQRBNP"),</li> 
-<li>les noires par des lettres en minuscule ("kqrbnp"), </li> 
-<li>le nombre de cases vides est noté par un nombre allant de 1 à 8, et une barre oblique « / » sépare les rangées</li>
-</ul>
-<p>
-« w » signifie que les blancs jouent, alors que « b » signifie que c'est le tour des noirs.
-<p>
-Roques possibles : 
+En partant de la position initiale du jeu traditionnel :
+
+<p> rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+
+<p> Ceci est une figuration des 8 rangées de l'échiquier en commençant par le haut, séparées par des "/" :
+
 <ul>
-<li>K (resp. k) :  roque possble des blancs à droite</li>
-<li>Q (resp. q) : roque possible des blancs à gauche</li>
-<li>- : aucun roque possible </li>
-</ul>
-
-<p>rnbqkbnr/pppppppp8/8/8/8/PPPPPPPP/RNBQKBNR w KQ- 
-<p>
-Ceci est une figuration des 8 rangées de l'échiquier en commençant par le haut, séparées par des « / » :
-
-<ul>
-<li>les pièces noires ("rnbqkbnr"),
+<li>Les pièces noires ("rnbqkbnr"),
 <li>les pions noirs (« pppppppp"),
 <li>4 rangées vides avec le chiffre 8 pour 8 cases vides ("8/8/8/8"),
 <li>les pions blancs ("PPPPPPPP"),
-<li>kes pièces blanches ("RNBQKBNR").
+<li>les pièces blanches ("RNBQKBNR").
 </ul>
 
-Tour aux blancs ("w")
 <p>
-Les blancs peuvent roquer des deux côtés ("KQ"). Les noirs ne peuvent pas ("-");
+Suivi d'informations complémentaires :
+
+<ul>
+<li>Tour aux blancs ("w"),</li>
+<li>roques possibles ("KQkq"),</li>
+<li>case en passant ("-"),</li>
+<li>nombre de demi coups pour règle des 50 coups : "0",</li>
+<li>numéro du coup complet en cours : "1".</li>
+</ul>
+
+
+Après le coup 1. e4 :
+<p>
+rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1
+<p>
+e3 désigne la case "en passant".
+
 
 <h2>Notation algébrique</h2>
 
@@ -788,12 +825,11 @@ Le numéro d'ordre des coups est donné pour les Blancs et n'est pas répété p
 
 <p>
 Lorsque la pièce jouée est un pion, on omet de noter l'initiale de la pièce (P).
-On ne mentionne pas la case de départ de la pièce lorsqu'il n'y a pas d'ambigüité ; en effet dans la majorité des cas, une seule pièce du type indiqué peut se rendre sur la case d'arrivée.
+<p>On ne mentionne pas la case de départ de la pièce lorsqu'il n'y a pas d'ambigüité ; en effet dans la majorité des cas, une seule pièce du type indiqué peut se rendre sur la case d'arrivée.
 En cas d'ambiguïté sur la pièce qui se déplace, on marque la lettre de la colonne où se trouve la bonne pièce. 
-Exemple : un cavalier blanc en f3, un cavalier blanc en g4. Le cavalier en f3 se déplace en e5. Noter Ne5 est insuffisant, on note alors Nfe5.
-
-S'il y a encore ambiguïté, on remplace la lettre de la colonne par le numéro de la rangée. 
-Exemple: un cavalier blanc en f3 et un cavalier blanc en f7. Ne5 ou Nfe5 sont tous deux insuffisants pour identifier la pièce ; on doit noter N3e5.
+<p>Exemple : un cavalier blanc en f3, un cavalier blanc en g4. Le cavalier en f3 se déplace en e5. Noter Ne5 est insuffisant, on note alors Nfe5.
+<p> S'il y a encore ambiguïté, on remplace la lettre de la colonne par le numéro de la rangée. 
+<p>Exemple: un cavalier blanc en f3 et un cavalier blanc en f7. Ne5 ou Nfe5 sont tous deux insuffisants pour identifier la pièce ; on doit noter N3e5.
 <pre>
 Exemple :
 
@@ -802,7 +838,7 @@ Exemple :
 </pre>
 
 <h2> Les fichiers PGN (Portable Game notation)</h2>
-<p> voir Wikipédia.
+<p> Voir Wikipédia.
 <p>
 Portable Game Notation (PGN) désigne un format standard de codage des parties d'échecs.
 <p>
@@ -833,7 +869,7 @@ f3 Bc8 34. Kf2 Bf5 35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5
 
 <h2> ECO : Encyclopedia of Chess Openings </h2>
 
-voir Wikipedia.
+Voir Wikipedia.
 <p>
 L'Encyclopédie des ouvertures d'échecs (Encyclopaedia of Chess Openings, ECO) est une publication en cinq volumes de la maison d'édition serbe l'Informateur d'échecs qui reprend les principales ouvertures connues dans le jeu. Elle utilise un code de classification des ouvertures, appelé code ECO, qui a été repris par d'autres publications et fait aujourd'hui figure de standard international.
 <p>
@@ -856,11 +892,18 @@ Un programme écrit en c, PGNtoFEN permet de convertir des fichier PGN au format
 
 <h3> uniqRR </h3>
 
-UniqRR est un programme écrit en C qui élimine les lignes redondantes d'un fichier trié.
+uniqRR est un programme écrit en C qui élimine les lignes redondantes d'un fichier trié.
 Deux lignes sont considérées équivalentes si le premier champ est identique.
 Ce premier champ est délimite par le separateur SEP. En général ";".
 <p>
 appel : ./uniqRR fileName
+<h3> findgame </h3>
+
+findgame est un programme écrit en C qui trouve le nième jeu dans un fichier PGN.
+<p>
+Un fichier PGN comportant des milliers de parties, il est utile de pouvoir un sélectionner une.
+
+appel : ./findgame fileName no */
 
 <h3>makefen.sh</h3>
 
