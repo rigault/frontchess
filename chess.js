@@ -4,14 +4,14 @@
 "use strict";
 const N = 8;
 const VOID = 0, PAWN = 1, KNIGHT = 2, BISHOP = 3, ROOK = 4, QUEEN = 5, KING = 6, CASTLE_KING = 7;
-const CASTLING_GAMER = 9999;   // signale que le joueur tente le roque
+const CASTLING_GAMER = 9999;  // signale que le joueur tente le roque
 const EN_PASSANT = 9998;      // signale que le joueur tente la prise en passant
 const REQ_TYPE = 2;
 const CINQUANTE = 50;         // pour la regle des 50 coups
 
-// const MY_URL = "http://23.251.143.190/cgi-bin/chess.cgi?";
-// const MY_URL = "http://192.168.1.100/cgi-bin/chess.cgi?";
-const MY_URL = "http://127.0.0.1/cgi-bin/chess.cgi?";
+// const MY_URL = "http://23.251.143.190/cgi-bin/chess.cgi?"; // GCP
+// const MY_URL = "http://192.168.1.100/cgi-bin/chess.cgi?";  // serveur reseau local
+const MY_URL = "http://127.0.0.1/cgi-bin/chess.cgi?";  // mac
 
 const EVAL_THRESHOLD = 900000;
 // Pawn, kNight, Bishop, Rook, Queen, King, rOckking
@@ -46,7 +46,6 @@ let indexHistory = 0;
 let maxIndexHistory = 0;
 let testState = false;
 let computerColor = "b";
-
 let gamerCount; // pour chrono Joueur
 
 let responseServer = {}; // objet JSON
@@ -79,6 +78,16 @@ let info = {
 };
 
 let lSource, cSource;
+
+/* Code colonne au format a-h. c = 0, cToString = "a" */
+function cToString (c) {
+   return String.fromCharCode(97+c);
+}
+
+/* renvoie l, c en fonction de la case en notation "e1" */
+function stringToLC (str) {
+   return [parseInt (str [1]) - 1, str.charCodeAt(0) - 'a'.charCodeAt(0)];
+}
 
 /* Forsyth–Edwards Notation */
 function gameToFen (jeu, color, ep, cpt50, noCoup) {
@@ -163,10 +172,8 @@ function symetryH (sq64, l1, c1, lDest) {
 
 /* transforme la specif algebriqe complete en abregee */
 function abbrev (sq64, complete) {
-   let l1 = parseInt (complete [2]) - 1;
-   let l2 = parseInt (complete [5]) - 1;
-   let c1 = complete.charCodeAt(1) - 'a'.charCodeAt(0);
-   let c2 = complete.charCodeAt(4) - 'a'.charCodeAt(0);
+   let [l1, c1] = stringToLC (complete.slice (1,3));
+   let [l2, c2] = stringToLC (complete.slice (4,6));
    let cCharPiece = complete [0]; 
    let prise = complete [3];
    let v = sq64 [l1][c1];
@@ -178,17 +185,17 @@ function abbrev (sq64, complete) {
    case PAWN:
       cCharPiece = ""; 
       if ((prise == 'x') && (symetryV (sq64, l1, c1, c2))) // il y a deux pions symetrique prenant en c2 a partir de la ligne l1
-         spec = String.fromCharCode(97+c1);                // on donne la colonne
+         spec = cToString (c1);                    // on donne la colonne
       break;
    case KNIGHT:
-      if (symetryV (sq64, l1, c1, c2)) spec = String.fromCharCode(97+c1); //cavaliers symetrique par rapport à la col. dest
-      else if (symetryH (sq64, l1, c1, l2)) spec = String.fromCharCode(49+l1); //cavaliers symetrique par rapport à la ligne dest
+      if (symetryV (sq64, l1, c1, c2)) spec = cToString (c1); //cavaliers symetrique par rapport à la col. dest
+      else if (symetryH (sq64, l1, c1, l2)) spec = (l1+1).toString (); //cavaliers symetrique par rapport à la ligne dest
       break;
    case ROOK:
       if ((l1 == l2) && (c1 < c2)) {               // meme ligne, recherche a droite  
          for (let i = (c2 + 1); i < N; i++) {
             if (sq64 [l1][i] == v) {               // il y a une autre tour en position d'aller vers l2 c2
-               spec = String.fromCharCode(97+c1);  // Trouve. on donne la colonne
+               spec = cToString (c1);              // Trouve. on donne la colonne
                break;
             }
             if (sq64 [l2][i] != VOID) break;
@@ -197,7 +204,7 @@ function abbrev (sq64, complete) {
       if ((l1 == l2) && (c1 > c2)) {               // meme ligne, recherche a droite  
          for (let i = (c2 - 1); i >= 0; i--) {
             if (sq64 [l1][i] == v) {               // il y a une autre tour en position d'aller vers l2 c2
-               spec = String.fromCharCode(97+c1);  // Trouve. On donne la colonne
+               spec = cToString (c1);              // Trouve. On donne la colonne
                break;
             }
             if (sq64 [l2][i] != VOID) break;
@@ -206,7 +213,7 @@ function abbrev (sq64, complete) {
       if ((c1 == c2) && (l1 < l2)) {               // meme colonne, recherche en bas 
          for (let i = (l2 + 1); i < N; i++) {
             if (sq64 [i][c1] == v) {               // il y a une autre tour en position d'aller vers l2 c2
-               spec = String.fromCharCode(49+l1);
+               spec = (l1+1).toString ();
                break;
             }
             if (sq64 [i][c2] != VOID) break;
@@ -215,7 +222,7 @@ function abbrev (sq64, complete) {
       if ((c1 == c2) && (l1 > l2)) {               // meme colonne, recherce en haut  
          for (let i = (l2 - 1); i >= 0; i--) {
             if (sq64 [i][c1] == v) {               // il y a une autre tour en position d'aller vers l2 c2
-               spec = String.fromCharCode(49+l1);
+               spec = (l1+1).toString ();
                break;
             }
             if (sq64 [i][c2] != VOID) break;
@@ -225,11 +232,11 @@ function abbrev (sq64, complete) {
    case QUEEN:                                     // cas ou il y aurait 2 reines apres une promotion
       for (let l = 0; l < N; l++)
          for (let c = 0; c < N; c ++)
-            if (l != l1 && c != c1 && sq64 [l][c] == v) spec = String.fromCharCode(97+c1) + String.fromCharCode(49+l1);
+            if (l != l1 && c != c1 && sq64 [l][c] == v) spec = cToString (c1) + (l1+1).toString ();
       break;
    default: // BISHOP, KING
    }
-   abbr = cCharPiece + spec + ((prise == 'x') ? "x" : "") + String.fromCharCode(97+c2) + String.fromCharCode(49+l2) + promotion;
+   abbr = cCharPiece + spec + ((prise == 'x') ? "x" : "") + cToString (c2) + (l2+1).toString () + promotion;
    if (complete.includes ("e.p.")) abbr += " e.p."; 
    if (complete.includes ("=")) abbr += '=' + complete [7];
    return abbr;
@@ -301,22 +308,22 @@ function LCkingInCheck (sq64, who, l, c) {
 
    // fou ou reine menace
    w2 = -who * BISHOP;
-   for (k = 0; k < Math.min (7-l, 7-c); k++) { // vers haut droit
+   for (k = 0; k < Math.min (7-l, 7-c); k++) {  // vers haut droit
       w = sq64 [l+k+1][c+k+1];
       if (w == w1 || w == w2) return true;
       if (w != 0) break;
    }
-   for (k = 0; k < Math.min (7-l, c); k++) {// vers haut gauche
+   for (k = 0; k < Math.min (7-l, c); k++) {    // vers haut gauche
       w = sq64 [l+k+1][c-k-1];
       if (w == w1 || w == w2) return true;
       if (w != 0) break;
    }
-   for (k = 0; k < Math.min (l, 7-c); k++) { // vers bas droit
+   for (k = 0; k < Math.min (l, 7-c); k++) {    // vers bas droit
       w = sq64 [l-k-1][c+k+1];
       if (w == w1 || w == w2) return true;
       if (w != 0) break;
    }
-   for (k = 0; k < Math.min (l, c); k++) { // vers bas gauche
+   for (k = 0; k < Math.min (l, c); k++) {      // vers bas gauche
       w = sq64 [l-k-1] [c-k-1];
       if (w == w1 || w == w2) return true;
       if (w != 0) break;
@@ -365,8 +372,7 @@ function verification (jeu, l, c, lDest, cDest, who) {
    switch (Math.abs (v)) {
    case PAWN:
       if (info.epComputer != "-") { // prise en passant possible
-         lEp = parseInt (info.epComputer [1]) - 1;
-         cEp = info.epComputer.charCodeAt(0) - 'a'.charCodeAt(0);
+         [lEp, cEp] = stringToLC (info.epComputer);
          if ((cEp == cDest) && (Math.abs (c - cDest) == 1) && (lDest == lEp) && ((lDest-l) == -who))
            return EN_PASSANT;
       }
@@ -558,7 +564,7 @@ function refresh () {
    display ();
 }
 
-/* met à jour le jeu suite à saisie d'un chaîne FEN */
+/* affecte les blancs au joueur ou à l'ordinateur */
 function whoGetWhites () {
    computerColor = (computerColor == "b") ? "w" : "b";
    alert ("computerColor = " + computerColor);
@@ -568,7 +574,7 @@ function whoGetWhites () {
 }
 
 /* retourne false si on arrete le jeu, TRUE si on continue */
-/* affiche un info fonction des codes reçus du serveur */
+/* affiche des infos fonction des codes reçus du serveur */
 function statusAnalysis () {
    // NO_EXIT = 0, EXIST = 1, IS_IN_CHECK = 2, UNVALID_IN_CHECK = 3, IS_MATE = 4, IS_PAT = 5;
    const STATE_MESSAGE_PLAYER = [
@@ -614,15 +620,13 @@ function test (nom) {
    let elem = document.getElementById (nom);
 
    if (info.lastGamerPlay == '') {                    // saisie de la case source
-      lSource = parseInt (nom [1]) - 1;
-      cSource =  nom.charCodeAt(0) - 'a'.charCodeAt(0);
+      [lSource, cSource] = stringToLC (nom);
       info.lastGamerPlay = nom;                       // la case source
       elem.style.background = 'olive';
       elem.style.color = 'white';
       }
    else {                                             // saisie de la case destination
-      lDest = parseInt (nom [1]) - 1;
-      cDest =  nom.charCodeAt(0) - 'a'.charCodeAt(0);
+      [lDest, cDest] = stringToLC (nom);
       v = jeu [lSource][cSource];
       if ((v == -PAWN) && (lDest == 7)) jeu [lDest][cDest] = -QUEEN; // promotion
       else jeu [lDest][cDest] = v;
@@ -653,40 +657,41 @@ function moveRead (nom) {
    if ((info.kingStateGamer == KINGSTATE.NOEXIST) || (info.kingStateGamer == KINGSTATE.IS_MATE))
       return;
 
-   if (info.lastGamerPlay == '') {                               // saisie de la case source
-      lSource = parseInt (nom [1]) - 1;
-      cSource =  nom.charCodeAt(0) - 'a'.charCodeAt(0);
-      if (choiceIsOK (jeu, lSource, cSource, gamerColor)) {      // who a le meme signe que la case jouee
-         info.lastGamerPlay = nom;                               // la case source
+   if (info.lastGamerPlay == '') {                          // saisie de la case source
+      [lSource, cSource] = stringToLC (nom);
+      if (choiceIsOK (jeu, lSource, cSource, gamerColor)) {     
+         info.lastGamerPlay = nom;                          // la case source
          elem.style.background = 'olive';
          elem.style.color = 'white';
       }
       return;
    }
 
-   lDest = parseInt (nom [1]) - 1;
-   cDest =  nom.charCodeAt(0) - 'a'.charCodeAt(0);
-   if (lSource == lDest && cSource == cDest) {                //+ on annule tout
+   [lDest, cDest] = stringToLC (nom);                       // saisie case destination
+   if (lSource == lDest && cSource == cDest) {              // on annule tout
       info.lastGamerPlay = '';
       display ();
       return;
    }
 
-   res = verification(jeu, lSource, cSource, lDest, cDest, gamerColor);
-   if (Math.abs(jeu [lSource][cSource]) == KING) { 
-         info.leftCastleGamerOK = false;
-         info.rightCastleGamerOK = false;
-   }
-
+   res = verification (jeu, lSource, cSource, lDest, cDest, gamerColor);
+   
+   // en passant
    if ((Math.abs(jeu [lSource][cSource]) == PAWN) && (cDest == cSource) && (Math.abs (lDest - lSource) == 2)) // en Passant possible
       info.epGamer = nom [0] + (lSource + 1 - gamerColor); // genre : c6. On ne change pas la colonne. 
    else info.epGamer = "-";
  
+   // limitation du roque si on touche au roi ou a la tour
+   if (Math.abs(jeu [lSource][cSource]) == KING) { 
+         info.leftCastleGamerOK = false;
+         info.rightCastleGamerOK = false;
+   }
    if (Math.abs(jeu [lDest][cDest]) == ROOK) {
       if (cDest == 7) info.rightCastleGamerOK = false;
       else if (cDest == 0) info.leftCastleGamerOK = false;
    }
    
+   // gestion du roque
    if (res == CASTLING_GAMER) {
       spaces = (info.nb < 10) ? "  ": ((info.nb < 100) ? " " : "");
       info.rightCastleGamerOK = false;
@@ -709,6 +714,7 @@ function moveRead (nom) {
       }
    }
 
+   // cas general
    if (res == true || res == EN_PASSANT) {
       v = Math.abs (jeu [lDest][cDest]);
       info.lastTakenByGamer = (v != 0) ? UNICODE [v]: '';  // prise de piece
@@ -733,6 +739,7 @@ function moveRead (nom) {
       if (res == EN_PASSANT) jeu [lSource][cDest] = 0; // bizarre mais vrai
       jeu [lSource][cSource] = 0;
    }
+
    if (res == CASTLING_GAMER || res == EN_PASSANT || res == true) {
       if (computerColor != 'b') info.nb += 1; // computer a les blancs
       if (prise == 'x' || pawnMove) 
@@ -864,7 +871,7 @@ function displayUpdate () {
    document.getElementById ('epGamer').value = info.epGamer;               // dernier coup du joueur
    document.getElementById ('dernierJoueur').value = info.lastGamerPlayA;  // dernier coup du joueur
    document.getElementById ('nJoueur').value = info.nGamerPieces;          // nb de pieces
-   document.getElementById ('nOrdi').value = info.nComputerPieces;         //nb de pieces
+   document.getElementById ('nOrdi').value = info.nComputerPieces;         // nb de pieces
    document.getElementById ('joueurRoque').value = info.castleGamer;
    document.getElementById ('ordiRoque').value = info.castleComputer;
    document.getElementById ('historique').value = info.story;
@@ -875,10 +882,10 @@ function displayUpdate () {
 /* partie commune dans Display */
 function commonDisplay (l, c) {
    //istr contient le nom de la case au format a1
-   let istr = String.fromCharCode(97+c) + String.fromCharCode(49+l);
+   let istr = cToString (c) + (l+1).toString ();
    let v = jeu [l][c];
    let sBut = "<button class = '";
-   if ((info.lastComputerPos.indexOf ("O-O") != -1) && info.indicator) { // cas du roque
+   if ((info.lastComputerPos.indexOf ("O-O") != -1) && info.indicator) {   // cas du roque
       info.indicator = false;
       alert ("Roque !");
    }
@@ -903,35 +910,35 @@ function display () {
    let sJeu= "<p><button class = 'deco'>-</button>";
    if (info.normal) { // a l'endroit : noirs en haut
       for (c = 0; c < N; c +=1) {
-         sJeu+= " <button class = 'deco'>"+String.fromCharCode(97+c) + "</button>\n";
+         sJeu+= " <button class = 'deco'>"+cToString (c) + "</button>\n";
       }
       sJeu += "<button class = 'deco'>-</button>\n";
       for (l = N-1; l >=0; l -=1) {
-         sJeu+= "<br/><button class = 'deco'>" + String.fromCharCode(49+l) + "</button>\n";
+         sJeu+= "<br/><button class = 'deco'>" + (l+1).toString () + "</button>\n";
          for (c = 0; c < N; c +=1)
 	    sJeu += commonDisplay (l, c);
-         sJeu+= "<button class = 'deco'>" + String.fromCharCode(49+l) + "</button>\n";
+         sJeu+= "<button class = 'deco'>" + (l+1).toString () + "</button>\n";
       }
       sJeu+= "<br/>";
       sJeu+= "<button class = 'deco'>-</button>\n";
       for (c = 0; c < N; c += 1)
-         sJeu += "<button class = 'deco'>" + String.fromCharCode(97+c) + "</button>\n";
+         sJeu += "<button class = 'deco'>" + cToString (c) + "</button>\n";
       sJeu += "<button class = 'deco'>-</button>\n";
    }
    else { // a l'envers
       for (c = N-1; c >= 0; c -= 1)
-         sJeu+= " <button class = 'deco'>"+String.fromCharCode(97+c) + "</button>";
+         sJeu+= " <button class = 'deco'>"+cToString (c) + "</button>";
       sJeu += "<button class = 'deco'>-</button>\n";
       for (l = 0; l < N; l += 1) {
-         sJeu+= "<br/><button class = 'deco'>" + String.fromCharCode(49+l) + "</button>";
+         sJeu+= "<br/><button class = 'deco'>" + (l+1).toString () + "</button>";
          for (c = N-1; c >= 0; c -= 1)
 	    sJeu += commonDisplay (l, c);
-         sJeu+= "<button class = 'deco'>" + String.fromCharCode(49+l) + "</button>\n";
+         sJeu+= "<button class = 'deco'>" + (l+1).toString () + "</button>\n";
       }
       sJeu+= ("<br/>");
       sJeu+= "<button class = 'deco'>-</button>\n";
       for (c = N-1; c >= 0; c -= 1)
-         sJeu += "<button class = 'deco'>" + String.fromCharCode(97+c) + "</button>\n";
+         sJeu += "<button class = 'deco'>" + cToString (c) + "</button>\n";
       sJeu += "<button class = 'deco'>-</button>\n";
    }
    document.getElementById('milieu').innerHTML = sJeu;
