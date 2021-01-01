@@ -112,6 +112,7 @@ Les paires (attribut, valeur) sont les suivantes :
    <tr><td>wdl</td><td>retour win-draw-loss des tables de fin de jeux syzygy</td><td>string</td></tr>
    <tr><td>computePlayC</td><td>déplacement ordinateur au format algébrique complet. ex: Pe2-e4</td><td>string</td></tr>
    <tr><td>computePlayA</td><td>déplacement ordinateur au format algébrique abrégé. ex: e4</td><td>string</td></tr>
+   <tr><td>score</td><td>"-" ou "0-1" ou "1-0" ou "1/2-1/2"</td><td>string</td></tr>
    <tr><td>dump</td><td>dump de variables internes au serveur</td><td>string</td></tr>
    </tbody>
 </table>
@@ -130,47 +131,49 @@ Seuls trois attributs sont présent : description, compilation-date et version.
 <pre>
 
 {
-"description" : "Chess Rene Rigault 2020",
-"compilation-date": "Dec 28 2020",
+"description" : "Chess Rene Rigault 2021",
+"compilation-date": "Jan  1 2021",
 "version" : "2.1",
-"clockTime": "0.000318",
-"time" : "0.000550",
-"note" : "71",
+"clockTime": "0.000077",
+"time" : "0.000081",
+"note" : "-6",
 "eval" : "0",
-"computerStatus" : "1",
-"playerStatus" : "1",
-"fen" : "rnbqkbnr/pppppppp/8/8/2P5/8/PP1PPPPP/RNBQKBNR+b+KQkq+-+0+0",
+"computerStatus" : "1 : EXIST",
+"playerStatus" : "1 : EXIST",
+"fen" : "rnbqkbnr/pppppppp/8/8/2P5/8/PP1PPPPP/RNBQKBNR+b+KQkq+c3+0+0",
 "lastTake" : " ",
 "openingName" : "chess.w.fen D69; Queen's Gambit Declined, Orthodox Defense, Classical Variation; GameN: 1; TourN: 1;",
 "endName" : "",
 "wdl" : "9",
 "computePlayC" : "Pc2-c4",
 "computePlayA" : "c4",
+"score" : "-",
+"dump" : "  maxDepth=4  nEvalCall=2  nLCKingInCheck=14  nBuildList=11  nValidComputerPos=22  nValidPlayerPos=20  nMaxList=42"
 }
-
 </pre>
 
 <h3>Réponse à une requete reqType=2</h3>
 L'attribut dump est ajouté.
 <pre>
 {
-"description" : "Chess Rene Rigault 2020",
-"compilation-date": "Dec 28 2020",
+"description" : "Chess Rene Rigault 2021",
+"compilation-date": "Jan  1 2021",
 "version" : "2.1",
-"clockTime": "0.000318",
-"time" : "0.000550",
-"note" : "71",
+"clockTime": "0.000077",
+"time" : "0.000081",
+"note" : "-6",
 "eval" : "0",
-"computerStatus" : "1",
-"playerStatus" : "1",
-"fen" : "rnbqkbnr/pppppppp/8/8/2P5/8/PP1PPPPP/RNBQKBNR+b+KQkq+-+0+0",
+"computerStatus" : "1 : EXIST",
+"playerStatus" : "1 : EXIST",
+"fen" : "rnbqkbnr/pppppppp/8/8/2P5/8/PP1PPPPP/RNBQKBNR+b+KQkq+c3+0+0",
 "lastTake" : " ",
 "openingName" : "chess.w.fen D69; Queen's Gambit Declined, Orthodox Defense, Classical Variation; GameN: 1; TourN: 1;",
 "endName" : "",
 "wdl" : "9",
 "computePlayC" : "Pc2-c4",
 "computePlayA" : "c4",
-"dump" : "  maxDepth=4  nEvalCall=2  nLCKingInCheck=19  nBuildList=15  nValidComputerPos=22  nValidPlayerPos=20"
+"score" : "-",
+"dump" : "  maxDepth=4  nEvalCall=2  nLCKingInCheck=14  nBuildList=11  nValidComputerPos=22  nValidPlayerPos=20  nMaxList=42"
 }
 
 </pre>
@@ -915,7 +918,6 @@ dans la phase d'ouverture.
 
 </div> <!-- "main"-->
 <h2>Vocabulaire anglais </h2>
-<pre>
 <table>
    <tbody><tr><th>Français</th><th>Anglais</th></tr>
    <tr><td>Échecs (jeu d’échecs):</td><td>Chess</td></tr>
@@ -948,7 +950,6 @@ dans la phase d'ouverture.
    <tr><td>Mat du couloir</td><td>Back rank mate</td></tr>
    </tbody>
 </table>
-</pre>
 <h2>Référence </h2>
 <pre>
 FIDE : Fédération Internationale Des Echecs

@@ -102,13 +102,13 @@ function gameToFen (jeu, color, ep, cpt50, noCoup) {
    for (let l = N-1; l >= 0; l -= 1) {
       for (let c = 0; c < N; c += 1) {
          v = jeu [l][c];
-         if (v != VOID) {
+         if (v != 0) {
             if (v == CASTLE_KING) bCastleB = true;
             if (v == -CASTLE_KING) bCastleW = true;
             sFen += ((v >= 0)? DICT [v].toLowerCase () : DICT [-v]);
          }
          else {
-            for (n = 0; (c+n < N) && (jeu [l][c+n] == VOID); n += 1);
+            for (n = 0; (c+n < N) && (jeu [l][c+n] == 0); n += 1);
             sFen += String.fromCharCode(48 + n);
             c += n-1;
          }
@@ -148,7 +148,7 @@ function fenToGame (fen, jeu) {
       if (cChar == '/') continue; 
       if ((cChar >= '1') && (cChar <= '8')) {
          for (let k = 0; k < parseInt (cChar); k += 1) {
-            jeu [l][c] = VOID;
+            jeu [l][c] = 0;
             c += 1;
          }
       }
@@ -207,7 +207,7 @@ function abbrev (sq64, complete) {
                spec = cToString (c1);              // Trouve. on donne la colonne
                break;
             }
-            if (sq64 [l2][i] != VOID) break;
+            if (sq64 [l2][i] != 0) break;
          }
       }
       if ((l1 == l2) && (c1 > c2)) {               // meme ligne, recherche a droite  
@@ -216,7 +216,7 @@ function abbrev (sq64, complete) {
                spec = cToString (c1);              // Trouve. On donne la colonne
                break;
             }
-            if (sq64 [l2][i] != VOID) break;
+            if (sq64 [l2][i] != 0) break;
          }
       }
       if ((c1 == c2) && (l1 < l2)) {               // meme colonne, recherche en bas 
@@ -225,7 +225,7 @@ function abbrev (sq64, complete) {
                spec = (l1+1).toString ();
                break;
             }
-            if (sq64 [i][c2] != VOID) break;
+            if (sq64 [i][c2] != 0) break;
          }
       }
       if ((c1 == c2) && (l1 > l2)) {               // meme colonne, recherce en haut  
@@ -234,7 +234,7 @@ function abbrev (sq64, complete) {
                spec = (l1+1).toString ();
                break;
             }
-            if (sq64 [i][c2] != VOID) break;
+            if (sq64 [i][c2] != 0) break;
          }
       }
       break;
