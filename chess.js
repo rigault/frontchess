@@ -270,7 +270,7 @@ function LCkingInCheck (sq64, who, l, c) {
    } // fin if (who...
    w1 = -who * KING;
    w2 = -who * CASTLE_KING;
-   // roi adverse  menace
+   // roi adverse menace
    if (l < 7 && (sq64 [l+1][c] == w1 || sq64 [l+1][c] == w2)) return true;
    if (l > 0 && (sq64 [l-1][c] == w1 || sq64 [l-1][c] == w2)) return true;
    if (c < 7 && (sq64 [l][c+1] == w1 || sq64 [l][c+1] == w2)) return true;

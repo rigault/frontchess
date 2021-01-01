@@ -9,7 +9,7 @@
 
 <body>
 <header>
-Documentation sur le jeu d'echec, René Rigault, 2021
+Documentation sur le jeu d'échecs, René Rigault, 2021
 </header>
 <h1>Sommaire </h1>
 <ol>
@@ -23,12 +23,12 @@ Documentation sur le jeu d'echec, René Rigault, 2021
 <div id = "main">
 
 <h1 id="Introduction">1. Introduction </h1>
-Ce jeu d'échec s'exécute sur un serveur. Il est écrit en langage C. Une API est publiée permettant à quiconque de développer la partie cliente indépendemment du serveur.
+Ce jeu d'échec s'exécute sur un serveur. Il est écrit en langage C. Une API est publiée permettant à quiconque de développer la partie cliente indépendamment du serveur.
 <p>
 Côté client, un ensemble HTML5, CSS et JavaScript est proposé. Son rôle est de gérer l'affichage du jeu, de contrôler la saisie du joueur, de lancer vers le serveur la requête XMLHTTPRequest conforme à l'API.
 
 <h1 id="API">2. API </h1>
-Une API restful est définie et exposée par le serveur.
+Une API restfull est définie et exposée par le serveur.
 La requête est de type GET avec les paramètres apparents dans l'URL.
 La réponse est au format JSON.
 Le serveur ne gère pas d'état. Il répond aux requêtes sans utiliser d'informations en mémoires.
@@ -52,19 +52,19 @@ En cas d'absence d'éléments, il existe des valeurs par défaut.
 
 La valeur par défaut est 2 (si rien de spécifié dans la requête).
 
-<ol start ="0">
-   <li>requête de vérification d'accesibilité</li>
+<ol>
+   <li>requête de vérification d'accessibilité</li>
    <li>requête standard</li>
-   <li>requete donnant des valeurs de variables internes au serveur</li>
+   <li>requête donnant des valeurs de variables internes au serveur</li>
 </ol>
 
-Une requête 2 est un sur-ensemble de la requête 1 qui est un sur-ensemble de la requête 0.
+Une requête 2 est un sur ensemble de la requête 1 qui est un sur ensemble de la requête 0.
 
 Sauf cas particulier, utiliser la requête 1.
 
 <h3>fen </h3>
 
-Le jeu dans les echanges externes (API) est représenté par la notation FEN (Forsyth–Edwards Notation). 
+Le jeu dans les échanges externes (API) est représenté par la notation FEN (Forsyth–Edwards Notation). 
 Le codage est le suivant :
 
 <p>
@@ -100,23 +100,23 @@ Les paires (attribut, valeur) sont les suivantes :
    <tr><td>compilation-date</td><td>Dec  8 2020</td><td>string</td></tr>
    <tr><td>version</td><td>2.0</td><td>string</td></tr>
    <tr><td>clocktime</td><td>temps utilisation processeur en secondes</td><td>string</td></tr>
-   <tr><td>time</td><td>temps de reponse serveur en secondes</td><td>float</td></tr>
-   <tr><td>note</td><td>evaluation du jeu courant</td><td>int</td></tr>         
-   <tr><td>eval</td><td>evaluation rendue par le minimax</td><td>int</td></tr> 
-   <tr><td>computerStatus</td><td>Etat du roi ordinateur</td><td>int</td></tr>     
-   <tr><td>playerStatus</td><td>Etat du Roi joueur</td><td>int</td></tr>
+   <tr><td>time</td><td>temps de réponse serveur en secondes</td><td>float</td></tr>
+   <tr><td>note</td><td>évaluation du jeu courant</td><td>int</td></tr>         
+   <tr><td>eval</td><td>évaluation rendue par le minimax</td><td>int</td></tr> 
+   <tr><td>computerStatus</td><td>État du roi ordinateur</td><td>int</td></tr>     
+   <tr><td>playerStatus</td><td>État du Roi joueur</td><td>int</td></tr>
    <tr><td>fen</td><td>Jeu au format FEN</td><td>string</td></tr>
    <tr><td>lastTake</td><td>dernière prise ordi</td><td>char</td></tr>
    <tr><td>openingName</td><td>Nom de l'ouverture utilisée (si pertinent)</td><td>string</td></tr>
    <tr><td>endName</td><td>commentaires de fin de jeux avec dtz et wdl</td><td>string</td></tr>
    <tr><td>wdl</td><td>retour win-draw-loss des tables de fin de jeux syzygy</td><td>string</td></tr>
-   <tr><td>computePlayC</td><td>deplacement ordinateur au format algébrique complet. ex: Pe2-e4</td><td>string</td></tr>
-   <tr><td>computePlayA</td><td>deplacement ordinateur au format algébrique abrégé. ex: e4</td><td>string</td></tr>
+   <tr><td>computePlayC</td><td>déplacement ordinateur au format algébrique complet. ex: Pe2-e4</td><td>string</td></tr>
+   <tr><td>computePlayA</td><td>déplacement ordinateur au format algébrique abrégé. ex: e4</td><td>string</td></tr>
    <tr><td>dump</td><td>dump de variables internes au serveur</td><td>string</td></tr>
    </tbody>
 </table>
 
-<h3>Réponse à une requete reqType=0</h3>
+<h3>Réponse à une requête reqType=0</h3>
 Seuls trois attributs sont présent : description, compilation-date et version.
 <pre>
 {
@@ -177,7 +177,7 @@ L'attribut dump est ajouté.
 <h1 id="Serveur">3. L'application côté serveur </h1>
 <h2>Introduction </h2>
 L'application est écrite uniquement en langage C et compatible cgi.
-Elle est multiphread et tire partie des architectures à plusieurs coeurs afin de paralléliser la recherche.
+Elle est multiphread et tire partie des architectures à plusieurs cœurs afin de paralléliser la recherche.
 Elle est basée sur la méthode du Minimax consistant à construire l'arbre des possibilités à une profondeur définie.
 Au niveau de chaque feuille de l'arbre, la fonction d'évaluation est appelée. Elle se base sur quelques heuristiques et retourne une valeur qualifiant la position choisie. 
 Afin de réduire la recherche aux seuls cas pertinents, la méthode Alpha-Bêta est utilisée.
@@ -188,7 +188,7 @@ Afin de réduire la recherche aux seuls cas pertinents, la méthode Alpha-Bêta 
    <li>les noirs sont identifiés par des valeurs positive et des caractères en minuscules,</li>
    <li>les cases vides ont une valeur nulle (0),</li>
    <li>le jeu est représenté par un tableau de 64 octets,</li>
-   <li>la liste des jeux est représentée par un tableau de jeux et un entier qui est l’index du prochain jeu à stocker,</li>
+   <li>la liste des jeux est représentée par un tableau de jeux et un entier qui est l'index du prochain jeu à stocker,</li>
    <li>les lignes et colonnes d’une pièces sont représentées par un couple d'entiers (l, c) en interne,</li>
    <li>la notation algébrique complète est utilisée pour préciser les déplacements. </li>
 </ul>
@@ -203,8 +203,8 @@ Afin de réduire la recherche aux seuls cas pertinents, la méthode Alpha-Bêta 
 
 <h2>La recherche</h2>
 La fonction buildList construit la liste de toutes les positions possibles jouables.
-<p>La fonction find part du sommet de l’arbre (position courante du jeu) et appelle buildList.
-<p> Quatrecomportements :
+<p>La fonction find part du sommet de l'arbre (position courante du jeu) et appelle buildList.
+<p> Quatre comportements :
 
 <ul>
    <li>Si niveau choisi -1, choix aléatoire,</li>
@@ -236,16 +236,16 @@ Soit (l, c) une case et (lDest, cDest) une autre case.
 Pour déterminer si un cavalier a le droit d’aller de (l, c) à  (lDest, cDest), il suffit que :
 <pre>abs ((lDest-l) * (cDest-c)) == 2</pre>
 <p>
-Pour aller de la case (l, c) à la case (lDest, cDest), comme on ne peut qu’aller sur une case vide ou contenant une pièce adverse, la condition nécessaire suivante doit être satisfaite :
+Pour aller de la case (l, c) à la case (lDest, cDest), comme on ne peut que aller sur une case vide ou contenant une pièce adverse, la condition nécessaire suivante doit être satisfaite :
 <pre>jeu [l][c] * jeu [lDest][cDest] &lt;= 0</pre>
 Attention au cas du Roque.
 <p>Pour vérifier qu’on est sur la même diagonale, la condition suivante doit être satisfaite:
 <pre>abs (lDes-l) == abs (cDest-c)</pre>
-<p>Un roi qui a le trait, qui est échec au roi et qui en se déplaçant sur toutes les cases jouable reste échec au roi est echec et mat.
+<p>Un roi qui a le trait, qui est échec au roi et qui en se déplaçant sur toutes les cases jouable reste échec au roi est échecs et mat.
 <p>Un roi a le trait, qui n’est pas échec au roi et qui en se déplaçant sur toutes les cases jouable reste échec au roi est pat (en supposant bien sûr qu'il n'existe pas d'autres possibilités de jouer).
 <h2>Un peu de théorie</h2>
 <p>Soit n (resp. m) le nombre de coups possibles pour le joueur (resp. ordinateur).
-<p>Soit p le nombre de coups à évaluer à l’avance. 2p est le nombre de demi-coups (joueur ou ordinateur).
+<p>Soit p le nombre de coups à évaluer à l’avance. 2p est le nombre de demi coups (joueur ou ordinateur).
 <p>Soit MAX le nombre de combinaisons à ne pas dépasser (pour le temps) correspondant à un niveau donné.
 
 <pre>nm puissance (2p) &lt; MAX 
@@ -258,13 +258,13 @@ p &lt; log (MAX) / 2 log (nm)
 Quelques particularitées liées au langage C, constatées avec le compilateur gcc sous Linux.
 <p>
 <pre>z = x * qui </pre> (avec qui = -1) est plus efficace que <pre>z = abs (x)</pre>
-<p>Contrairement à ce qu’on pourrait croire faire 
+<p>Contrairement à ce que l’on pourrait croire faire 
 <br>
 <pre>if ((w = jeu [l][c]) == w1 || w == w2) return TRUE;
 </pre>
 est plus lent que :
 <pre>
-w = jeu [l][c];	
+w = jeu [l][c];
 if (w == w1 || w == w2) return TRUE;
 </pre>
 <p>De même 
@@ -281,26 +281,26 @@ Comme indice de boucle, préférer le type "int" au type "char" car plus rapide.
 <h2>Bibliothèque d'ouverture </h2>
 
 Avant de lancer la recherche dans l'arbre, une bibliothèque d'ouverture est utilisée.
-<p> Les fichiers utilisés sont placés dans un repertoire spécifique
+<p> Les fichiers utilisés sont placés dans un répertoire spécifique
 <p> Il sont évalués dans l'ordre alphabétique. Ceci signifie que si deux configurations éligibles sont situées
-dans des fichiers différent, seule celle appartenant au premier fichier dans l'orde alphabétique sera considérée. 
+dans des fichiers différent, seule celle appartenant au premier fichier dans l'ordre alphabétique sera considérée. 
 <p>Les fichiers suffixés par ".b.fen" et ".w.fen" sont au format textuel CSV et contiennent la liste des ouvertures au format FEN vus des noirs et vus des blancs.
 <p> Format CSV : FENstring ; dep ; commentaires
 <p> dep contient le déplacement en notation algébrique complète Xe2:e4[=Y] | O-O | O-O-O
-<p> X : piece joue. Y : promotion,  O-O : petit roque,  O-O-O : grand roque
+<p> X : pièce joue. Y : promotion,  O-O : petit roque,  O-O-O : grand roque
 <p> Exemple
 <pre>
 rnbqkbnr/pppppppp8/8/4P3/8/PPPP1PPP/RNBQKBNR b Pe7-e5; Classique-Ouvert-ou-Alekhine-Coup1; RR
 rnbqkbnr/pppppppp8/8/3P4/8/PPP1PPPP/RNBQKBNR b Pd7-d5; Classique-ferme-Coup1; RR
 </pre>
-<p> Les indications de couleurs b|w sont ignorées car l'ordinateur connait déja sa couleur et sélectionne le fichier ".b.fen" si noir, ".w.fen" si blanc en conséquence.
+<p> Les indications de couleurs b|w sont ignorées car l'ordinateur connait déjà sa couleur et sélectionne le fichier ".b.fen" si noir, ".w.fen" si blanc en conséquence.
 
 <h2>Gestion En Passant </h2>
 
 La notion de En Passant est gérée dans l'API et dans la fonction différence qui sait reconnaître si la case "en passant" fournie par le joueur 
 (epGamer) est utilisable pour une prise et si il est nécessaire de renseigner en passant par l'ordinateur (epComputer).
-La fonction buildList a un complement pour énumérer les prises potentielles associées au "en passant". 
-Par contre, l'arbre (au dessous du premier niveau) ne prend pas en compte les possibiités offertes par En Passant. Il est donc possible que la proposition faite soit sous optimale.  
+La fonction buildList a un complément pour énumérer les prises potentielles associées au "en passant". 
+Par contre, l'arbre (au dessous du premier niveau) ne prend pas en compte les possibilités offertes par En Passant. Il est donc possible que la proposition faite soit sous optimale.  
 
 <h2>Gestion des 50 coups </h2>
 
@@ -320,7 +320,7 @@ L'API donne un commentaire "endgame" incluant les valeur de :
 <li>WDL : valeur de 0 à 4</li>
 <li>DTZ : distance to zero </li>
 </ul>
-Le meilleur mouvement ("bestmove") est sélectionné afin de minimiser DTZ. Le DTZ n'et pas la valeur minimale permettant d'atteindre le Mat mais la valeur jusqu'à prochaine remise à zéro du compteur des 50 coups 
+Le meilleur mouvement ("bestmove") est sélectionné afin de minimiser DTZ. Le DTZ n'est pas la valeur minimale permettant d'atteindre le Mat mais la valeur jusqu'à prochaine remise à zéro du compteur des 50 coups 
 (un pion bouge ou une pièce est prise). Le comportement de l'ordinateur est donc parfois surprenant, 
 conduisant à des séquences longues. Mais il est efficace.
 
@@ -372,12 +372,12 @@ Les pièces joueurs, blanches, sont négatives en internes et représentées par
 <table>
    <tr><th>Fichier côté serveur</th><th>dans ...cgi-bin</th><th>type</th></tr>
    <tr><td>chess.c, chessUtil.c, syzygy.c</td><td>code source</td><td>texte</td></tr>
-   <tr><td>tbprobe.c, tbcore.c </td><td>code source pour l'access au tables de fin de jeux</td><td>texte</td></tr>
+   <tr><td>tbprobe.c, tbcore.c </td><td>code source pour l'accès au tables de fin de jeux</td><td>texte</td></tr>
    <tr><td>chess.cgi</td><td>code exécutable</td><td>exec</td></tr>
-   <tr><td>../repertoire ad-hoc/*.b.fen</td><td>bibliothèque d'ouvertures vue des noirs</td><td>texte</td></tr>
-   <tr><td>../repertoire ad-hoc/*.w.fen </td><td>bibliothèque d'ouvertures vue des blancs</td><td>texte</td></tr>
-   <tr><td>../autre repertoire ad-hoc/</td><td>repertoire contenant les tables de fin de jeux</td><td>texte</td></tr>
-   <tr><td>chess.log</td><td>log</td><td>enregistre les requetes (dates, identification du type de poste)</td></tr>   
+   <tr><td>../répertoire ad-hoc/*.b.fen</td><td>bibliothèque d'ouvertures vue des noirs</td><td>texte</td></tr>
+   <tr><td>../répertoire ad-hoc/*.w.fen </td><td>bibliothèque d'ouvertures vue des blancs</td><td>texte</td></tr>
+   <tr><td>../autre répertoire ad-hoc/</td><td>répertoire contenant les tables de fin de jeux</td><td>texte</td></tr>
+   <tr><td>chess.log</td><td>log</td><td>enregistre les requêtes (dates, identification du type de poste)</td></tr>   
 </table>
 <p>
 
@@ -560,10 +560,10 @@ int buildList (TGAME refJeu, register int who, TLIST list) { /* */
 
 <h1 id="Client">4. Côté client </h1>
 
-Le front, côté client est composé d'un fichier HTML, un CSS et de fonctions écrites en Javascipt.
+Le front, côté client est composé d'un fichier HTML, un CSS et de fonctions écrites en JavaScript.
 main () est la fonction appelée dans le code HTML.
 
-Le code javascript contrôle que l'entrée du joueur est valide, envoie le jeu via une requete XMLhttp request au format décrit dans la section API, reçoit la réponse du serveur JSON. Il interprête l'attribut fen et affiche le jeu.
+Le code JavaScript contrôle que l'entrée du joueur est valide, envoie le jeu via une requête XMLhttp request au format décrit dans la section API, reçoit la réponse du serveur JSON. Il interprète l'attribut fen et affiche le jeu.
 
 <h2>Aspects pratiques </h2>
 
@@ -571,13 +571,13 @@ Le code javascript contrôle que l'entrée du joueur est valide, envoie le jeu v
    <tbody><tr><th>Fichier pour le client</th><th>Commentaire</th></tr>
    <tr><td>chess.html</td><td>HTML5</td></tr>
    <tr><td>chess.css</td><td>css</td></tr>
-   <tr><td>chess.js</td><td>fonctions Javascript</td></tr>
+   <tr><td>chess.js</td><td>fonctions JavaScript</td></tr>
    <tr><td>favicon.ico</td><td>icône</td></tr>
    <tr><td>beep.wav</td><td>son pour retour serveur</td></tr>   
    </tbody>
 </table>
 
-<h2>Les fonctions Javascript</h2>
+<h2>Les fonctions JavaScript</h2>
 <pre>
 
 /* Code colonne au format a-h. c = 0, cToString = "a" */
@@ -740,7 +740,7 @@ Cette notation est en anglais, les pièces sont nommées rook (tour), knight (ca
 <p>
 Un enregistrement contient 6 champs. Le séparateur est l'espace. 
 
-Note : Le "+" est utilisé dans nos programmes, pour être compatible avec le passage par URL et en liggne de commande.
+Note : Le "+" est utilisé dans nos programmes, pour être compatible avec le passage par URL et en ligne de commande.
 
 Les champs sont :
 
@@ -758,7 +758,7 @@ Si aucun roque possible : « - »;</li>
 
 <li>Case d'une prise en passant possible en notation algébrique. Si un pion vient de se déplacer de 2 pas, c'est la position « derrière » le pion. Sinon inscrire « - »;</li>
 
-<li> Demi-coups : le nombre de demi-coups depuis la dernière capture ou le dernier mouvement de pion. Cela permet de savoir si la partie est nulle selon la règle des 50 coups; </li>
+<li> Demi coups : le nombre de demi coups depuis la dernière capture ou le dernier mouvement de pion. Cela permet de savoir si la partie est nulle selon la règle des 50 coups; </li>
 
 <li> Coups : le nombre de coups complets. Il commence à 1 et est incrémenté de 1 après le coup des noirs. </li>
 </ol>
@@ -871,9 +871,9 @@ f3 Bc8 34. Kf2 Bf5 35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5
 
 Voir Wikipedia.
 <p>
-L'Encyclopédie des ouvertures d'échecs (Encyclopaedia of Chess Openings, ECO) est une publication en cinq volumes de la maison d'édition serbe l'Informateur d'échecs qui reprend les principales ouvertures connues dans le jeu. Elle utilise un code de classification des ouvertures, appelé code ECO, qui a été repris par d'autres publications et fait aujourd'hui figure de standard international.
+L'encyclopédie des ouvertures d'échecs (Encyclopaedia of Chess Openings, ECO) est une publication en cinq volumes de la maison d'édition serbe l'Informateur d'échecs qui reprend les principales ouvertures connues dans le jeu. Elle utilise un code de classification des ouvertures, appelé code ECO, qui a été repris par d'autres publications et fait aujourd'hui figure de standard international.
 <p>
-L'Encyclopédie classe les ouvertures en cinq grandes catégories désignées par une lettre (de A à E), et chacune de ces catégories est divisée en cent sous-catégories, numérotées de 00 à 99 : par exemple B01 contient les ouvertures qui commencent par 1. e4 d5 (la défense scandinave).
+L'encyclopédie classe les ouvertures en cinq grandes catégories désignées par une lettre (de A à E), et chacune de ces catégories est divisée en cent sous catégories, numérotées de 00 à 99 : par exemple B01 contient les ouvertures qui commencent par 1. e4 d5 (la défense scandinave).
 
 <p>Un code ECO est donc composé de la lettre A, B, C, D ou E suivi de deux chiffres, de 00 à 99.
 <p> On trouve sur les Web les 500 fichiers ECO : A00.pgn à F99.pgn.
@@ -883,10 +883,10 @@ L'Encyclopédie classe les ouvertures en cinq grandes catégories désignées pa
 Un programme écrit en c, PGNtoFEN permet de convertir des fichier PGN au format FEN, assimilable par le serveur qui les utilise pour la gestion des ouvertures.
 <ul>
 <li> ./PGNtoFEN [-f] [-p] sourceFile [destFile]</li>
-<li>PGNtoFEN traduit un fichier nom au format PGN en deux fichier au format FEN si destFime est fourni</li> 
+<li>PGNtoFEN traduit un fichier nom au format PGN en deux fichier au format FEN si destFile est fourni</li> 
 <li>nom.b.fen pour les noirs (black)</li>
 <li>nom.w.fen pour les blancs (white)</li>
-<li>-p : affiche le jeu a la console en format convivial</li>
+<li>-p : affiche le jeu à la console en format convivial</li>
 <li>-f : notation algébrique abrégée en français (R = Roi...) </li>
 </ul> 
 
@@ -894,7 +894,7 @@ Un programme écrit en c, PGNtoFEN permet de convertir des fichier PGN au format
 
 uniqRR est un programme écrit en C qui élimine les lignes redondantes d'un fichier trié.
 Deux lignes sont considérées équivalentes si le premier champ est identique.
-Ce premier champ est délimite par le separateur SEP. En général ";".
+Ce premier champ est délimité par le séparateur SEP. En général ";".
 <p>
 appel : ./uniqRR fileName
 <h3> findgame </h3>
@@ -902,7 +902,7 @@ appel : ./uniqRR fileName
 findgame est un programme écrit en C qui trouve le nième jeu dans un fichier PGN.
 <p>
 Un fichier PGN comportant des milliers de parties, il est utile de pouvoir un sélectionner une.
-
+<p>
 appel : ./findgame fileName no */
 
 <h3>makefen.sh</h3>
@@ -914,6 +914,44 @@ Il est notamment appliqué sur les 500 fichiers de la bibliothèque eco ("A00.pg
 dans la phase d'ouverture.
 
 </div> <!-- "main"-->
-
+<h2>Vocabulaire anglais </h2>
+<pre>
+<table>
+   <tbody><tr><th>Français</th><th>Anglais</th></tr>
+   <tr><td>Échecs (jeu d’échecs):</td><td>Chess</td></tr>
+   <tr><td>Jouer aux échecs:</td><td>To play chess</td></tr>
+   <tr><td>Pion</td><td>Pawn</td></tr>
+   <tr><td>Cavalier</td><td>Knight</td></tr>
+   <tr><td>Fou</td><td>Bishop</td></tr>
+   <tr><td>Tour</td><td>Rook</td></tr>
+   <tr><td>Dame</td><td>Queen</td></tr>
+   <tr><td>Roi</td><td>King</td></tr>
+   <tr><td>Faire échec:</td><td>To check</td></tr>
+   <tr><td>Roque</td><td>Castling</td></tr>
+   <tr><td>Mater</td><td>To checkmate</td></tr>
+   <tr><td>Pat</td><td>Stalemate</td></tr>
+   <tr><td>Annuler</td><td>To draw</td></tr>
+   <tr><td>Echiquier</td><td>Chess board</td></tr>
+   <tr><td>Case</td><td>Square</td></tr>
+   <tr><td>Cases blanches / cases noires</td><td>Light squares / dark squares</td></tr>
+   <tr><td>Colonne</td><td>File</td></tr>
+   <tr><td>Colonne ouverte</td><td>Open file</td></tr>
+   <tr><td>Rangée</td><td>Rank</td></tr>
+   <tr><td>Aile Dame</td><td>Queen side</td></tr>
+   <tr><td>Aile Roi</td><td>King side</td></tr>
+   <tr><td>Ouverture</td><td>Opening</td></tr>
+   <tr><td>Milieu de partie</td><td>Middlegame</td></tr>
+   <tr><td>Finale</td><td>Endgame</td></tr>
+   <tr><td>Tournoi</td><td>Tournament</td></tr>
+   <tr><td>Classement élo</td><td>Elo rating</td></tr>
+   <tr><td>Mat du berger</td><td>Scholar’s mate</td></tr>
+   <tr><td>Mat du couloir</td><td>Back rank mate</td></tr>
+   </tbody>
+</table>
+</pre>
+<h2>Référence </h2>
+<pre>
+FIDE : Fédération Internationale Des Echecs
+</pre>
 </body>
 </html>
