@@ -610,10 +610,8 @@ function statusAnalysis () {
    if (r != KINGSTATE.EXIST) return false;
 
    let intComputerColor = (computerColor == "b") ? 1 : -1;
-
    if ((parseInt (responseServer.eval) * intComputerColor >= EVAL_THRESHOLD) ||
-      (parseInt (responseServer.wdl) == 4 && intComputerColor == 1) ||
-      (parseInt (responseServer.wdl) == 0 && intComputerColor == -1))
+      (parseInt (responseServer.wdl) == 4))
       document.getElementById ('info').value += "Je vais gagner, c'est certain !\n";
    if (info.cpt50 >= CINQUANTE)
       document.getElementById ('info').value = "Règle des 50 coups sans prise ni mouv. pion atteinte";

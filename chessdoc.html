@@ -916,6 +916,19 @@ Le résultat est constitué de deux fichiers ".b.fen" et ".w.fen", synthèse des
 Il est notamment appliqué sur les 500 fichiers de la bibliothèque eco ("A00.pgn" à "F99.pgn") pour produire les fichiers b.fen et w.fen utilisés par le serveur 
 dans la phase d'ouverture.
 
+<h3>playfen</h3>
+
+playfen est un programme écrit en C qui rejoue un jeu a partir des logs.
+<p>
+<ul>
+<li>Ce fichier est au format CSV : FENstring ; dep ; commentaire</li>
+<li>dep contient le deplacement en notation algebrique complete Xe2-e4[=Y] | O-O | O-O-O</li>
+<li>X : piece joue. Y : promotion,  O-O : petit roque,  O-O-O : grand roque,</li>
+<li>attention ; le premier champ est obligatoirement la chaîne fen.</li>
+</ul>
+<p>
+appel : ./playfen <fichier log> 
+
 </div> <!-- "main"-->
 <h2>Vocabulaire anglais </h2>
 <table>
