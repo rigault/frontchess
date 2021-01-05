@@ -54,7 +54,7 @@ let info = {
    indicator: false,
    nb: 1,
    cpt50: 0,
-   level: 3,
+   level: 4,
    normal: true,             // pour representation "normale" avec blanc joueur en bas. Sinon on inverse. Cf display ()
    nGamerPieces: 16,         // nombre de pieces Joueur
    nComputerPieces: 16,      // nombre de pieces Ordi
