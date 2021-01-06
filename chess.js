@@ -252,92 +252,63 @@ function abbrev (sq64, complete) {
 }
 
 /* vrai si le roi situe case l, c est echec au roi */
-/* "who" est la couleur du roi qui est attaque */
 function LCkingInCheck (sq64, who, l, c) {
-   let w, w1, w2, i, j, k;
-   // pion menace
-   if (who == -1) {
-      if (l < 7) {
-         if (c < 7 && sq64 [l+1][c+1] == PAWN) return true;
-         if (c > 0 && sq64 [l+1][c-1] == PAWN) return true;
-      }
-   }
-   else { //  who == 1
-      if (l > 0) {
-         if (c < 7 && sq64 [l-1][c+1] == -PAWN) return true;
-         if (c > 0 && sq64 [l-1][c-1] == -PAWN) return true;
-      }
-   } // fin if (who...
-   w1 = -who * KING;
-   w2 = -who * CASTLE_KING;
-   // roi adverse menace
-   if (l < 7 && (sq64 [l+1][c] == w1 || sq64 [l+1][c] == w2)) return true;
-   if (l > 0 && (sq64 [l-1][c] == w1 || sq64 [l-1][c] == w2)) return true;
-   if (c < 7 && (sq64 [l][c+1] == w1 || sq64 [l][c+1] == w2)) return true;
-   if (c > 0 && (sq64 [l][c-1] == w1 || sq64 [l][c-1] == w2)) return true;
-   if (l < 7 && c < 7 &&(sq64 [l+1][c+1] == w1 || sq64 [l+1][c+1] == w2)) return true;
-   if (l < 7 && c > 0 &&(sq64 [l+1][c-1] == w1 || sq64 [l+1][c-1] == w2)) return true;
-   if (l > 0 && c < 7 &&(sq64 [l-1][c+1] == w1 || sq64 [l-1][c+1] == w2)) return true;
-   if (l > 0 && c > 0 &&(sq64 [l-1][c-1] == w1 || sq64 [l-1][c-1] == w2)) return true;
+   let w, k;
+   // roi adverse  menace.  Matche -KING et -CASTLEKING
+   if (l < 7 && (-who * sq64 [l+1][c] >= KING)) return true;
+   if (l > 0 && (-who * sq64 [l-1][c] >= KING)) return true;
+   if (c < 7 && (-who * sq64 [l][c+1] >= KING)) return true;
+   if (c > 0 && (-who * sq64 [l][c-1] >= KING)) return true;
+   if (l < 7 && c < 7 && (-who * sq64 [l+1][c+1] >= KING)) return true;
+   if (l < 7 && c > 0 && (-who * sq64 [l+1][c-1] >= KING)) return true;
+   if (l > 0 && c < 7 && (-who * sq64 [l-1][c+1] >= KING || -who * sq64 [l-1][c+1] == PAWN)) return true;
+   if (l > 0 && c > 0 && (-who * sq64 [l-1][c-1] >= KING || -who * sq64 [l-1][c-1] == PAWN)) return true;
 
-   w = -who * KNIGHT;
    // cavalier menace
-   if (l < 7 && c < 6 && sq64 [l+1][c+2] == w) return true;
-   if (l < 7 && c > 1 && sq64 [l+1][c-2] == w) return true;
-   if (l < 6 && c < 7 && sq64 [l+2][c+1] == w) return true;
-   if (l < 6 && c > 0 && sq64 [l+2][c-1] == w) return true;
-   if (l > 0 && c < 6 && sq64 [l-1][c+2] == w) return true;
-   if (l > 0 && c > 1 && sq64 [l-1][c-2] == w) return true;
-   if (l > 1 && c < 7 && sq64 [l-2][c+1] == w) return true;
-   if (l > 1 && c > 0 && sq64 [l-2][c-1] == w) return true;
+   if (l < 7 && c < 6 && (-who * sq64 [l+1][c+2] == KNIGHT)) return true;
+   if (l < 7 && c > 1 && (-who * sq64 [l+1][c-2] == KNIGHT)) return true;
+   if (l < 6 && c < 7 && (-who * sq64 [l+2][c+1] == KNIGHT)) return true;
+   if (l < 6 && c > 0 && (-who * sq64 [l+2][c-1] == KNIGHT)) return true;
+   if (l > 0 && c < 6 && (-who * sq64 [l-1][c+2] == KNIGHT)) return true;
+   if (l > 0 && c > 1 && (-who * sq64 [l-1][c-2] == KNIGHT)) return true;
+   if (l > 1 && c < 7 && (-who * sq64 [l-2][c+1] == KNIGHT)) return true;
+   if (l > 1 && c > 0 && (-who * sq64 [l-2][c-1] == KNIGHT)) return true;
 
-   w1 = -who * QUEEN;
-   w2 = -who * ROOK;
    // tour ou reine menace
-   for (i = l+1; i < N; i++) {
-      w = sq64 [i][c];
-      if (w == w1 || w == w2) return true;
-      if (w != 0) break;
+   for (k = l+1; k < N; k++) {
+      if ((w = -who * sq64 [k][c]) == ROOK || w == QUEEN) return true;
+      if (w) break;
    }
-   for (i = l-1; i >= 0; i--) {
-      w = sq64 [i][c];
-      if (w == w1 || w == w2) return true;
-      if (w != 0) break;
+   for (k = l-1; k >= 0; k--) {
+      if ((w= -who * sq64 [k][c]) == ROOK || w == QUEEN) return true;
+      if (w) break;
    }
-   for (j = c+1; j < N; j++) {
-      w = sq64 [l][j];
-      if (w == w1 || w == w2) return true;
-      if (w != 0) break;
+   for (k = c+1; k < N; k++) {
+      if ((w = -who * sq64 [l][k]) == ROOK || w == QUEEN) return true;
+      if (w) break;
    }
-   for (j = c-1; j >= 0; j--) {
-      w = sq64 [l][j];
-      if (w == w1 || w == w2) return true;
-      if (w != 0) break;
+   for (k = c-1; k >= 0; k--) {
+      if ((w = -who * sq64 [l][k]) == ROOK || w == QUEEN) return true;
+      if (w) break;
    }
 
    // fou ou reine menace
-   w2 = -who * BISHOP;
-   for (k = 0; k < Math.min (7-l, 7-c); k++) {  // vers haut droit
-      w = sq64 [l+k+1][c+k+1];
-      if (w == w1 || w == w2) return true;
-      if (w != 0) break;
+   for (k = 0; k < Math.min (7-l, 7-c); k++) { // vers haut droit
+      if ((w = -who * sq64 [l+k+1][c+k+1]) == BISHOP || w == QUEEN) return true;
+      if (w) break;
    }
-   for (k = 0; k < Math.min (7-l, c); k++) {    // vers haut gauche
-      w = sq64 [l+k+1][c-k-1];
-      if (w == w1 || w == w2) return true;
-      if (w != 0) break;
+   for (k = 0; k < Math.min (7-l, c); k++) {// vers haut gauche
+      if ((w = -who * sq64 [l+k+1][c-k-1]) == BISHOP || w == QUEEN) return true;
+      if (w) break;
    }
-   for (k = 0; k < Math.min (l, 7-c); k++) {    // vers bas droit
-      w = sq64 [l-k-1][c+k+1];
-      if (w == w1 || w == w2) return true;
-      if (w != 0) break;
+   for (k = 0; k < Math.min (l, 7-c); k++) { // vers bas droit
+      if ((w = -who * sq64 [l-k-1][c+k+1]) == BISHOP || w == QUEEN) return true;
+      if (w) break;
    }
-   for (k = 0; k < Math.min (l, c); k++) {      // vers bas gauche
-      w = sq64 [l-k-1] [c-k-1];
-      if (w == w1 || w == w2) return true;
-      if (w != 0) break;
+   for (k = 0; k < Math.min (l, c); k++) { // vers bas gauche
+      if ((w = -who * sq64 [l-k-1] [c-k-1]) == BISHOP || w == QUEEN) return true;
+      if (w) break;
    }
-
    return false;
 }
 
