@@ -3,7 +3,7 @@
 
 "use strict";
 const N = 8;
-const VOID = 0, PAWN = 1, KNIGHT = 2, BISHOP = 3, ROOK = 4, QUEEN = 5, KING = 6, CASTLE_KING = 7;
+const PAWN = 1, KNIGHT = 2, BISHOP = 3, ROOK = 4, QUEEN = 5, KING = 6, CASTLE_KING = 7;
 const CASTLING_GAMER = 9999;  // signale que le joueur tente le roque
 const EN_PASSANT = 9998;      // signale que le joueur tente la prise en passant
 const REQ_TYPE = 2;
@@ -22,7 +22,7 @@ const DICT = ['-', 'P', 'N', 'B', 'R', 'Q', 'K', 'K' ];
 
 const TRANSLATE = {"-": 0, "P":PAWN, "N": KNIGHT, "B": BISHOP, "R":ROOK, "Q":QUEEN, "K": KING};
 
-// representation HTML des pieces Ordi dans l'ordre  VOID ... CASTLE_KING
+// representation HTML des pieces Ordi dans l'ordre  PAWN ... CASTLE_KING
 // const UNICODE = ["-", "&#x265F", "&#x265E", "&#x265D", "&#x265C", "&#x265B", "&#x265A", "&#x265A"];
 // const UNICODE = ["-", " &#x2659", "&#x2658", "&#x2657", "&#x2656", "&#x2655", "&#x2654", "&#x2654"];
 const UNICODE = ["-", " &#x265F", "&#x2658", "&#x2657", "&#x2656", "&#x2655", "&#x2654", "&#x2654"];
@@ -43,7 +43,6 @@ let jeu = [
 //let jeu = [[0,-2,0,0,-6,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,-1,0,0,1,0,0,0],[0,0,0,0,6,0,0,4]];
 let historyGame = [JSON.stringify(jeu)];
 let indexHistory = 0;
-let maxIndexHistory = 0;
 let testState = false;
 let gamerCount; // pour chrono Joueur
 
@@ -51,16 +50,16 @@ let responseServer = {}; // objet JSON
 
 let info = {
    indicator: false,
-   nb: 1,
-   cpt50: 0,
+   nb: 1,                    // numero du coup complet en cours
+   cpt50: 0,                 // compteur pour regle des 50 coups 
    level: 4,
    normal: true,             // pour representation "normale" avec blanc joueur en bas. Sinon on inverse. Cf display ()
    gamerColor: -1,           // -1 : whites, 1 : black
    nGamerPieces: 16,         // nombre de pieces Joueur
    nComputerPieces: 16,      // nombre de pieces Ordi
-   lastGamerPlay: '',        // dernier coup joueur au format complet Xa1-b1
+   lastGamerPlayC: '',        // dernier coup joueur au format complet Xa1-b1
    lastGamerPlayA: '',       // dernier coup joueur au format Alg abrege
-   lastComputerPos: '',      // dernier coup ordi au format complet Xa1-b1
+   lastComputerPlayC: '',      // dernier coup ordi au format complet Xa1-b1
    kingStateGamer: 0,
    kingStateComputer: 0,
    story: "",                // historique du jeu
@@ -69,10 +68,10 @@ let info = {
    totalComputerTime: 0,
    lastTakenByGamer: '',     // derniere prise par joueur
    lastTake: '',             // derniere prise par Ord
-   leftCastleGamerOK: true,
-   rightCastleGamerOK: true,
-   leftCastleComputerOK: true,
-   rightCastleComputerOK: true,
+   queenCastleGamerOK: true,
+   kingCastleGamerOK: true,
+   queenCastleComputerOK: true,
+   kingCastleComputerOK: true,
    epComputer:"-",           // en passant Ordi
    epGamer: "-"              // en passant Joueur
 };
@@ -93,45 +92,45 @@ function stringToLC (str) {
 function castleToStr (info) {
    let str = "";
    if (info.gamerColor == -1) {
-      if (info.rightCastleGamerOK) str += "K";
-      if (info.leftCastleGamerOK) str += "Q";
-      if (info.rightCastleComputerOK) str += "k";
-      if (info.leftCastleComputerOK) str += "q";
+      if (info.kingCastleGamerOK) str += "K";
+      if (info.queenCastleGamerOK) str += "Q";
+      if (info.kingCastleComputerOK) str += "k";
+      if (info.queenCastleComputerOK) str += "q";
    }
    else {
-      if (info.rightCastleComputerOK) str += "K";
-      if (info.leftCastleComputerOK) str += "Q";
-      if (info.rightCastleGamerOK) str += "k";
-      if (info.leftCastleGamerOK) str += "q";
+      if (info.kingCastleComputerOK) str += "K";
+      if (info.queenCastleComputerOK) str += "Q";
+      if (info.kingCastleGamerOK) str += "k";
+      if (info.queenCastleGamerOK) str += "q";
    }
    return ((str == "") ? "-" : str) ;
 }
 
 /* traduit les possibilites de roque en booleens */
 function strToCastle (str) {
-   info.rightCastleGamerOK = info.rightCastleComputerOK = info.leftCastleGamerOK = info.leftCastleComputerOK = false;
+   info.kingCastleGamerOK = info.kingCastleComputerOK = info.queenCastleGamerOK = info.queenCastleComputerOK = false;
    let whiteCanCastle = false;
    let blackCanCastle = false;
    
    for (let i = 0; i < str.length; i++) {
       switch (str [i]) {
-      case "K": if (info.gamerColor == -1) info.rightCastleGamerOK = true;
-                else info.rightCastleComputerOK = true;
+      case "K": if (info.gamerColor == -1) info.kingCastleGamerOK = true;
+                else info.kingCastleComputerOK = true;
                 whiteCanCastle = true;
                 break;
-      case "k": if (info.gamerColor == 1) info.rightCastleGamerOK = true;
-                else info.rightCastleComputerOK = true;
+      case "k": if (info.gamerColor == 1) info.kingCastleGamerOK = true;
+                else info.kingCastleComputerOK = true;
                 blackCanCastle = true;
                 break;
-      case "Q": if (info.gamerColor == -1) info.leftCastleGamerOK = true;
-                else info.leftCastleComputerOK = true;
+      case "Q": if (info.gamerColor == -1) info.queenCastleGamerOK = true;
+                else info.queenCastleComputerOK = true;
                 whiteCanCastle = true;
                 break;
-      case "q": if (info.gamerColor == 1) info.leftCastleGamerOK = true;
-                else info.leftCastleComputerOK = true;
+      case "q": if (info.gamerColor == 1) info.queenCastleGamerOK = true;
+                else info.queenCastleComputerOK = true;
                 blackCanCastle = true;
                 break;
-      default:;
+      default:
       }
    }
    return [whiteCanCastle, blackCanCastle];
@@ -366,27 +365,27 @@ function verification (jeu, l, c, lDest, cDest, who) {
    let lEp = -1; // pour en Passant
    // pour roquer le roi ne doit pas etre en echec (etat = EXIST), il ne doit pas avoir bouge et les
    // cases intemédiaires ne doivet pas etre echec au roi
-   if (who == 1 && v == KING && w == ROOK && l == 7 && c == 4 && lDest == 7 && cDest == 1 && 
+   if (who == 1 && v >= KING && w == ROOK && l == 7 && c == 4 && lDest == 7 && cDest == 1 && 
       jeu[7][3] == 0 && jeu [7][2] == 0 && jeu [7][1] == 0 && 
-      info.leftCastleGamerOK && info.kingStateGamer == KINGSTATE.EXIST &&
+      info.queenCastleGamerOK && info.kingStateGamer == KINGSTATE.EXIST &&
       ! LCkingInCheck (jeu, who, 7,4) && ! LCkingInCheck (jeu, who, 7,3) && ! LCkingInCheck (jeu, who, 7,2))
       return CASTLING_GAMER;
 
-   if (who == 1 && v == KING && w == ROOK && l == 7 && c == 4 && lDest == 7 && cDest == 7 && 
+   if (who == 1 && v >= KING && w == ROOK && l == 7 && c == 4 && lDest == 7 && cDest == 7 && 
       jeu[7][5] == 0 && jeu [7][6] == 0 && 
-      info.rightCastleGamerOK && info.kingStateGamer == KINGSTATE.EXIST &&
+      info.kingCastleGamerOK && info.kingStateGamer == KINGSTATE.EXIST &&
       ! LCkingInCheck (jeu, who, 7, 4) && ! LCkingInCheck (jeu, who, 7, 5) && ! LCkingInCheck (jeu, who, 7,6))
       return CASTLING_GAMER;
 
-   if (who == -1 && v == -KING && w == -ROOK && l == 0 && c == 4 && lDest == 0 && cDest == 0 && 
+   if (who == -1 && v <= -KING && w == -ROOK && l == 0 && c == 4 && lDest == 0 && cDest == 0 && 
       jeu[0][3] == 0 && jeu [0][2] == 0 && jeu[0][1] == 0 && 
-      info.leftCastleGamerOK && info.kingStateGamer == KINGSTATE.EXIST && 
+      /*info.queenCastleGamerOK && */info.kingStateGamer == KINGSTATE.EXIST && 
       ! LCkingInCheck (jeu, who, 0, 4) && ! LCkingInCheck (jeu, who, 0, 3) && ! LCkingInCheck (jeu, who, 0, 2))
       return CASTLING_GAMER;
-   
-   if (who == -1 && v == -KING && w == -ROOK && l == 0 && c == 4 && lDest == 0 && cDest == 7 && 
+  
+   if (who == -1 && v <= -KING && w == -ROOK && l == 0 && c == 4 && lDest == 0 && cDest == 7 && 
       jeu[0][5] == 0 && jeu [0][6] == 0 && 
-      info.rightCastleGamerOK && info.kingStateGamer == KINGSTATE.EXIST &&
+      info.kingCastleGamerOK && info.kingStateGamer == KINGSTATE.EXIST &&
       ! LCkingInCheck (jeu, who, 0, 4) && ! LCkingInCheck (jeu, who, 0, 5) && ! LCkingInCheck (jeu, who, 0,6))
       return CASTLING_GAMER;
    
@@ -637,9 +636,9 @@ function test (nom) {
    let v;
    let elem = document.getElementById (nom);
 
-   if (info.lastGamerPlay == '') {                    // saisie de la case source
+   if (info.lastGamerPlayC == '') {                    // saisie de la case source
       [lSource, cSource] = stringToLC (nom);
-      info.lastGamerPlay = nom;                       // la case source
+      info.lastGamerPlayC = nom;                       // la case source
       elem.style.background = 'olive';
       elem.style.color = 'white';
       }
@@ -652,7 +651,7 @@ function test (nom) {
       infoUpdate (jeu);
       displayUpdate ();
       display ();
-      info.lastGamerPlay = '';
+      info.lastGamerPlayC = '';
    }
 }
 
@@ -671,10 +670,10 @@ function moveRead (nom) {
    if ((info.kingStateGamer == KINGSTATE.NOEXIST) || (info.kingStateGamer == KINGSTATE.IS_MATE))
       return;
 
-   if (info.lastGamerPlay == '') {                          // saisie de la case source
+   if (info.lastGamerPlayC == '') {                          // saisie de la case source
       [lSource, cSource] = stringToLC (nom);
       if (choiceIsOK (jeu, lSource, cSource, info.gamerColor)) {     
-         info.lastGamerPlay = nom;                          // la case source
+         info.lastGamerPlayC = nom;                          // la case source
          elem.style.background = 'olive';
          elem.style.color = 'white';
       }
@@ -683,7 +682,7 @@ function moveRead (nom) {
 
    [lDest, cDest] = stringToLC (nom);                       // saisie case destination
    if (lSource == lDest && cSource == cDest) {              // on annule tout
-      info.lastGamerPlay = '';
+      info.lastGamerPlayC = '';
       display ();
       return;
    }
@@ -697,25 +696,25 @@ function moveRead (nom) {
 
    // limitation du roque si on touche au roi ou a la tour
    if (jeu [lSource][cSource] * info.gamerColor >= KING) { 
-      info.leftCastleGamerOK = false;
-      info.rightCastleGamerOK = false;
+      info.queenCastleGamerOK = false;
+      info.kingCastleGamerOK = false;
    }
    if (jeu [lSource][cSource] * info.gamerColor == ROOK) {
-      if (cSource == 7) info.rightCastleGamerOK = false;
-      else if (cSource == 0) info.leftCastleGamerOK = false;
+      if (cSource == 7) info.kingCastleGamerOK = false;
+      else if (cSource == 0) info.queenCastleGamerOK = false;
    }
    
    // gestion du roque
    if (res == CASTLING_GAMER) {
       spaces = (info.nb < 10) ? "  ": ((info.nb < 100) ? " " : "");
-      info.rightCastleGamerOK = false;
-      info.leftCastleGamerOK = false;
+      info.kingCastleGamerOK = false;
+      info.queenCastleGamerOK = false;
       if (cDest == 0) {           // grand Roque
          jeu [lSource][0] = 0;
          jeu [lSource][2] = info.gamerColor * CASTLE_KING;
          jeu [lSource][3] = info.gamerColor * ROOK;
          jeu [lSource][4] = 0;
-         info.lastGamerPlay = "O-O-O";
+         info.lastGamerPlayC = "O-O-O";
          info.story += "\n" + info.nb + spaces + "  O-O-O";
       }
       else if (cDest == 7) {       //petit Roque
@@ -723,7 +722,7 @@ function moveRead (nom) {
          jeu [lSource][5] = info.gamerColor * ROOK;
          jeu [lSource][6] = info.gamerColor * CASTLE_KING;
          jeu [lSource][7] = 0;
-         info.lastGamerPlay = "O-O";
+         info.lastGamerPlayC = "O-O";
          info.story += "\n" + info.nb + spaces + "    O-O";
       }
    }
@@ -735,9 +734,9 @@ function moveRead (nom) {
       prise = (v != 0 || res == EN_PASSANT) ? 'x' : '-';
       v = Math.abs(jeu [lSource][cSource]);
       carPiece = DICT [v];
-      info.lastGamerPlay = carPiece + info.lastGamerPlay + prise + nom; // source + destination
-      if (res == EN_PASSANT) info.lastGamerPlay += "e.p.";
-      info.lastGamerPlayA = abbrev (jeu, info.lastGamerPlay);
+      info.lastGamerPlayC = carPiece + info.lastGamerPlayC + prise + nom; // source + destination
+      if (res == EN_PASSANT) info.lastGamerPlayC += "e.p.";
+      info.lastGamerPlayA = abbrev (jeu, info.lastGamerPlayC);
       if ((info.story != '') && (info.gamerColor == -1)) info.story += '\n';
       spaces = (info.nb < 10) ? "  ": ((info.nb < 100) ? " " : "");
       if (info.gamerColor == -1) info.story += info.nb + spaces + "   " + info.lastGamerPlayA.padStart(4, ' ');
@@ -795,7 +794,7 @@ function serverRequest () {
             spaces = (info.nb < 10) ? "  ": ((info.nb < 100) ? " " : "");
             info.story += (info.gamerColor == 1) ? info.nb + spaces : "";
             info.story += "    " + responseServer.computePlayA.padStart(4, ' ');
-            info.lastComputerPos = responseServer.computePlayC;
+            info.lastComputerPlayC = responseServer.computePlayC;
             new Audio ('beep.wav').play ();
             document.getElementById ('FEN').value = responseServer.fen;
             document.getElementById ('info').value = "A toi de jouer\n";
@@ -806,7 +805,7 @@ function serverRequest () {
             else info.cpt50 += 1;
             infoUpdate (jeu);
             displayUpdate ();
-            info.lastGamerPlay = '';
+            info.lastGamerPlayC = '';
             info.gamerTime = 0;
             display ();
             indexHistory += 1;
@@ -883,10 +882,12 @@ function displayUpdate () {
    document.getElementById ('dernierJoueur').value = info.lastGamerPlayA;  // dernier coup du joueur
    document.getElementById ('nJoueur').value = info.nGamerPieces;          // nb de pieces
    document.getElementById ('nOrdi').value = info.nComputerPieces;         // nb de pieces
-   document.getElementById ('joueurRoque').value = castleToStr (info);
-   document.getElementById ('ordiRoque').value = castleToStr (info);
    document.getElementById ('historique').value = info.story;
    document.getElementById ('piecePrise').innerHTML += info.lastTakenByGamer;
+   document.getElementById ('joueurRoqueRoi').value = (info.kingCastleGamerOK) ? "Oui" : "Non";
+   document.getElementById ('joueurRoqueReine').value = (info.queenCastleGamerOK) ? "Oui" : "Non";
+   document.getElementById ('ordiRoqueRoi').value = (info.kingCastleComputerOK) ? "Oui" : "Non";
+   document.getElementById ('ordiRoqueReine').value = (info.queenCastleComputerOK) ? "Oui" : "Non";
    info.lastTakenByGamer = '';
 }
 
@@ -896,11 +897,11 @@ function commonDisplay (l, c) {
    let istr = cToString (c) + (l+1).toString ();
    let v = jeu [l][c];
    let sBut = "<button class = '";
-   if ((info.lastComputerPos.indexOf ("O-O") != -1) && info.indicator) {   // cas du roque
+   if ((info.lastComputerPlayC.indexOf ("O-O") != -1) && info.indicator) {   // cas du roque
       info.indicator = false;
       alert ("Roque !");
    }
-   if ((info.lastComputerPos.slice (4, 6) == istr) && info.indicator) {
+   if ((info.lastComputerPlayC.slice (4, 6) == istr) && info.indicator) {
        info.indicator = false;
        sBut += "last";
    }
