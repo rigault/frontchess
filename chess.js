@@ -29,51 +29,42 @@ const UNICODE = ["-", " &#x265F", "&#x2658", "&#x2657", "&#x2656", "&#x2655", "&
 
 const KINGSTATE = {NOEXIST:0, EXIST:1, IS_IN_CHECK:2, UNVALID_IN_CHECK:3, IS_MATE:4, IS_PAT:5};
 
-let jeu = [
-   [-4,-2,-3,-5,-6,-3,-2,-4],
-   [-1,-1,-1,-1,-1,-1,-1,-1],
-   [0,0,0,0,0,0,0,0],
-   [0,0,0,0,0,0,0,0],
-   [0,0,0,0,0,0,0,0],
-   [0,0,0,0,0,0,0,0],
-   [1,1,1,1,1,1,1,1],
-   [4,2,3,5,6,3,2,4]
-   ];
-//let jeu = [[0,0,0,0,-6,0,0,0],[0,0,-5,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,1,0,0],[0,0,0,0,6,0,0,4]];
-//let jeu = [[0,-2,0,0,-6,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,-1,0,0,1,0,0,0],[0,0,0,0,6,0,0,4]];
+const initFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR+w+KQkq";
+// const initFen = "4k3/8/8/8/p7/8/8/4K3+w+-";
+
+let jeu = new Array (N);      // cree le jeu un tableau de N lignes qui contiendront N Cases (cd inii dans main)
 let historyGame = [JSON.stringify(jeu)];
 let indexHistory = 0;
 let testState = false;
-let gamerCount; // pour chrono Joueur
-
-let responseServer = {}; // objet JSON
+let gamerCount;               // pour chrono Joueur
+let responseServer = {};      // objet JSON
 
 let info = {
    indicator: false,
-   nb: 1,                    // numero du coup complet en cours
-   cpt50: 0,                 // compteur pour regle des 50 coups 
+   nb: 1,                     // numero du coup complet en cours
+   cpt50: 0,                  // compteur pour regle des 50 coups 
    level: 4,
-   normal: true,             // pour representation "normale" avec blanc joueur en bas. Sinon on inverse. Cf display ()
-   gamerColor: -1,           // -1 : whites, 1 : black
-   nGamerPieces: 16,         // nombre de pieces Joueur
-   nComputerPieces: 16,      // nombre de pieces Ordi
+   normal: true,              // pour representation "normale" avec blanc joueur en bas. Sinon on inverse. Cf display ()
+   gamerColor: -1,            // -1 : whites, 1 : black
+   nGamerPieces: 16,          // nombre de pieces Joueur
+   nComputerPieces: 16,       // nombre de pieces Ordi
    lastGamerPlayC: '',        // dernier coup joueur au format complet Xa1-b1
-   lastGamerPlayA: '',       // dernier coup joueur au format Alg abrege
-   lastComputerPlayC: '',      // dernier coup ordi au format complet Xa1-b1
+   lastGamerPlayA: '',        // dernier coup joueur au format Alg abrege
+   lastComputerPlayC: '',     // dernier coup ordi au format complet Xa1-b1
    kingStateGamer: 0,
    kingStateComputer: 0,
-   story: "",                // historique du jeu
-   gamerTime: 0,             // en secondes
+   story: "",                 // story du jeu, a ne pas confondre avec historyGame...
+   gamerTime: 0,              // en secondes
    totalGamerTime: 0,
    totalComputerTime: 0,
-   lastTakenByGamer: '',     // derniere prise par joueur
-   lastTake: '',             // derniere prise par Ord
-   queenCastleGamerOK: true,
+   lastTakenByGamer: '',      // derniere prise par joueur
+   lastTake: '',              // derniere prise par Ord
+   queenCastleGamerOK: true,  // 4 boolens indiquent de quel cote quel roi a encore le droit de roquer
    kingCastleGamerOK: true,
    queenCastleComputerOK: true,
    kingCastleComputerOK: true,
-   epComputer:"-",           // en passant Ordi
-   epGamer: "-"              // en passant Joueur
+   epComputer:"-",            // en passant Ordi
+   epGamer: "-"               // en passant Joueur
 };
 
 let lSource, cSource;        // necessaire e variable globale pour moveread. 
@@ -175,15 +166,15 @@ function fenToGame (fen, jeu) {
    let l = 7;
    let c = 0;
    let cChar;
+   let bCastleW = false; 
+   let bCastleB = false; 
    let fenNorm = fen.replaceAll (' ', '+');   
    let list = fenNorm.split ("+");
    let sFen = list [0];
-   let bCastleW = false;
-   let bCastleB = false; 
    let ep = ((list [3] != null) ? list [3] : "-");
-   if (list [2] != null) {
-      [bCastleW, bCastleB] = strToCastle (list [2]);
-   }
+   if (list [1] != null) info.gamerColor = (list [1] == "w") ? -1 : 1; 
+   if (list [2] != null) [bCastleW, bCastleB] = strToCastle (list [2]);
+
    for (let i = 0; i < sFen.length ; i += 1) {
       cChar = sFen [i];
       if (cChar == ' ' || cChar == '\t' || cChar == '\n') break;
@@ -363,32 +354,23 @@ function verification (jeu, l, c, lDest, cDest, who) {
    let w = jeu[lDest][cDest];
    let cEp = -1; // pour en Passant
    let lEp = -1; // pour en Passant
+   let base = (l == 0) ? 0 : 7;
    // pour roquer le roi ne doit pas etre en echec (etat = EXIST), il ne doit pas avoir bouge et les
    // cases intemédiaires ne doivet pas etre echec au roi
-   if (who == 1 && v >= KING && w == ROOK && l == 7 && c == 4 && lDest == 7 && cDest == 1 && 
-      jeu[7][3] == 0 && jeu [7][2] == 0 && jeu [7][1] == 0 && 
+   // cote reine
+   if (v * who >= KING && w * who == ROOK && l == base && c == 4 && lDest == base && cDest == 0 && 
+      jeu[base][3] == 0 && jeu [base][2] == 0 && jeu [base][1] == 0 && 
       info.queenCastleGamerOK && info.kingStateGamer == KINGSTATE.EXIST &&
-      ! LCkingInCheck (jeu, who, 7,4) && ! LCkingInCheck (jeu, who, 7,3) && ! LCkingInCheck (jeu, who, 7,2))
+      ! LCkingInCheck (jeu, who, base, 4) && ! LCkingInCheck (jeu, who, base, 3) && 
+      ! LCkingInCheck (jeu, who, base ,2))
+      return CASTLING_GAMER;
+   // cote Roi
+   if (v * who >= KING && w * who == ROOK && l == base && c == 4 && lDest == base && cDest == 7 && 
+      jeu[base][5] == 0 && jeu [base][6] == 0 && 
+      info.kingCastleGamerOK && info.kingStateGamer == KINGSTATE.EXIST &&
+      ! LCkingInCheck (jeu, who, base, 4) && ! LCkingInCheck (jeu, who, base, 5) && ! LCkingInCheck (jeu, who, base,6))
       return CASTLING_GAMER;
 
-   if (who == 1 && v >= KING && w == ROOK && l == 7 && c == 4 && lDest == 7 && cDest == 7 && 
-      jeu[7][5] == 0 && jeu [7][6] == 0 && 
-      info.kingCastleGamerOK && info.kingStateGamer == KINGSTATE.EXIST &&
-      ! LCkingInCheck (jeu, who, 7, 4) && ! LCkingInCheck (jeu, who, 7, 5) && ! LCkingInCheck (jeu, who, 7,6))
-      return CASTLING_GAMER;
-
-   if (who == -1 && v <= -KING && w == -ROOK && l == 0 && c == 4 && lDest == 0 && cDest == 0 && 
-      jeu[0][3] == 0 && jeu [0][2] == 0 && jeu[0][1] == 0 && 
-      /*info.queenCastleGamerOK && */info.kingStateGamer == KINGSTATE.EXIST && 
-      ! LCkingInCheck (jeu, who, 0, 4) && ! LCkingInCheck (jeu, who, 0, 3) && ! LCkingInCheck (jeu, who, 0, 2))
-      return CASTLING_GAMER;
-  
-   if (who == -1 && v <= -KING && w == -ROOK && l == 0 && c == 4 && lDest == 0 && cDest == 7 && 
-      jeu[0][5] == 0 && jeu [0][6] == 0 && 
-      info.kingCastleGamerOK && info.kingStateGamer == KINGSTATE.EXIST &&
-      ! LCkingInCheck (jeu, who, 0, 4) && ! LCkingInCheck (jeu, who, 0, 5) && ! LCkingInCheck (jeu, who, 0,6))
-      return CASTLING_GAMER;
-   
    if  (v*w > 0) return false;
 
    switch (Math.abs (v)) {
@@ -715,7 +697,7 @@ function moveRead (nom) {
          jeu [lSource][3] = info.gamerColor * ROOK;
          jeu [lSource][4] = 0;
          info.lastGamerPlayC = "O-O-O";
-         info.story += "\n" + info.nb + spaces + "  O-O-O";
+         info.story += ((info.gamerColor == 1 && info.story == "") ? "\n" : "") + info.nb + spaces + "  O-O-O";
       }
       else if (cDest == 7) {       //petit Roque
          jeu [lSource][4] = 0;
@@ -723,7 +705,8 @@ function moveRead (nom) {
          jeu [lSource][6] = info.gamerColor * CASTLE_KING;
          jeu [lSource][7] = 0;
          info.lastGamerPlayC = "O-O";
-         info.story += "\n" + info.nb + spaces + "    O-O";
+         if (info.gamerColor == -1) info.story += '\n';
+         info.story +=  ((info.gamerColor == 1 && info.story == "") ? "\n" : "") + info.nb + spaces + "    O-O";
       }
    }
 
@@ -959,6 +942,9 @@ function display () {
 /* programme principal */
 function main () {
    gamerCount = setInterval (chronoGamer,1000); // la fonction est relancee
+   for (let i = 0; i < N; i++)
+      jeu [i] = [0,0,0,0,0,0,0,0];              // crer 8 cases par lignes
+   fenToGame (initFen, jeu);
    infoUpdate (jeu);
    displayUpdate ();
    display ();
