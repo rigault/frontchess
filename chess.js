@@ -37,6 +37,7 @@ let historyGame = [JSON.stringify(jeu)];
 let indexHistory = 0;
 let testState = false;
 let gamerCount;               // pour chrono Joueur
+let computerCount;            // pour chrono computer quand gere du navigateur
 let responseServer = {};      // objet JSON
 
 let info = {
@@ -55,6 +56,7 @@ let info = {
    kingStateComputer: 0,
    story: "",                 // story du jeu, a ne pas confondre avec historyGame...
    gamerTime: 0,              // en secondes
+   computerTime: 0,           // en secondes
    totalGamerTime: 0,
    totalComputerTime: 0,
    lastTakenByGamer: '',      // derniere prise par joueur
@@ -493,16 +495,23 @@ function secToHHMMSS (sec) {
    let hours = Math.floor(sec / 3600).toString ().padStart (2, "0");
    let minutes = Math.floor((sec - (hours * 3600)) / 60).toString ().padStart (2, "0");
    let seconds = (sec - (hours * 3600) - (minutes * 60)).toString().padStart (2, "0");
-
    return hours + ':' + minutes + ':' + seconds;
 }
 
 /* affiche le chrono joueur */
-function chronoGamer() {
+function chronoGamer () {
    document.getElementById ('timePlayer').value = secToHHMMSS (info.gamerTime);
    info.gamerTime += 1;
    document.getElementById ('cumulTimePlayer').value = secToHHMMSS (info.totalGamerTime);
    info.totalGamerTime += 1;
+}
+
+/* affiche le chrono computer quand gere cote navigateur */
+function chronoComputer () {
+   document.getElementById ('timeComputer').value = secToHHMMSS (info.computerTime);
+   info.computerTime += 1;
+   document.getElementById ('cumulTimeComputer').value = secToHHMMSS (info.totalComputerTime);
+   info.totalComputerTime += 1;
 }
 
 /* met a jour le niveau pour profondeur de la recherche */
@@ -531,8 +540,7 @@ function reverseDisplay () {
 /* fait passer du mode normal au mode test */
 function reverseTest () {
    testState = !testState;
-   if (testState)  document.getElementById ('test').value = 'TEST';
-   else document.getElementById ('test').value = 'NORM';
+   document.getElementById ('test').value = ((testState) ? 'TEST' : 'NORM');
 }
 
 /* va un coup en arrière */
@@ -668,7 +676,6 @@ function moveRead (nom) {
       display ();
       return;
    }
-
    res = verification (jeu, lSource, cSource, lDest, cDest, info.gamerColor);
    
    // en passant
@@ -728,16 +735,16 @@ function moveRead (nom) {
 
       if (((jeu [lSource][cSource] == -PAWN) && (lDest == 7)) || 
          ((jeu [lSource][cSource] == PAWN) && (lDest == 0)))  {
-         jeu [lDest][cDest] = info.gamerColor * QUEEN; // promotion
+         jeu [lDest][cDest] = info.gamerColor * QUEEN;   // promotion
          info.story += "=Q";
       }
       else jeu [lDest][cDest] = jeu [lSource][cSource];
-      if (res == EN_PASSANT) jeu [lSource][cDest] = 0; // bizarre mais vrai
+      if (res == EN_PASSANT) jeu [lSource][cDest] = 0;   // bizarre mais vrai
       jeu [lSource][cSource] = 0;
    }
 
    if (res == CASTLING_GAMER || res == EN_PASSANT || res == true) {
-      if (info.gamerColor == -1) info.nb += 1; // computer a les blancs
+      if (info.gamerColor == -1) info.nb += 1;           // computer a les blancs
       if (prise == 'x' || pawnMove) 
          info.cpt50 = 0;
       else info.cpt50 += 1; 
@@ -748,7 +755,7 @@ function moveRead (nom) {
       document.getElementById ('info').value = "Le serveur pense... !\n";
       if (info.cpt50 > CINQUANTE)
          alert ("règle des 50 coups atteinte");
-      else serverRequest ();
+      else serverRequest ();                             // on appelle le serveur
    }
 }
 
@@ -762,15 +769,16 @@ function serverRequest () {
    document.getElementById ('FEN').value = strFen;
    url += "&fen=" + strFen;
    console.log ("\nurl: %s\n", url);
-   // alert (url);
+   info.computerTime = 0;
+   computerCount = setInterval (chronoComputer,1000);        //la fonction est relancee
    
    http.onreadystatechange = function (event) {
    // XMLHttpRequest.DONE === 4
       if (this.readyState === XMLHttpRequest.DONE) {
          if (this.status === 200) {
-            console.log ("Réponse reçue: %s\n", this.responseText);
+            clearInterval (computerCount);
             response = this.responseText;
-            // alert (response);
+            console.log ("Réponse reçue: %s\n", response);
             responseServer = JSON.parse (response);
             [jeu, info.epComputer] = fenToGame (responseServer.fen, jeu);
             if ((info.story != '') && (info.gamerColor == 1)) info.story += '\n';
@@ -805,6 +813,7 @@ function serverRequest () {
 }
 
 /* met a jour l'objet info a partir de l'objet jeu */
+/* compte les pieces et MAJ l'etat du roi */
 function infoUpdate (jeu) {
    let v;
    info.kingStateGamer = info.kingStateComputer = KINGSTATE.NOEXIST;
@@ -851,12 +860,13 @@ function displayUpdate () {
    document.getElementById ('lastTake').innerHTML += info.lastTake;
    responseServer.lastTake = '';
 
+   /* Quand repo,se ordi geree cote ordi
    if (responseServer.time != null) {
       document.getElementById ('timeComputer').value = secToHHMMSS (parseFloat(responseServer.time));
       info.totalComputerTime += parseFloat (responseServer.time);
       document.getElementById ('cumulTimeComputer').value = secToHHMMSS (info.totalComputerTime);
    }
-
+   */
    //b : black. Inversion car joueur
    document.getElementById ('votreCouleur').value = (info.gamerColor) ? "blanche" : "noire"; 
    document.getElementById ('noCoup').value = info.nb;
@@ -871,6 +881,8 @@ function displayUpdate () {
    document.getElementById ('joueurRoqueReine').value = (info.queenCastleGamerOK) ? "Oui" : "Non";
    document.getElementById ('ordiRoqueRoi').value = (info.kingCastleComputerOK) ? "Oui" : "Non";
    document.getElementById ('ordiRoqueReine').value = (info.queenCastleComputerOK) ? "Oui" : "Non";
+   document.getElementById ('niveau').value = info.level;
+   document.getElementById ('niveauValeur').innerHTML = document.getElementById ('niveau').value;
    info.lastTakenByGamer = '';
 }
 
@@ -941,13 +953,10 @@ function display () {
 
 /* programme principal */
 function main () {
-   gamerCount = setInterval (chronoGamer,1000); // la fonction est relancee
-   for (let i = 0; i < N; i++)
-      jeu [i] = [0,0,0,0,0,0,0,0];              // crer 8 cases par lignes
+   gamerCount = setInterval (chronoGamer,1000);              // la fonction est relancee
+   for (let i = 0; i < N; i++) jeu [i] = [0,0,0,0,0,0,0,0];  // creer 8 cases pour les 8 lignes
    fenToGame (initFen, jeu);
    infoUpdate (jeu);
    displayUpdate ();
    display ();
-   document.getElementById ('niveau').value = info.level;
-   document.getElementById ('niveauValeur').innerHTML = document.getElementById ('niveau').value;
 }
