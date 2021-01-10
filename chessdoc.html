@@ -391,8 +391,7 @@ Fichier chess.c
 ---------------
 /*   Pour produire la doc sur les fonctions : grep "\/\*" chess.c | sed 's/^\([a-zA-Z]\)/\n\1/' */
 /*   Jeu d'echec */
-/*   ./chess.cgi -i|-I [FENGame] [profondeur] : CLI avec sortie JSON */
-/*   ./chess.cgi -r|-R [FENGame] [profondeur] : CLI avec sortie raw */
+/*   ./chess.cgi -q |-v |-V [FENGame] [profondeur] : CLI avec sortie JSON q)uiet v)erbose ou V)ery verbose */
 /*   ./chess.cgi -f : test performance */
 /*   ./chess.cgi -t [FENGame] : test unitaire */
 /*   ./chess.cgi -p [FENGame] [profondeur] : play mode CLI */
@@ -463,8 +462,10 @@ int find (TGAME sq64, TGAME bestSq64, int *bestNote, int color) { /* */
 void computerPlay (TGAME sq64, int color) { /* */
    /* prepare le lancement de la recherche avec find */
 
-void cgi () { /* */
-   /* MODE CGI
+bool cgi () { /* */
+   /* MODE CGI */
+   /* vrai si on peut lire les variables d'environnement */
+   /* faux sinon */
 
 int main (int argc, char *argv[]) { /* */
    /* lit la ligne de commande */
@@ -565,7 +566,7 @@ char *difference (TGAME sq64_1, TGAME sq64_2, int color, char *prise, char *comp
    /* renvoie aussi epComputer - en passant - pour renseigner les coordonnees eventuelles de prise en passant (sinon : "-") */
    /* epGamer permet de prendre en compte l'indication du gamer pour une prise possible */
 
-void sendGame (const char *fen, struct sinfo info, int reqType) { /* */
+void sendGame (bool http, const char *fen, struct sinfo info, int reqType) { /* */
    /* envoie le jeu decrit par fen et info au format JSON */
 
 </pre>
