@@ -4,8 +4,8 @@
 "use strict";
 const N = 8;
 const PAWN = 1, KNIGHT = 2, BISHOP = 3, ROOK = 4, QUEEN = 5, KING = 6, CASTLE_KING = 7;
-const CASTLING_GAMER = 9999;  // signale que le joueur tente le roque
-const EN_PASSANT = 9998;      // signale que le joueur tente la prise en passant
+const CASTLING_GAMER = 999;  // signale que le joueur tente le roque
+const EN_PASSANT = 998;      // signale que le joueur tente la prise en passant
 const REQ_TYPE = 2;
 const CINQUANTE = 50;         // pour la regle des 50 coups
 
@@ -13,7 +13,7 @@ const CINQUANTE = 50;         // pour la regle des 50 coups
 // const MY_URL = "http://192.168.1.100/cgi-bin/chess.cgi?";  // serveur reseau local
 const MY_URL = "http://127.0.0.1/cgi-bin/chess.cgi?";  // mac
 
-const EVAL_THRESHOLD = 900000;
+const EVAL_THRESHOLD = 9000;
 // Pawn, kNight, Bishop, Rook, Queen, King, rOckking
 // FEN notation
 // White : minuscules. Black: Majuscules
