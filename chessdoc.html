@@ -101,7 +101,6 @@ Les paires (attribut, valeur) sont les suivantes :
    <tr><td>version</td><td>2.0</td><td>string</td></tr>
    <tr><td>clocktime</td><td>temps utilisation processeur en secondes</td><td>string</td></tr>
    <tr><td>time</td><td>temps de réponse serveur en secondes</td><td>float</td></tr>
-   <tr><td>note</td><td>évaluation du jeu courant</td><td>int</td></tr>         
    <tr><td>eval</td><td>évaluation rendue par le minimax</td><td>int</td></tr> 
    <tr><td>computerStatus</td><td>État du roi ordinateur</td><td>int</td></tr>     
    <tr><td>playerStatus</td><td>État du Roi joueur</td><td>int</td></tr>
@@ -136,7 +135,6 @@ Seuls trois attributs sont présent : description, compilation-date et version.
 "version" : "2.1",
 "clockTime": "0.000077",
 "time" : "0.000081",
-"note" : "-6",
 "eval" : "0",
 "computerStatus" : "1 : EXIST",
 "playerStatus" : "1 : EXIST",
@@ -161,7 +159,6 @@ L'attribut dump est ajouté.
 "version" : "2.1",
 "clockTime": "0.000077",
 "time" : "0.000081",
-"note" : "-6",
 "eval" : "0",
 "computerStatus" : "1 : EXIST",
 "playerStatus" : "1 : EXIST",
@@ -396,7 +393,7 @@ Fichier chess.c
 /*   ./chess.cgi -t [FENGame] : test unitaire */
 /*   ./chess.cgi -p [FENGame] [profondeur] : play mode CLI */
 /*   ./chess.cgi -h : help */
-/*   autrement  CGI gérant une API restful (GET) avec les réponses au format JSON */
+/*   sans parametre ni option :  CGI gérant une API restful (GET) avec les réponses au format JSON */
 /*   fichiers associes : chess.log, chessB.fen, chessW.fen, chessUtil.c, syzygy.c, tbprobes.c tbcore.c et .h associes  */
 /*   Structures de donnees essentielles */
 /*     - jeu represente dans un table a 2 dimensions : TGAME sq64 */
@@ -404,6 +401,12 @@ Fichier chess.c
 /*     - nextL est un entier pointant sur le prochain jeux a inserer dans la liste */
 /*   Noirs : positifs  (Minuscules) */
 /*   Blancs : negatifs  (Majuscules) */
+
+void initTable() { /* */
+   /* Initializes the table Zobrist*/
+
+uint32_t computeHash (TGAME sq64) { /* */
+   /* Computes the hashvalue of a given game. Zobrist */
 
 int fMaxDepth (int lev, struct sinfo info) { /* */
    /* renvoie la profondeur du jeu en fonction du niveau choisi et */
@@ -448,18 +451,21 @@ int evaluation (TGAME sq64, int who, bool *pat) { /* */
 
 int alphaBeta (TGAME sq64, int who, int p, int refAlpha, int refBeta) { /* */
    /* le coeur du programme */
+   /*
+   /*
 
 void *fThread (void *arg) { /* */
    /* association des thread a alphabeta */
 
-void updateInfo (TGAME sq64) { /* */
-   /* met a jour l'objet info a partir de l'objet jeu */
-
-int find (TGAME sq64, TGAME bestSq64, int *bestNote, int color) { /* */
+int find (TGAME sq64, TGAME bestSq64, int *bestNote) { /* */
    /* ordinateur joue renvoie le meilleur jeu possible et le nombre de jeux possibles */
    /*
 
-void computerPlay (TGAME sq64, int color) { /* */
+int whereKings (TGAME sq64, int gamerColor, int *lGK, int *cGK, int *lCK, int *cCK) { /* */
+   /* localise les rois */
+   /* renvoie le nombre de pieces totales */
+
+void computerPlay (TGAME sq64) { /* */
    /* prepare le lancement de la recherche avec find */
 
 bool cgi () { /* */
@@ -493,9 +499,28 @@ bool syzygyRR (const char* path, const char *fen, unsigned *wdl, char *bestMove,
 
 Fichier chessUtil.c
 -------------------
+#define UM 0xFFFFFFFF80000000ULL       /* Most significant 33 bits */
+#define LM 0x7FFFFFFFULL               /* Least significant 31 bits */
+
+void init_genrand64 (uint64_t seed) { /* */
+   /* initializes mt[NN] with a seed */
+
+void init_by_array64 (uint64_t init_key[], uint64_t key_length) { /* */
+   /* initialize by an array with array-length */
+   /* init_key is the array for initializing keys */
+   /* key_length is its length */
+          + init_key[j] + j; /* non linear */
+        - i; /* non linear */
+   mt[0] = 1ULL  63; /* MSB is 1; assuring non-zero initial array */ 
+
+uint64_t genrand64_int64(void) { /* */
+/* generates a random number on [0, 2^64-1]-interval */
+   if (mti sup= NN) { /* generate NN words at one time */
+      /* if init_genrand64() has not been called, */
+        /* a default initial seed is used     */
 
 int charToInt (int c) { /* */
-   /* traduit la piece au format RNBQR... en nombre entier */
+   /* traduit la piece au format RNBQK... en nombre entier */
 
 void printGame (TGAME jeu, int eval) { /* */
    /* imprime le jeu a la console pour Debug */
@@ -530,12 +555,12 @@ void moveGame (TGAME sq64, int color, char *move) { /* */
 
 bool opening (const char *fileName, char *gameFen, char *sComment, char *move) { /* */
    /* lit le fichier des ouvertures et produit le jeu final */
-   /* ce fichier est au forma CSV : FENstring ; dep ; commentaire */
+   /* ce fichier est au format CSV : FENstring ; dep ; commentaire */
    /* dep contient le deplacement en notation algebrique complete Xe2:e4[Y] | O-O | O-O-O */
    /* X : piece joue. Y : promotion,  O-O : petit roque,  O-O-O : grand roque */
    /* renseihne la chaine move (deplacement choisi) et le commentaire associe */
    /* renvoie vrai si ouverture trouvee dans le fichier, faux sinon */
-   /* liste les fichier du reperdoire dir contenant la chaine filter */
+   /* liste les fichier du repertoire dir contenant la chaine filter */
    /* fichier dans l'ordre alphabetique */
    /* donc nommer les fichier les plus prioritaires en debut d'alphabet */
    /* appelle opening sur les fichiers listes jusqu a trouver */
@@ -568,6 +593,7 @@ char *difference (TGAME sq64_1, TGAME sq64_2, int color, char *prise, char *comp
 
 void sendGame (bool http, const char *fen, struct sinfo info, int reqType) { /* */
    /* envoie le jeu decrit par fen et info au format JSON */
+
 
 </pre>
 

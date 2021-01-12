@@ -841,8 +841,6 @@ function displayUpdate () {
       document.getElementById ('FEN').value = responseServer.gameFEN;
    if (responseServer.dump != null)
       document.getElementById ('dump').innerHTML = responseServer.dump;
-   if (responseServer.note != null)
-      document.getElementById ('note').value = parseInt (responseServer.note);
    if (responseServer.eval != null) {
       document.getElementById ('eval').value = parseInt (responseServer.eval);
    }
