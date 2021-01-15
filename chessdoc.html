@@ -346,11 +346,9 @@ Ne pas oublier (très important) l'envoi de
 <pre>Access-Control-Allow-Origin: *</pre>
 Extrait de la fonction "SendGame" :
 <pre>
-   printf ("Access-Control-Allow-Origin: *\n");
-   printf ("Content-Type: text/html\n\n");
-   printf ("{\n");
-   printf ("\"description\" : \"%s\",\n", DESCRIPTION);
-
+  printf ("Access-Control-Allow-Origin: *\n"); // obligatoire !
+  printf ("Cache-Control: no-cache\n");        // eviter les caches
+  printf ("Content-Type: text/html\n\n");
 </pre>
 
 <h2>Aspects pratiques </h2>
@@ -381,6 +379,19 @@ Les pièces joueurs, blanches, sont négatives en internes et représentées par
 </table>
 <p>
 
+<h2>Architecture des appels de fonction</h2>
+<pre>
+main ()
+   cgi ()
+      computerPlay ()                       
+         find ()
+            fThread ()
+               alphaBeta ()
+                  evaluation ()
+                     buildList ()
+                        pushList ()
+                     LCkingInCheck ()
+</pre>
 <h2>Les fonctions et les commentaires associés </h2>
 <pre>
 
@@ -960,7 +971,7 @@ appel : ./findgame fileName no */
 
 <h3>makefen.sh</h3>
 
-"makefen" est un script shell bash qui applique PGNtoFFEN à l'ensemble des fichiers PGN d'un répertoire, concatène les fichiers, les trie et applique UniqRR.
+"makefen" est un script shell bash qui applique PGNtoFEN à l'ensemble des fichiers PGN d'un répertoire, concatène les fichiers, les trie et applique UniqRR.
 Le résultat est constitué de deux fichiers ".b.fen" et ".w.fen", synthèse des fichiers PGN, trié et sans redondances.
 <p>
 Il est notamment appliqué sur les 500 fichiers de la bibliothèque eco ("A00.pgn" à "F99.pgn") pour produire les fichiers b.fen et w.fen utilisés par le serveur 

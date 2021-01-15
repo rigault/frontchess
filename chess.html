@@ -36,7 +36,7 @@
       <input size='7' value = 'Oui' id = "joueurRoqueRoi"/> <label>Roque côté Roi  possible</label><p>
       <input size='7' value = 'Oui' id = "joueurRoqueReine"/> <label>Roque côté Reine possible</label><p>
       <input size='7' value = '-' id = "epGamer"/> <label>En Passant</label><p>
-      <button id = 'piecePrise'>  </button><p>
+      <button id = 'takenByGamer'>  </button><p>
       <textarea  readonly="readonly" rows='16' cols='28' id = "historique">
       </textarea>
       <input size='50' value = 'FEN Zone' id = "FEN" onchange = "refresh ()"/><p>
@@ -54,7 +54,7 @@
       <input size='7' value = 'Oui' id = "ordiRoqueRoi"/> <label>Roque côté Roi possible</label><p>
       <input size='7' value = 'Oui' id = "ordiRoqueReine"/> <label>Roque côté Reine possible</label><p>
       <input size='7' value = '-' id = "epComputer"/> <label>En Passant</label><p>
-      <button id = 'lastTake'>  </button> <p>
+      <button id = 'takenByComputer'>  </button> <p>
       <textarea  readonly="readonly" rows='16' cols='28' id = "message">
       </textarea>
       <div id = "dump"> Dump Zone </div>
@@ -64,19 +64,17 @@
 <footer>
    <input type='range' id='niveau' onchange='updateLevel ()' min='2' max='5' value = '3'>
    <button name='niveauValeur' id = 'niveauValeur'> 4 </button>
+   <p>
    <input onclick = 'window.location.reload();' value = 'RAZ'/>
    <input onclick = 'reverseDisplay();' id = 'sens' value = 'INV'/>
-   <input onclick = 'back();' id = 'back' value = 'BACK'/>
-   <input onclick = 'forward();' id = 'forward' value = 'FWD'/>
-   <input onclick = 'reverseTest ()' id = 'test' value = 'NORM'/>
+   <input onclick = 'back();' id = 'back' value = '<<'/>
+   <input onclick = 'forward();' id = 'forward' value = '>>'/>
+   <input onclick = 'reverseTest ()' id = 'test' value = 'TEST'/>
    <input onclick = 'pass ()' id = 'pass' value = 'PASSE'/>
-   <input onclick = 'whoGetWhites ()' id = 'whoGetWhites' value = 'WHOGETWHITES'/>
    <p>
    <textarea  readonly="readonly" rows='3' cols='49' id = "info">
    </textarea>
 </footer>
 <script> main ();</script>
 </body>
-
-
 </html>
