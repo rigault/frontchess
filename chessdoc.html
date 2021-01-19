@@ -36,7 +36,7 @@ La requête contient un type, la totalité du jeu d'échecs au format ASCII FEN 
 
 <h2>requêtes</h2>
 
-Il y a trois éléments, tous optionnels, dans les requêtes.
+Il y a jusqu'à 5 éléments, tous optionnels, dans les requêtes.
 En cas d'absence d'éléments, il existe des valeurs par défaut.
 <p>
 
@@ -45,6 +45,8 @@ En cas d'absence d'éléments, il existe des valeurs par défaut.
    <tr><td>reqType</td><td>0, 1, 2</td><td>int</td></tr>
    <tr><td>fen</td><td>chaine décrivant le jeu au format FEN</td><td>string</td></tr>
    <tr><td>level</td><td>niveau de profondeur demandé</td><td>int</td></tr>
+   <tr><td>noalea</td><td>Pour choix non aléatoire d'un jeu si plusieus son equivalents</td><td></td></tr>
+   <tr><td>notrans</td><td>Pour non utilisation des tables de transposition</td><td></td></tr>
    </tbody>
 </table>
 
@@ -81,10 +83,16 @@ Le codage est le suivant :
 
 <h3>level </h3>
 Profondeur de la recherche demandée au serveur.
+
+<h3>noalea </h3>
+Pas de parametre.
+
+<h3>notrans </h3>
+Pas de parametre.
 <p>
 <h2>Exemple de requête complète</h2>
 <pre>
-http://&lt;server name&gt;/cgi-bin/chess.cgi?&amp;reqType=2&amp;level=3&amp;fen=rnbqkbnr/pppp1ppp8/4p3/8/8/PPPPPPPP/RNBQKBNR+b+KQkq
+http://&lt;server name&gt;/cgi-bin/chess.cgi?&amp;reqType=2&amp;level=3&amp;notrans&amp;fen=rnbqkbnr/pppp1ppp8/4p3/8/8/PPPPPPPP/RNBQKBNR+b+KQkq
 </pre>
 
 Note : les espaces sont remplacés par des "+".
@@ -131,46 +139,60 @@ Seuls trois attributs sont présent : description, compilation-date et version.
 
 {
 "description" : "Chess Rene Rigault 2021",
-"compilation-date": "Jan  1 2021",
+"compilation-date": "Jan 16 2021",
 "version" : "2.1",
-"clockTime": "0.000077",
-"time" : "0.000081",
+"clockTime": "0.000074",
+"time" : "0.000076",
 "eval" : "0",
 "computerStatus" : "1 : EXIST",
 "playerStatus" : "1 : EXIST",
-"fen" : "rnbqkbnr/pppppppp/8/8/2P5/8/PP1PPPPP/RNBQKBNR+b+KQkq+c3+0+0",
+"fen" : "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR+w+KQkq+e6+0+2",
 "lastTake" : " ",
-"openingName" : "chess.w.fen D69; Queen's Gambit Declined, Orthodox Defense, Classical Variation; GameN: 1; TourN: 1;",
+"openingName" : "chess.b.fen C89; Spanish Game, Marshall Attack, Modern Main Line; GameN: 2; TourN: 1;",
 "endName" : "",
 "wdl" : "9",
-"computePlayC" : "Pc2-c4",
-"computePlayA" : "c4",
+"computePlayC" : "Pe7-e5",
+"computePlayA" : "e5",
+"maxDepth" : "5",
+"nEvalCall" : "0",
+"nAlphaBeta" : "0",
+"nBestNote" : "0",
+"nValidGamerPos" : "30",
+"nValidComputerPos" : "20",
 "score" : "-",
-"dump" : "  maxDepth=4  nEvalCall=2  nLCKingInCheck=14  nBuildList=11  nValidComputerPos=22  nValidPlayerPos=20  nMaxList=42"
 }
+
+
 </pre>
 
 <h3>Réponse à une requete reqType=2</h3>
 L'attribut dump est ajouté.
 <pre>
+
 {
 "description" : "Chess Rene Rigault 2021",
-"compilation-date": "Jan  1 2021",
+"compilation-date": "Jan 16 2021",
 "version" : "2.1",
-"clockTime": "0.000077",
-"time" : "0.000081",
+"clockTime": "0.000074",
+"time" : "0.000076",
 "eval" : "0",
 "computerStatus" : "1 : EXIST",
 "playerStatus" : "1 : EXIST",
-"fen" : "rnbqkbnr/pppppppp/8/8/2P5/8/PP1PPPPP/RNBQKBNR+b+KQkq+c3+0+0",
+"fen" : "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR+w+KQkq+e6+0+2",
 "lastTake" : " ",
-"openingName" : "chess.w.fen D69; Queen's Gambit Declined, Orthodox Defense, Classical Variation; GameN: 1; TourN: 1;",
+"openingName" : "chess.b.fen C89; Spanish Game, Marshall Attack, Modern Main Line; GameN: 2; TourN: 1;",
 "endName" : "",
 "wdl" : "9",
-"computePlayC" : "Pc2-c4",
-"computePlayA" : "c4",
+"computePlayC" : "Pe7-e5",
+"computePlayA" : "e5",
+"maxDepth" : "5",
+"nEvalCall" : "0",
+"nAlphaBeta" : "0",
+"nBestNote" : "0",
+"nValidGamerPos" : "30",
+"nValidComputerPos" : "20",
 "score" : "-",
-"dump" : "  maxDepth=4  nEvalCall=2  nLCKingInCheck=14  nBuildList=11  nValidComputerPos=22  nValidPlayerPos=20  nMaxList=42"
+"dump" : "  nbTrTa=0  nbMatchTrans=0  nCollision=0  nCallfHash=0  nLCKingInCheck=0  nBuildList=0"
 }
 
 </pre>
@@ -218,10 +240,8 @@ La fonction alphabeta implémente l’algorithme Minimax avec élagage Alphabeta
 
 <h2>Le CLI Command Line Interface </h2>
 <pre>
-mode CLI sortie JSON : ./chess.cgi -i [&lt;jeuAuFormaFEN&gt;] [profondeur]
-mode CLI sortie raw : ./chess.cgi -r [&lt;jeuAuFormaFEN&gt;] [profondeur]
+mode CLI sortie JSON : ./chess.cgi -q|v|V [&lt;jeuAuFormaFEN&gt;] [profondeur]
 mode CLI play : ./chess.cgi -p [&lt;jeuAuFormaFEN&gt;] [profondeur]
-mode CLI : ./chess.cgi -t 
 mode CLI help: ./chess.cgi -h 
 </pre>
 
@@ -355,11 +375,10 @@ Extrait de la fonction "SendGame" :
 <p>
 Pour compiler, l'option pthread" est nécessaire pour la gestion multithread.
 Il est possible de lancer chess en mode CLI (Command Line Interface) à partir de la console.
-<br/>
+<p/>
+Lancer help pour liste des options.
 <pre>
-mode CLI (Interface API): sudo ./chess.cgi -i [&lt;jeuAFormatFEN&gt;] [profondeur]
-mode CLI (Interface Raw): sudo ./chess.cgi -r [&lt;jeuAFormatFEN&gt;] [profondeur]
-mode test : sudo ./chess -t
+exemple mode CLI: sudo ./chess.cgi -v [&lt;jeuAFormatFEN&gt;] [profondeur]
 help : sudo ./chess.cgi -h
 </pre>
 Les pièces ordinateurs, noires sont positives en interne et représentées par des caractères minuscule pour l'API.
@@ -413,13 +432,19 @@ Fichier chess.c
 /*   Noirs : positifs  (Minuscules) */
 /*   Blancs : negatifs  (Majuscules) */
 
+inline bool sameParity (int a, int b) { /* */
+   /* retource vrai si a et b ont la meme parite */
+
+uint64_t rand64 () { /* */
+   /* retourne un nb aleatoire sur 64 bits */
+
 void initTable() { /* */
    /* Initializes the table Zobrist*/
 
-uint32_t computeHash (TGAME sq64) { /* */
+uint32_t computeHash (TGAME sq64, int who) { /* */
    /* Computes the hashvalue of a given game. Zobrist */
 
-int fMaxDepth (int lev, struct sinfo info) { /* */
+int fMaxDepth (int lev, int nGamerPos, int nComputerPos) { /* */
    /* renvoie la profondeur du jeu en fonction du niveau choisi et */
    /* de l'etat du jeu */
 
@@ -462,8 +487,6 @@ int evaluation (TGAME sq64, int who, bool *pat) { /* */
 
 int alphaBeta (TGAME sq64, int who, int p, int refAlpha, int refBeta) { /* */
    /* le coeur du programme */
-   /*
-   /*
 
 void *fThread (void *arg) { /* */
    /* association des thread a alphabeta */
@@ -510,25 +533,6 @@ bool syzygyRR (const char* path, const char *fen, unsigned *wdl, char *bestMove,
 
 Fichier chessUtil.c
 -------------------
-#define UM 0xFFFFFFFF80000000ULL       /* Most significant 33 bits */
-#define LM 0x7FFFFFFFULL               /* Least significant 31 bits */
-
-void init_genrand64 (uint64_t seed) { /* */
-   /* initializes mt[NN] with a seed */
-
-void init_by_array64 (uint64_t init_key[], uint64_t key_length) { /* */
-   /* initialize by an array with array-length */
-   /* init_key is the array for initializing keys */
-   /* key_length is its length */
-          + init_key[j] + j; /* non linear */
-        - i; /* non linear */
-   mt[0] = 1ULL  63; /* MSB is 1; assuring non-zero initial array */ 
-
-uint64_t genrand64_int64(void) { /* */
-/* generates a random number on [0, 2^64-1]-interval */
-   if (mti sup= NN) { /* generate NN words at one time */
-      /* if init_genrand64() has not been called, */
-        /* a default initial seed is used     */
 
 int charToInt (int c) { /* */
    /* traduit la piece au format RNBQK... en nombre entier */
@@ -536,7 +540,7 @@ int charToInt (int c) { /* */
 void printGame (TGAME jeu, int eval) { /* */
    /* imprime le jeu a la console pour Debug */
 
-char *castleToStr (struct sinfo info, bool whiteIsCastled, bool blackIsCastled, char *str) { /* */
+char *castleToStr (bool whiteIsCastled, bool blackIsCastled, char *str) { /* */
    /* traduit booleen decrivant les possibilits de roque en string */
 
 void strToCastle (char *str, int color, bool *whiteCanCastle, bool *blackCanCastle) { /* */
@@ -602,9 +606,8 @@ char *difference (TGAME sq64_1, TGAME sq64_2, int color, char *prise, char *comp
    /* renvoie aussi epComputer - en passant - pour renseigner les coordonnees eventuelles de prise en passant (sinon : "-") */
    /* epGamer permet de prendre en compte l'indication du gamer pour une prise possible */
 
-void sendGame (bool http, const char *fen, struct sinfo info, int reqType) { /* */
+void sendGame (bool http, const char *fen, int reqType) { /* */
    /* envoie le jeu decrit par fen et info au format JSON */
-
 
 </pre>
 
@@ -630,6 +633,14 @@ Le code JavaScript contrôle que l'entrée du joueur est valide, envoie le jeu v
 <h2>Les fonctions JavaScript</h2>
 <pre>
 
+/* Affiche l'echiquier, saisi le coup joue, formatte l'URL */
+/* genere la requete au serveur (serverRequest)
+ analyse le resultat */
+/* et.. reaffiche le jeu */
+/* FEN notation pour API avec le serveur */
+/* White : minuscules. Black: Majuscules */
+/* codage des pieces Vide : 0, Pawn : 1, kNight: 2, Bishop: 3, Rook: 4, Queen: 5, King; 6, castleKing : 7 */
+/* Le roi qui roque est code 7. Si non 6. */
 /* Code colonne au format a-h. c = 0, cToString = "a" */
 function cToString (c)
   
@@ -708,9 +719,10 @@ function forward ()
 /* met à jour le jeu suite à saisie d'un chaîne FEN */
 function refresh ()
   
-/* affecte les blancs au joueur ou à l'ordinateur */
-function whoGetWhites ()
+/* utilisation iu pas des tables e transposition */
+function transtable ()
   
+/* met à jour le jeu suite à saisie d'un chaîne FEN */
 /* retourne false si on arrete le jeu, TRUE si on continue */
 /* affiche des infos fonction des codes reçus du serveur */
 function statusAnalysis ()
@@ -724,14 +736,24 @@ function moveRead (nom)
 /* envoie requete asynchrone XMLHttpRequest au serveur */
 function serverRequest ()
   
+/* affiche le jeu */
+function fullDisplay ()
+  
 /* met a jour l'objet info a partir de l'objet jeu */
 /* compte les pieces et MAJ l'etat du roi */
 function infoUpdate (jeu)
   
+/* liste les pieces prise de part et d'autre */
+function analPieces ()
+  
 /* met a jour la page */
 function displayUpdate ()
   
-   /* Quand repo,se ordi geree cote ordi
+   /* Quand temps de reponse ordi geree cote ordi
+/* en fonction du deplacement marque les case a colorier */
+/* revoie vrai si la case l, c doit être marquee a colorier */
+function mark (dep, l, c)
+  
 /* partie commune dans Display */
 function commonDisplay (l, c)
   
@@ -786,7 +808,6 @@ h7 : l = 6, c = 7
 h8 : l = 7, c = 7
 </pre>
 <p></p>
-
 
 <h1 id="Annexe">5. Annexe </h1>
 
