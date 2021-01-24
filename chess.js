@@ -44,7 +44,8 @@ let responseServer = {};      // objet JSON
 
 let info = {
    testState: false,          // moveRead simplifie pour test
-   trans: true,               // vrai si utilisation des table de transpositions
+   alea: false,               // vrai si choix aleatoire d'un jey parmi ceux ayant la meeilleure evaluation si plusieur
+   trans: false,              // vrai si utilisation des table de transpositions
    nb: 1,                     // numero du coup complet en cours
    cpt50: 0,                  // compteur pour regle des 50 coups 
    level: 4,                  // niveau demande au serveur
@@ -761,6 +762,7 @@ function serverRequest () {
    let response;
    let http = new XMLHttpRequest ();
    let url = MY_URL + "reqType=" + REQ_TYPE + "&level=" + info.level;
+   if (!info.alea) url += "&noalea";
    if (!info.trans) url += "&notrans";
    let strFen = gameToFen (jeu, -gamer.color, castleToStr (info), gamer.ep, info.cpt50, info.nb);
    document.getElementById ('info').value = "Le serveur pense... !\n";
@@ -872,7 +874,7 @@ function displayUpdate () {
    if (responseServer.gameFEN != null)
       document.getElementById ('FEN').value = responseServer.gameFEN;
    if (responseServer.dump != null)
-      document.getElementById ('dump').innerHTML = responseServer.dump;
+      document.getElementById ('dump').innerHTML = JSON.stringify (responseServer.dump).replaceAll (',', '\n') ;
    if (responseServer.eval != null) {
       document.getElementById ('eval').value = parseInt (responseServer.eval);
    }
