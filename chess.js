@@ -901,7 +901,7 @@ function displayUpdate () {
    document.getElementById ('epGamer').value = gamer.ep;               // dernier coup du joueur
    document.getElementById ('dernierJoueur').value = gamer.lastPlayA;  // dernier coup du joueur
    document.getElementById ('nJoueur').value = gamer.nPieces;          // nb de pieces
-   document.getElementById ('nOrdi').value = info.nComputerPieces;         // nb de pieces
+   document.getElementById ('nOrdi').value = computer.nPieces;         // nb de pieces
    document.getElementById ('historique').value = info.story;
    document.getElementById ('joueurRoqueRoi').value = (gamer.kingCastleOK) ? "Oui" : "Non";
    document.getElementById ('joueurRoqueReine').value = (gamer.queenCastleOK) ? "Oui" : "Non";
