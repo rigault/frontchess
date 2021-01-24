@@ -119,8 +119,14 @@ Les paires (attribut, valeur) sont les suivantes :
    <tr><td>wdl</td><td>retour win-draw-loss des tables de fin de jeux syzygy</td><td>string</td></tr>
    <tr><td>computePlayC</td><td>déplacement ordinateur au format algébrique complet. ex: Pe2-e4</td><td>string</td></tr>
    <tr><td>computePlayA</td><td>déplacement ordinateur au format algébrique abrégé. ex: e4</td><td>string</td></tr>
-   <tr><td>score</td><td>"-" ou "0-1" ou "1-0" ou "1/2-1/2"</td><td>string</td></tr>
-   <tr><td>dump</td><td>dump de variables internes au serveur</td><td>string</td></tr>
+   <tr><td>maxDepth</td><td>profondeur max ajustée</td><td>int</td></tr>
+   <tr><td>nEvalCall</td><td>nombre d'appels à la fonction evaluation</td><td>int</td></tr>
+   <tr><td>nAlphaBeta</td><td>nombre d'appels à la fonction alphaBeta</td><td>int</td></tr>
+   <tr><td>nBestNote</td><td>nombre de possibilité avec la meilleure évaluation</td><td>int</td></tr>
+   <tr><td>nValidGamerPos</td><td>nombre de possibilité de jeux pour le joueur</td><td>int</td></tr>
+   <tr><td>nValidComputerPos</td><td>nombre de possibilité de jeux pour l'ordinateur</td><td>int</td></tr>
+   <tr><td>moveList</td><td>table des possibilités de déplacements pour l'ordinateur suivies de leur evaluation</td><td>array</td></tr>
+   <tr><td>dump</td><td>dump de variables internes au serveur</td><td>objet</td></tr>
    </tbody>
 </table>
 
@@ -139,59 +145,81 @@ Seuls trois attributs sont présent : description, compilation-date et version.
 
 {
 "description" : "Chess Rene Rigault 2021",
-"compilation-date": "Jan 21 2021",
+"compilation-date" : "Jan 24 2021",
 "version" : "2.1",
-"clockTime":0.000787,
-"time" : 0.000791,
-"eval" : 0,
+"clockTime":7.506420,
+"time" : 1.939607,
+"eval" : 10000,
 "computerStatus" : "1 : EXIST",
-"playerStatus" : "1 : EXIST",
-"fen" : "rnbqkbnr/pppp1ppp/8/4p3/5P2/8/PPPPP1PP/RNBQKBNR+w+KQkq+e6+0+2",
-"lastTake" : " ",
-"openingName" : "chess.b.fen A02; Bird Opening, From Gambit, Lasker Variation; GameN: 1024; TourN: 1;",
+"playerStatus" : "4 : IS_MATE",
+"fen" : "r3k2r/p4pn1/2p5/2np3p/2P3b1/2P4K/P3Pq1P/1R3B1R+w+-+-+0+24",
+"lastTake" : "P",
+"openingName" : "",
 "endName" : "",
 "wdl" : 9,
-"computePlayC" : "Pe7-e5",
-"computePlayA" : "e5",
-"maxDepth" : 5,
-"nEvalCall" : 0,
-"nAlphaBeta" : 0,
-"nBestNote" : 0,
-"nValidGamerPos" : 20,
-"nValidComputerPos" : 20,
-"score" : "-"
+"computePlayC" : "Bc8xg4",
+"computePlayA" : "Bxg4",
+"maxDepth" : 4,
+"nEvalCall" : 5151219,
+"nAlphaBeta" : 5133376,
+"nBestNote" : 2,
+"nValidGamerPos" : 23,
+"nValidComputerPos" : 47,
+"moveList" : [
+   "Ph5xg4", 10000, "Bc8xg4", 10000, "Nc5-e6",  9998, "Nc5-a6",  9998, "Nc5-b7",  9998, 
+   "Nc5-e4",  9998, "Nc5-a4",  9998, "Nc5-d3",  9998, "Nc5-b3",  9998, "Pd5-d4",  9998, 
+   "Pd5xc4",  9998, "Pa7-a5",  9998, "Pa7-a6",  9998, "Pf7-f5",  9998, "Pf7-f6",  9998, 
+   "Ng7-e6",  9998, "Ra8-b8",  9998, "Ke8-f8",  9998, "Ke8-d8",  9998, "Rh8-h7",  9998, 
+   "Rh8-h6",  9998, "Ph5-h4",  9996, "Ng7-f5",  9996, "Bc8-d7",  9996, "Bc8-e6",  9996, 
+   "Ke8-e7",  9996, "Rh8-g8",  9996, "Rh8-f8",  9996, "Bc8-a6",  2100, "Ke8-d7",  2099, 
+   "Nc5-d7",  2095, "Qf2-e3",  1910, "Qf2-f4",  1905, "Bc8-b7",  1795, "Bc8-f5",  1711, 
+   "Qf2-f6",  1704, "Qf2-f5",  1111, "Qf2xh2",  1017, "Qf2xf1",  1011, "Qf2xe2",   811, 
+   "Qf2-f3",   713, "Qf2-d4",   713, "Qf2-h4",   711, "Qf2-g1",   711, "Qf2-e1",   711, 
+   "Qf2-g2",   613, "Qf2-g3",   613
+],
+"score" : "0-1",
 }
-
 
 </pre>
 
 <h3>Réponse à une requete reqType=2</h3>
 L'attribut dump est ajouté.
 <pre>
-
 {
 "description" : "Chess Rene Rigault 2021",
-"compilation-date": "Jan 21 2021",
+"compilation-date" : "Jan 24 2021",
 "version" : "2.1",
-"clockTime":0.000787,
-"time" : 0.000791,
-"eval" : 0,
+"clockTime":7.506420,
+"time" : 1.939607,
+"eval" : 10000,
 "computerStatus" : "1 : EXIST",
-"playerStatus" : "1 : EXIST",
-"fen" : "rnbqkbnr/pppp1ppp/8/4p3/5P2/8/PPPPP1PP/RNBQKBNR+w+KQkq+e6+0+2",
-"lastTake" : " ",
-"openingName" : "chess.b.fen A02; Bird Opening, From Gambit, Lasker Variation; GameN: 1024; TourN: 1;",
+"playerStatus" : "4 : IS_MATE",
+"fen" : "r3k2r/p4pn1/2p5/2np3p/2P3b1/2P4K/P3Pq1P/1R3B1R+w+-+-+0+24",
+"lastTake" : "P",
+"openingName" : "",
 "endName" : "",
 "wdl" : 9,
-"computePlayC" : "Pe7-e5",
-"computePlayA" : "e5",
-"maxDepth" : 5,
-"nEvalCall" : 0,
-"nAlphaBeta" : 0,
-"nBestNote" : 0,
-"nValidGamerPos" : 20,
-"nValidComputerPos" : 20,
-"score" : "-",
+"computePlayC" : "Bc8xg4",
+"computePlayA" : "Bxg4",
+"maxDepth" : 4,
+"nEvalCall" : 5151219,
+"nAlphaBeta" : 5133376,
+"nBestNote" : 2,
+"nValidGamerPos" : 23,
+"nValidComputerPos" : 47,
+"moveList" : [
+   "Ph5xg4", 10000, "Bc8xg4", 10000, "Nc5-e6",  9998, "Nc5-a6",  9998, "Nc5-b7",  9998, 
+   "Nc5-e4",  9998, "Nc5-a4",  9998, "Nc5-d3",  9998, "Nc5-b3",  9998, "Pd5-d4",  9998, 
+   "Pd5xc4",  9998, "Pa7-a5",  9998, "Pa7-a6",  9998, "Pf7-f5",  9998, "Pf7-f6",  9998, 
+   "Ng7-e6",  9998, "Ra8-b8",  9998, "Ke8-f8",  9998, "Ke8-d8",  9998, "Rh8-h7",  9998, 
+   "Rh8-h6",  9998, "Ph5-h4",  9996, "Ng7-f5",  9996, "Bc8-d7",  9996, "Bc8-e6",  9996, 
+   "Ke8-e7",  9996, "Rh8-g8",  9996, "Rh8-f8",  9996, "Bc8-a6",  2100, "Ke8-d7",  2099, 
+   "Nc5-d7",  2095, "Qf2-e3",  1910, "Qf2-f4",  1905, "Bc8-b7",  1795, "Bc8-f5",  1711, 
+   "Qf2-f6",  1704, "Qf2-f5",  1111, "Qf2xh2",  1017, "Qf2xf1",  1011, "Qf2xe2",   811, 
+   "Qf2-f3",   713, "Qf2-d4",   713, "Qf2-h4",   711, "Qf2-g1",   711, "Qf2-e1",   711, 
+   "Qf2-g2",   613, "Qf2-g3",   613
+],
+"score" : "0-1",
 "dump" : { "nbTrTa" : 0, "nbMatchTrans" : 0, "nCollision" : 0, "nCallfHash" : 0, "nLCKingInCheck" : 0, "nBuildList" : 0 }
 }
 
@@ -229,7 +257,6 @@ La fonction buildList construit la liste de toutes les positions possibles jouab
 <p> Quatre comportements :
 
 <ul>
-   <li>Si niveau choisi -1, choix aléatoire,</li>
    <li>recherche dans la bibliothèque d'ouvertures,</li>
    <li>recherche dans le tables de fin de jeux,</li>
    <li>sinon pour toutes les positions possibles, génération d’un thread qui va lancer alphabeta,
@@ -240,7 +267,7 @@ La fonction alphabeta implémente l’algorithme Minimax avec élagage Alphabeta
 
 <h2>Le CLI Command Line Interface </h2>
 <pre>
-mode CLI sortie JSON : ./chess.cgi -q|v|V [&lt;jeuAuFormaFEN&gt;] [profondeur]
+mode CLI sortie JSON : ./chess.cgi -q|v [&lt;jeuAuFormaFEN&gt;] [profondeur]
 mode CLI play : ./chess.cgi -p [&lt;jeuAuFormaFEN&gt;] [profondeur]
 mode CLI help: ./chess.cgi -h 
 </pre>
@@ -368,7 +395,7 @@ Extrait de la fonction "SendGame" :
 <pre>
   printf ("Access-Control-Allow-Origin: *\n"); // obligatoire !
   printf ("Cache-Control: no-cache\n");        // eviter les caches
-  printf ("Content-Type: text/html\n\n");
+  printf ("Content-Type: text/html; charset=utf-8\n\n");
 </pre>
 
 <h2>Aspects pratiques </h2>
@@ -418,7 +445,7 @@ Fichier chess.c
 ---------------
 /*   Pour produire la doc sur les fonctions : grep "\/\*" chess.c | sed 's/^\([a-zA-Z]\)/\n\1/' */
 /*   Jeu d'echec */
-/*   ./chess.cgi -q |-v |-V [FENGame] [profondeur] : CLI avec sortie JSON q)uiet v)erbose ou V)ery verbose */
+/*   ./chess.cgi -q |-v [FENGame] [profondeur] : CLI avec sortie JSON q)uiet v)erbose */
 /*   ./chess.cgi -f : test performance */
 /*   ./chess.cgi -t [FENGame] : test unitaire */
 /*   ./chess.cgi -p [FENGame] [profondeur] : play mode CLI */
@@ -490,8 +517,9 @@ int alphaBeta (TGAME sq64, int who, int p, int refAlpha, int refBeta) { /* */
 
 void *fThread (void *arg) { /* */
    /* association des thread a alphabeta */
+   /*comparaison evaluation de deux move pour tri croissant si couleur gamer blanche, decroissante sinon */
 
-int find (TGAME sq64, TGAME bestSq64, int *bestNote) { /* */
+int find (TGAME sq64) { /* */
    /* ordinateur joue renvoie le meilleur jeu possible et le nombre de jeux possibles */
    /*
 
@@ -633,14 +661,16 @@ Le code JavaScript contrôle que l'entrée du joueur est valide, envoie le jeu v
 <h2>Les fonctions JavaScript</h2>
 <pre>
 
+/* client jeu echec */
 /* Affiche l'echiquier, saisi le coup joue, formatte l'URL */
 /* genere la requete au serveur (serverRequest)
- analyse le resultat */
+/* analyse le resultat */
 /* et.. reaffiche le jeu */
 /* FEN notation pour API avec le serveur */
 /* White : minuscules. Black: Majuscules */
 /* codage des pieces Vide : 0, Pawn : 1, kNight: 2, Bishop: 3, Rook: 4, Queen: 5, King; 6, castleKing : 7 */
 /* Le roi qui roque est code 7. Si non 6. */
+
 /* Code colonne au format a-h. c = 0, cToString = "a" */
 function cToString (c)
   
