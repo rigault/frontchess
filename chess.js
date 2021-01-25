@@ -3,12 +3,12 @@
 
 /* client jeu echec */
 /* Affiche l'echiquier, saisi le coup joue, formatte l'URL */
-/* genere la requete au serveur (serverRequest) analyse le resultat */
+/* genere la requete au serveur - serverRequest - analyse le resultat */
 /* et.. reaffiche le jeu */
 /* FEN notation pour API avec le serveur */
 /* White : minuscules. Black: Majuscules */
 /* codage des pieces Vide : 0, Pawn : 1, kNight: 2, Bishop: 3, Rook: 4, Queen: 5, King; 6, castleKing : 7 */
-/* Le roi qui roque est code 7. Si non 6. */
+/* Le roi qui roque est code 7. Sinon 6. */
 
 "use strict";
 const N = 8;
@@ -44,13 +44,14 @@ let responseServer = {};      // objet JSON
 
 let info = {
    testState: false,          // moveRead simplifie pour test
-   alea: false,               // vrai si choix aleatoire d'un jey parmi ceux ayant la meeilleure evaluation si plusieur
+   alea: false,               // vrai si choix aleatoire d'un jeu parmi ceux ayant la meeilleure evaluation si plusieur
    trans: false,              // vrai si utilisation des table de transpositions
    nb: 1,                     // numero du coup complet en cours
    cpt50: 0,                  // compteur pour regle des 50 coups 
    level: 4,                  // niveau demande au serveur
    normal: true,              // pour representation "normale" avec blanc joueur en bas. Sinon on inverse. Cf display ()
    story: "",                 // story du jeu, a ne pas confondre avec historyGame...
+   indic: false               // pour display dans le cas du roque
 };
 
 let gamer = {
@@ -84,7 +85,7 @@ let computer = {              // idem. color inutile (- gamer.color)
 
 let lSource, cSource;        // necessaire en variable globale pour moveread. 
 
-/* Code colonne au format a-h. c = 0, cToString = "a" */
+/* Code colonne au format a-h. Ex : pour c = 0, cToString = "a" */
 function cToString (c) {
    return String.fromCharCode(97+c);
 }
@@ -94,7 +95,7 @@ function stringToLC (str) {
    return [parseInt (str [1]) - 1, str.charCodeAt(0) - 'a'.charCodeAt(0)];
 }
 
-/* traduit booleen decrivant les possibilits de roque en string */
+/* traduit les booleens decrivant les possibilits de roque en string */
 function castleToStr (info) {
    let str = "";
    if (gamer.color == -1) {
@@ -887,13 +888,12 @@ function displayUpdate () {
 
    document.getElementById ('takenByComputer').innerHTML = computer.taken;
 
-   /* Quand temps de reponse ordi geree cote ordi
-   if (responseServer.time != null) {
-      document.getElementById ('timeComputer').value = secToHHMMSS (parseFloat(responseServer.time));
-      computer.totalTime += parseFloat (responseServer.time);
-      document.getElementById ('cumulTimeComputer').value = secToHHMMSS (computer.totalTime);
-   }
-   */
+   // Quand temps de reponse ordi geree cote ordi
+   //if (responseServer.time != null) {
+   //   document.getElementById ('timeComputer').value = secToHHMMSS (parseFloat(responseServer.time));
+   //   computer.totalTime += parseFloat (responseServer.time);
+   //   document.getElementById ('cumulTimeComputer').value = secToHHMMSS (computer.totalTime);
+   //}
    //b : black. Inversion car joueur
    document.getElementById ('votreCouleur').value = (gamer.color) ? "blanche" : "noire"; 
    document.getElementById ('noCoup').value = info.nb;
@@ -911,6 +911,7 @@ function displayUpdate () {
    document.getElementById ('niveauValeur').innerHTML = document.getElementById ('niveau').value;
    document.getElementById ('takenByGamer').innerHTML = gamer.taken;
    gamer.taken = '';
+   document.getElementById ('trans').value = ((info.trans) ? 'TRANS' : 'NO TRANS');
 }
 
 /* en fonction du deplacement marque les case a colorier */
@@ -956,8 +957,9 @@ function commonDisplay (l, c) {
    let istr = cToString (c) + (l+1).toString ();
    let v = jeu [l][c];
    let sBut = "<button class = '";
-   if (computer.lastPlayC.indexOf ("O-O") != -1) {   // cas du roque
+   if ((computer.lastPlayC.indexOf ("O-O") != -1) && ! info.indic) {   // cas du roque
       alert ("Roque !");
+      info.indic = true;
    }
    if (mark (computer.lastPlayC, l, c)) sBut += "last";
    sBut += ((c + l) % 2) ? "blanc" : "noir";
@@ -975,6 +977,7 @@ function commonDisplay (l, c) {
 function display () {
    let l, c;
    let sJeu= "<p><button class = 'deco'>-</button>";
+   info.indic = false;
    if (info.normal) { // a l'endroit : noirs en haut
       for (c = 0; c < N; c +=1) {
          sJeu+= " <button class = 'deco'>"+cToString (c) + "</button>\n";
