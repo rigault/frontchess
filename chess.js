@@ -779,18 +779,18 @@ function serverRequest () {
          if (this.status === 200) {
             clearInterval (computer.count);
             response = this.responseText;
-            console.log ("Réponse reçue: %s\n", response);
+            console.log ("Réponse reçue: \n%s\n", response);
             responseServer = JSON.parse (response);
             [jeu, computer.ep] = fenToGame (responseServer.fen, jeu);
             if ((info.story != '') && (gamer.color == 1)) info.story += '\n';
             info.story += (gamer.color == 1) ? info.nb.toString ().padStart (4, ' ') : "";
-            info.story += responseServer.computePlayA.padStart(8, ' ');
-            computer.lastPlayC = responseServer.computePlayC;
+            info.story += responseServer.moveA.padStart(8, ' ');
+            computer.lastPlayC = responseServer.move;
             new Audio ('beep.wav').play ();
             document.getElementById ('FEN').value = responseServer.fen;
             document.getElementById ('info').value = "A toi de jouer\n";
             if (gamer.color == -1) info.nb += 1; // computer a les noirs
-            if (responseServer.computePlayC [0] == 'P' || responseServer.computePlayC [3] == 'x') 
+            if (responseServer.move [0] == 'P' || responseServer.move [3] == 'x') 
                info.cpt50 = 0;
             else info.cpt50 += 1;
             fullDisplay ();
@@ -879,12 +879,10 @@ function displayUpdate () {
    if (responseServer.eval != null) {
       document.getElementById ('eval').value = parseInt (responseServer.eval);
    }
-   if (responseServer.computePlayC != null)
-      document.getElementById ('computePlay').value = responseServer.computePlayA;
-   if (responseServer.openingName != null)
-      document.getElementById ('message').value = responseServer.openingName.trim();
-   if (responseServer.endName != null && responseServer.endName != '')
-      document.getElementById ('message').value = responseServer.endName;
+   if (responseServer.moveA != null)
+      document.getElementById ('computePlay').value = responseServer.moveA;
+   if ((responseServer.comment != null) && responseServer.endName != '')
+      document.getElementById ('message').value = responseServer.comment.trim();
 
    document.getElementById ('takenByComputer').innerHTML = computer.taken;
 
