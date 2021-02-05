@@ -141,28 +141,33 @@ Seuls trois attributs sont présent : description, compilation-date et version.
 
 <h3>Réponse à une requete reqType=1</h3>
 <pre>
+
 {
 "description" : "Chess Rene Rigault 2021",
-"compilation-date" : "Jan 29 2021",
+"compilation-date" : "Feb  4 2021",
 "version" : "2.1",
-"clockTime": 0.000075,
-"time" : 0.000078,
+"clockTime": 0.000145,
+"time" : 0.000151,
 "nbThread" : 4,
 "eval" : 0,
 "computerStatus" : "1 : EXIST",
 "playerStatus" : "1 : EXIST",
-"fen" : "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR+w+KQkq+e6+0+2",
+"fen" : "rnbqkbnr/pppppppp/8/8/2P5/8/PP1PPPPP/RNBQKBNR+b+KQkq+c3+0+0",
 "lastTake" : " ",
-"comment" : "chess.b.fen C89; Spanish Game, Marshall Attack, Modern Main Line; GameN: 2; TourN: 1;",
-"wdl" : 9,
-"move" : "Pe7-e5",
-"moveA" : "e5",
+"comment" : "chess.w.fen D69; Queen's Gambit Declined, Orthodox Defense, Classical Variation; GameN: 1; TourN: 1;",
+"wdl" : -1,
+"move" : "Pc2-c4",
+"moveA" : "c4",
 "score" : "-",
 "moveList" : [
-   "Pa7-a5",     0, "Pa7-a6",     0, "Pb7-b5",     0, "Pb7-b6",     0, "Pc7-c5",     0, "Pc7-c6",     0, "Pd7-d5",     0, 
-   "Pd7-d6",     0, "Pe7-e5",     0, "Pe7-e6",     0, "Pf7-f5",     0, "Pf7-f6",     0, "Pg7-g5",     0, "Pg7-g6",     0, 
-   "Ph7-h5",     0, "Ph7-h6",     0, "Nb8-c6",     0, "Nb8-a6",     0, "Ng8-h6",     0, "Ng8-f6",     0
-]
+   "Nb1-c3",     0, "Nb1-a3",     0, "Ng1-h3",     0, "Ng1-f3",     0, "Pa2-a4",     0, "Pa2-a3",     0, "Pb2-b4",     0, 
+   "Pb2-b3",     0, "Pc2-c4",     0, "Pc2-c3",     0, "Pd2-d4",     0, "Pd2-d3",     0, "Pe2-e4",     0, "Pe2-e3",     0, 
+   "Pf2-f4",     0, "Pf2-f3",     0, "Pg2-g4",     0, "Pg2-g3",     0, "Ph2-h4",     0, "Ph2-h3",     0
+],
+"dump" : {
+   "maxDepth" : 5, "nEvalCall" : 1, "nAlphaBeta" : 0, "nBestNote" : 0, "nValidGamerPos" : 20, "nValidComputerPos" : 20,
+   "nDoMove" : 0, "nTrTa" : 0, "nMatchTrans" : 0, "nCollision" : 0, "nCallfHash" : 0, "nLCKingInCheck" : 0, "nBuildList" : 0
+}
 }
 
 </pre>
@@ -170,33 +175,35 @@ Seuls trois attributs sont présent : description, compilation-date et version.
 <h3>Réponse à une requete reqType=2</h3>
 L'attribut dump est ajouté.
 <pre>
+
 {
 "description" : "Chess Rene Rigault 2021",
-"compilation-date" : "Jan 29 2021",
+"compilation-date" : "Feb  4 2021",
 "version" : "2.1",
-"clockTime": 0.000075,
-"time" : 0.000078,
+"clockTime": 0.000145,
+"time" : 0.000151,
 "nbThread" : 4,
 "eval" : 0,
 "computerStatus" : "1 : EXIST",
 "playerStatus" : "1 : EXIST",
-"fen" : "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR+w+KQkq+e6+0+2",
+"fen" : "rnbqkbnr/pppppppp/8/8/2P5/8/PP1PPPPP/RNBQKBNR+b+KQkq+c3+0+0",
 "lastTake" : " ",
-"comment" : "chess.b.fen C89; Spanish Game, Marshall Attack, Modern Main Line; GameN: 2; TourN: 1;",
-"wdl" : 9,
-"move" : "Pe7-e5",
-"moveA" : "e5",
+"comment" : "chess.w.fen D69; Queen's Gambit Declined, Orthodox Defense, Classical Variation; GameN: 1; TourN: 1;",
+"wdl" : -1,
+"move" : "Pc2-c4",
+"moveA" : "c4",
 "score" : "-",
 "moveList" : [
-   "Pa7-a5",     0, "Pa7-a6",     0, "Pb7-b5",     0, "Pb7-b6",     0, "Pc7-c5",     0, "Pc7-c6",     0, "Pd7-d5",     0, 
-   "Pd7-d6",     0, "Pe7-e5",     0, "Pe7-e6",     0, "Pf7-f5",     0, "Pf7-f6",     0, "Pg7-g5",     0, "Pg7-g6",     0, 
-   "Ph7-h5",     0, "Ph7-h6",     0, "Nb8-c6",     0, "Nb8-a6",     0, "Ng8-h6",     0, "Ng8-f6",     0
+   "Nb1-c3",     0, "Nb1-a3",     0, "Ng1-h3",     0, "Ng1-f3",     0, "Pa2-a4",     0, "Pa2-a3",     0, "Pb2-b4",     0, 
+   "Pb2-b3",     0, "Pc2-c4",     0, "Pc2-c3",     0, "Pd2-d4",     0, "Pd2-d3",     0, "Pe2-e4",     0, "Pe2-e3",     0, 
+   "Pf2-f4",     0, "Pf2-f3",     0, "Pg2-g4",     0, "Pg2-g3",     0, "Ph2-h4",     0, "Ph2-h3",     0
 ],
 "dump" : {
-   "maxDepth" : 4, "nEvalCall" : 0, "nAlphaBeta" : 0, "nBestNote" : 0, "nValidGamerPos" : 30, "nValidComputerPos" : 20,
-   "nbTrTa" : 0, "nbMatchTrans" : 0, "nCollision" : 0, "nCallfHash" : 0, "nLCKingInCheck" : 0, "nBuildList" : 0
+   "maxDepth" : 5, "nEvalCall" : 1, "nAlphaBeta" : 0, "nBestNote" : 0, "nValidGamerPos" : 20, "nValidComputerPos" : 20,
+   "nDoMove" : 0, "nTrTa" : 0, "nMatchTrans" : 0, "nCollision" : 0, "nCallfHash" : 0, "nLCKingInCheck" : 0, "nBuildList" : 0
 }
 }
+
 </pre>
 <h1 id="Serveur">3. L'application côté serveur </h1>
 <h2>Introduction </h2>
@@ -345,6 +352,14 @@ Le meilleur mouvement ("bestmove") est sélectionné afin de minimiser DTZ. Le D
 (un pion bouge ou une pièce est prise). Le comportement de l'ordinateur est donc parfois surprenant, 
 conduisant à des séquences longues. Mais il est efficace.
 
+<h2>Les tables de transpositions </h2>
+
+Les tables de transpositions permettent en théorie de réduire le temps de recherche. Chaque nouveau noeud de l'arbre créé par la fonction Alphabeta est indexé par un hashcode. Chaque entrée dans la table inclu notamment la profondeur du noeud indexé et le résultat de la fonction d'évaluation sur ce noeud.
+<p>
+L'alogorithme de Zobrist est utilisé pour générer la table de transposition. Chaque nouveau coup recalcule le hascode Zobrist en se basant sur des xor (ou exclusif).
+<p>
+Le gain obtenu n'est pas très important.
+
 <h2>Gestion du CGI </h2>
 <h3>Lire la requête GET </h3>
 On utilise "getenv" avec "QUERY_STRING" en paramètre pour lire les paramètres de l'URL.
@@ -428,13 +443,10 @@ Fichier chess.c
 /*   fichiers associes : chess.log, chessB.fen, chessW.fen, chessUtil.c, syzygy.c, tbprobes.c tbcore.c et .h associes  */
 /*   Structures de donnees essentielles */
 /*     - jeu represente dans un table a 2 dimensions : TGAME sq64 */
-/*     - liste de jeux qui est un tableau de jeux :  TLIST list */
-/*     - nextL est un entier pointant sur le prochain jeux a inserer dans la liste */
+/*     - liste des deplacement qui est un tableau de move : */
+/*     - nextL est un entier pointant sur le prochain move a inserer dans la liste */
 /*   Noirs : positifs  (Minuscules) */
 /*   Blancs : negatifs  (Majuscules) */
-
-inline bool sameParity (int a, int b) { /* */
-   /* retource vrai si a et b ont la meme parite */
 
 uint64_t rand64 () { /* */
    /* retourne un nb aleatoire sur 64 bits */
@@ -442,7 +454,10 @@ uint64_t rand64 () { /* */
 void initTable() { /* */
    /* Initializes the table Zobrist*/
 
-uint64_t computeHash (TGAME sq64, int who) { /* */
+inline int indexOf (int v) { /* */
+   /* index d'une piece pour transposition table */
+
+uint64_t computeHash (TGAME sq64) { /* */
    /* Computes the hashvalue of a given game. Zobrist */
 
 int fMaxDepth (int lev, int nGamerPos, int nComputerPos) { /* */
@@ -459,13 +474,20 @@ bool LCkingInCheck (TGAME sq64, int who, int l, int c) { /* */
    /* vrai si le roi situe case l, c est echec au roi */
    /* "who" est la couleur du roi qui est attaque */
 
-inline int8_t *pushList (TGAME refJeu, TLIST list, int nListe, int8_t *pl, int l1, int c1, int l2, int c2, int u) { /* */
-   /* pousse le jeu refJeu dans la liste avec les modifications specifiees */
+inline int pushMove (TLISTMOVE listMove, int who, int type, int nList, int l1, int c1, int l2, int c2) { /* */
+   /* pousse un deplacement dans la liste */
 
-int buildListEnPassant (TGAME refJeu, int who, char *epGamer, TLIST list, int nextL) { /* */
+inline uint64_t doMove (TGAME sq64, TMOVE move, uint64_t zobrist) { /* */
+   /* execute le deplacement */
+   /* renvoie le nouveau zobrist */
+
+inline void doMove0 (TGAME sq64, TMOVE move) { /* */
+   /* execute le deplacement */
+
+int buildListEnPassant (TGAME refJeu, int who, char *epGamer, TLISTMOVE listMove, int nextL) { /* */
    /* apporte le complement de positions a buildList prenant en compte en Passant suggere par le joueur */
 
-int buildList (TGAME refJeu, register int who, bool kingSide, bool queenSide, TLIST list) { /* */
+int buildList (TGAME refJeu, register int who, bool kingSide, bool queenSide, TLISTMOVE listMove) { /* */
    /* construit la liste des jeux possibles a partir de jeu. */
    /* 'who' joue */
    /* kingSide vrai si roque autorise cote roi */
@@ -486,7 +508,7 @@ int evaluation (TGAME sq64, int who, bool *pat) { /* */
    /* -MAT si joueur gagne, 0 si nul,... */
    /* position le boolean pat si pat */
 
-int alphaBeta (TGAME sq64, int who, int p, int refAlpha, int refBeta) { /* */
+int alphaBeta (TGAME sq64, int who, int p, int refAlpha, int refBeta, uint64_t zobrist) { /* */
    /* le coeur du programme */
 
 void *fThread (void *arg) { /* */
@@ -529,7 +551,7 @@ static bool parseFEN (struct pos *pos, const char *fen) { /* */
 static void moveToStr (const struct pos *pos, unsigned move, char *str) { /* */
    /* Converti un deplacement en une chaine str au format algebrique complet. Ex :  Pe2-e4 */
 
-bool syzygyRR (const char* path, const char *fen, unsigned *wdl, char *bestMove, char *comment) { /* */
+bool syzygyRR (const char* path, const char *fen, int *wdl, char *bestMove, char *comment) { /* */
    /* recherche dans la tablebase sygyzy situee dans path le jeu decrit en notation */
    /* FEN par fen. Renvoie le deplacement au format algebrique complet dans bestMove */
    /* le commentaire contient ce deplacement et les valeur WIN WDL DTZ */
@@ -541,6 +563,9 @@ Fichier chessUtil.c
 
 int charToInt (int c) { /* */
    /* traduit la piece au format RNBQK... en nombre entier */
+
+void moveToStr (TMOVE move, char str [MAXSTRMOVE]) { /* */
+   /* traduit move en chaine algébrique */
 
 void printGame (TGAME jeu, int eval) { /* */
    /* imprime le jeu a la console pour Debug */
@@ -573,7 +598,7 @@ char *gameToFen (TGAME sq64, char *fen, int color, char sep, bool complete, char
 
 void moveGame (TGAME sq64, int color, char *move) { /* */
    /* modifie jeu avec le deplacement move */
-   /* move en notation algébique Pa2-a4 ou Pa2xc3 */
+   /* move en notation algébrique Pa2-a4 ou Pa2xc3 */
    /* tolere e2e4 e2-e4 e:e4 e2xe4 */
 
 bool opening (const char *fileName, char *gameFen, char *sComment, char *move) { /* */
@@ -601,18 +626,6 @@ char *abbrev (TGAME sq64, char *complete, char *abbr) { /* */
 char *enPassant (int color, char *complete, char *strEp) { /* */
    /* renvoie les coordonnees eventuelles de la case en passant au format e5 */
    /* sinon renvoie "-" */
-
-char *difference (TGAME sq64_1, TGAME sq64_2, int color, char *prise, char *complete, char *abbr, char *epGamer, char *epComputer, bool *queenCastleOK, bool *kingCastleOK) { /* */
-   /* color = 1 pour les noirs, - 1 pour les blancs */
-   /* retrouve le coup joue par Ordi */
-   /* traite le roque. Et met a jour les booleans liés au Roque */
-   /* traite le en passant suggere par le joueur */
-   /* en dehors de ces deux cas suppose qu'il n'y a que deux cases differentes (l1,c1) (l2, c2) */
-   /* renvoie la chaine decrivant la difference */
-   /* qui represente le deplacement au format complet Pe2:e4 et au format abregé e4 */
-   /* renvoie aussi prise, valeur de la piece prise. ' ' si pas de prise */
-   /* renvoie aussi epComputer - en passant - pour renseigner les coordonnees eventuelles de prise en passant (sinon : "-") */
-   /* epGamer permet de prendre en compte l'indication du gamer pour une prise possible */
 
 void sendGame (bool http, const char *fen, int reqType) { /* */
    /* envoie le jeu decrit par fen et les struct computer et info au format JSON */
