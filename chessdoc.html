@@ -45,7 +45,8 @@ En cas d'absence d'éléments, il existe des valeurs par défaut.
    <tr><td>reqType</td><td>0, 1, 2</td><td>int</td></tr>
    <tr><td>fen</td><td>chaine décrivant le jeu au format FEN</td><td>string</td></tr>
    <tr><td>level</td><td>niveau de profondeur demandé</td><td>int</td></tr>
-   <tr><td>noalea</td><td>Pour choix non aléatoire d'un jeu si plusieus son equivalents</td><td></td></tr>
+   <tr><td>exp</td><td>exposant de la taille des tables de transpositions</td><td>int</td></tr>
+   <tr><td>alea</td><td>pour choix aléatoire ou déterministe dans la liste si plusieurs choix sont équivalents</td><td></td></tr>
    <tr><td>notrans</td><td>Pour non utilisation des tables de transposition</td><td></td></tr>
    <tr><td>nomulti</td><td>Pour non utilisation multithread</td><td></td></tr>
    </tbody>
@@ -83,16 +84,33 @@ Le codage est le suivant :
 </table>
 
 <h3>level </h3>
-Profondeur de la recherche demandée au serveur.
+level=x
+<p>Profondeur de la recherche demandée au serveur.
 
-<h3>noalea </h3>
-Pas de parametre.
+<h3>exp </h3>
+exp=n
+<p>
+La taille des tables de transposition est égale à : 2 <sup>n</sup>. 
+
+<h3>alea</h3>
+alea=-1|0|1
+<p>
+un paramètre dont la valeur est -1 ou 0 ou 1.
+<ul>
+<li> 1 (par défaut) : choix aléatoire d'un jeu parmi la liste des jeux ayant la même évaluation, </li>
+<li> 0 : premier de la liste </li>
+<li> -1 : dernier de la liste </li>
+</ul>
 
 <h3>notrans </h3>
 Pas de parametre.
+<p>
+si absent, utilisation des tables de transpositions.
 
 <h3>nomulti </h3>
 Pas de parametre.
+<p>
+Si absent, fonctonnement en multitread.
 <p>
 <h2>Exemple de requête complète</h2>
 <pre>
@@ -434,10 +452,10 @@ Fichier chess.c
 ---------------
 /*   Pour produire la doc sur les fonctions : grep "\/\*" chess.c | sed 's/^\([a-zA-Z]\)/\n\1/' */
 /*   Jeu d'echec */
-/*   ./chess.cgi -q |-v [FENGame] [profondeur] : CLI avec sortie JSON q)uiet v)erbose */
+/*   ./chess.cgi -q |-v [FENGame] [profondeur] [exp] : CLI avec sortie JSON q)uiet v)erbose */
 /*   ./chess.cgi -f : test performance */
 /*   ./chess.cgi -t [FENGame] : test unitaire */
-/*   ./chess.cgi -p [FENGame] [profondeur] : play mode CLI */
+/*   ./chess.cgi -p [FENGame] [profondeur] [exp] : play mode CLI */
 /*   ./chess.cgi -h : help */
 /*   sans parametre ni option :  CGI gérant une API restful (GET) avec les réponses au format JSON */
 /*   fichiers associes : chess.log, chessB.fen, chessW.fen, chessUtil.c, syzygy.c, tbprobes.c tbcore.c et .h associes  */
@@ -454,7 +472,7 @@ uint64_t rand64 () { /* */
 void initTable() { /* */
    /* Initializes the table Zobrist*/
 
-inline int indexOf (int v) { /* */
+inline int indexOf (register int v) { /* */
    /* index d'une piece pour transposition table */
 
 uint64_t computeHash (TGAME sq64) { /* */
@@ -470,14 +488,10 @@ bool LCBlackKingInCheck (TGAME sq64, register int l, register int c) { /* */
 bool LCWhiteKingInCheck (TGAME sq64, register int l, register int c) { /* */
    /* vrai si le roi Blanc situe case l, c est echec au roi */
 
-bool LCkingInCheck (TGAME sq64, int who, int l, int c) { /* */
-   /* vrai si le roi situe case l, c est echec au roi */
-   /* "who" est la couleur du roi qui est attaque */
-
-inline int pushMove (TLISTMOVE listMove, int who, int type, int nList, int l1, int c1, int l2, int c2) { /* */
+inline int pushMove (TLISTMOVE listMove, register int who, register int type, register int nList, register int l1, register int c1, register int l2, register int c2) { /* */
    /* pousse un deplacement dans la liste */
 
-inline uint64_t doMove (TGAME sq64, TMOVE move, uint64_t zobrist) { /* */
+inline uint64_t doMove (TGAME sq64, TMOVE move, register uint64_t zobrist) { /* */
    /* execute le deplacement */
    /* renvoie le nouveau zobrist */
 
@@ -493,7 +507,7 @@ int buildList (TGAME refJeu, register int who, bool kingSide, bool queenSide, TL
    /* kingSide vrai si roque autorise cote roi */
    /* quenSide vrai si roque autorise cote roi */
 
-bool fKingInCheck (TGAME sq64, register int who) { /* */
+inline bool fKingInCheck (TGAME sq64, register int who) { /* */
    /* retourne vrai si le roi "who" est en echec */
 
 bool kingCannotMove (TGAME sq64, register int who) { /* */
@@ -503,7 +517,7 @@ bool kingCannotMove (TGAME sq64, register int who) { /* */
    /* c'est perdu. Noter que si le roi a le trait et qu'il n'est pas echec au roi il est Pat */
    /* si le roi est echec au roi il est mat */
 
-int evaluation (TGAME sq64, int who, bool *pat) { /* */
+int evaluation (TGAME sq64, register int who, bool *pat) { /* */
    /* fonction d'evaluation retournant MAT si Ordinateur gagne, */
    /* -MAT si joueur gagne, 0 si nul,... */
    /* position le boolean pat si pat */
@@ -786,6 +800,9 @@ function main ()
 
 </pre> 
   
+
+<h1 id="Annexe">5. Annexe </h1>
+
 <h2>Codage des pièces</h2>
 <div id = "conteneur">
 <div id="gauche">
@@ -814,8 +831,9 @@ function main ()
    </tbody>
 </table>
 </div>
-</div>
-<h2>Codage des case</h2>
+</div> <!-- conteneur -->
+
+<h2>Codage des cases</h2>
 
 Soit une case xn au format a1.
 <p>
@@ -830,9 +848,6 @@ h7 : l = 6, c = 7
 h8 : l = 7, c = 7
 </pre>
 <p></p>
-
-<h1 id="Annexe">5. Annexe </h1>
-
 <h2>Format FEN : Forsyth–Edwards Notation</h2>
 Voir Wikipedia
 <p>

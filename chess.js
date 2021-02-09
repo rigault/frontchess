@@ -43,15 +43,15 @@ let indexHistory = 0;         // idem
 let responseServer = {};      // objet JSON
 
 let info = {
-   testState: false,          // moveRead simplifie pour test
-   alea: false,               // vrai si choix aleatoire d'un jeu parmi ceux ayant la meeilleure evaluation si plusieur
-   trans: false,              // vrai si utilisation des table de transpositions
-   nb: 1,                     // numero du coup complet en cours
-   cpt50: 0,                  // compteur pour regle des 50 coups 
-   level: 4,                  // niveau demande au serveur
-   normal: true,              // pour representation "normale" avec blanc joueur en bas. Sinon on inverse. Cf display ()
-   story: "",                 // story du jeu, a ne pas confondre avec historyGame...
-   indic: false               // pour display dans le cas du roque
+   testState: false, // moveRead simplifie pour test
+   alea: 1,          // 1 : choix aleatoire d'un jeu parmi ceux ayant la meilleure evaluation. 0 premier de la liste -1 fernier
+   trans: false,     // vrai si utilisation des table de transpositions
+   nb: 1,            // numero du coup complet en cours
+   cpt50: 0,         // compteur pour regle des 50 coups 
+   level: 4,         // niveau demande au serveur
+   normal: true,     // pour representation "normale" avec blanc joueur en bas. Sinon on inverse. Cf display ()
+   story: "",        // story du jeu, a ne pas confondre avec historyGame...
+   indic: false      // pour display dans le cas du roque
 };
 
 let gamer = {
@@ -304,24 +304,24 @@ function abbrev (sq64, complete) {
 function LCkingInCheck (sq64, who, l, c) {
    let w, k;
    // roi adverse  menace.  Matche -KING et -CASTLEKING
-   if (l < 7 && (-who * sq64 [l+1][c] >= KING)) return true;
-   if (l > 0 && (-who * sq64 [l-1][c] >= KING)) return true;
-   if (c < 7 && (-who * sq64 [l][c+1] >= KING)) return true;
-   if (c > 0 && (-who * sq64 [l][c-1] >= KING)) return true;
-   if (l < 7 && c < 7 && (-who * sq64 [l+1][c+1] >= KING)) return true;
-   if (l < 7 && c > 0 && (-who * sq64 [l+1][c-1] >= KING)) return true;
-   if (l > 0 && c < 7 && (-who * sq64 [l-1][c+1] >= KING || -who * sq64 [l-1][c+1] == PAWN)) return true;
-   if (l > 0 && c > 0 && (-who * sq64 [l-1][c-1] >= KING || -who * sq64 [l-1][c-1] == PAWN)) return true;
+   if ((l < 7 && (-who * sq64 [l+1][c] >= KING)) ||
+       (l > 0 && (-who * sq64 [l-1][c] >= KING)) ||
+       (c < 7 && (-who * sq64 [l][c+1] >= KING)) ||
+       (c > 0 && (-who * sq64 [l][c-1] >= KING)) ||
+       (l < 7 && c < 7 && (-who * sq64 [l+1][c+1] >= KING)) ||
+       (l < 7 && c > 0 && (-who * sq64 [l+1][c-1] >= KING)) ||
+       (l > 0 && c < 7 && ((w = (-who * sq64 [l-1][c+1]) >= KING) || (w == PAWN))) ||
+       (l > 0 && c > 0 && ((w = (-who * sq64 [l-1][c-1]) >= KING) || (w == PAWN))) ||
 
    // cavalier menace
-   if (l < 7 && c < 6 && (-who * sq64 [l+1][c+2] == KNIGHT)) return true;
-   if (l < 7 && c > 1 && (-who * sq64 [l+1][c-2] == KNIGHT)) return true;
-   if (l < 6 && c < 7 && (-who * sq64 [l+2][c+1] == KNIGHT)) return true;
-   if (l < 6 && c > 0 && (-who * sq64 [l+2][c-1] == KNIGHT)) return true;
-   if (l > 0 && c < 6 && (-who * sq64 [l-1][c+2] == KNIGHT)) return true;
-   if (l > 0 && c > 1 && (-who * sq64 [l-1][c-2] == KNIGHT)) return true;
-   if (l > 1 && c < 7 && (-who * sq64 [l-2][c+1] == KNIGHT)) return true;
-   if (l > 1 && c > 0 && (-who * sq64 [l-2][c-1] == KNIGHT)) return true;
+       (l < 7 && c < 6 && (-who * sq64 [l+1][c+2] == KNIGHT)) ||
+       (l < 7 && c > 1 && (-who * sq64 [l+1][c-2] == KNIGHT)) ||
+       (l < 6 && c < 7 && (-who * sq64 [l+2][c+1] == KNIGHT)) ||
+       (l < 6 && c > 0 && (-who * sq64 [l+2][c-1] == KNIGHT)) ||
+       (l > 0 && c < 6 && (-who * sq64 [l-1][c+2] == KNIGHT)) ||
+       (l > 0 && c > 1 && (-who * sq64 [l-1][c-2] == KNIGHT)) ||
+       (l > 1 && c < 7 && (-who * sq64 [l-2][c+1] == KNIGHT)) ||
+       (l > 1 && c > 0 && (-who * sq64 [l-2][c-1] == KNIGHT))) return true;
 
    // tour ou reine menace
    for (k = l+1; k < N; k++) {
@@ -762,8 +762,7 @@ function moveRead (nom) {
 function serverRequest () {
    let response;
    let http = new XMLHttpRequest ();
-   let url = MY_URL + "reqType=" + REQ_TYPE + "&level=" + info.level;
-   if (!info.alea) url += "&noalea";
+   let url = MY_URL + "reqType=" + REQ_TYPE + "&level=" + info.level + "&alea=" + info.alea;
    if (!info.trans) url += "&notrans";
    let strFen = gameToFen (jeu, -gamer.color, castleToStr (info), gamer.ep, info.cpt50, info.nb);
    document.getElementById ('info').value = "Le serveur pense... !\n";
