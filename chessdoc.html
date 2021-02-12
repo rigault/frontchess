@@ -452,10 +452,11 @@ Fichier chess.c
 ---------------
 /*   Pour produire la doc sur les fonctions : grep "\/\*" chess.c | sed 's/^\([a-zA-Z]\)/\n\1/' */
 /*   Jeu d'echec */
-/*   ./chess.cgi -q |-v [FENGame] [profondeur] [exp] : CLI avec sortie JSON q)uiet v)erbose */
+/*   ./chess.cgi -q |-v [FENstring] [profondeur] [exp] : CLI avec sortie JSON q)uiet v)erbose */
+/*   ./chess.cgi -m | M [Fenstring] [Movestring] : execute le déplacement etrenvoie le jeur */
+/*   ./chess.cgi -d | D [FENstring] : affiche le jeu */
 /*   ./chess.cgi -f : test performance */
 /*   ./chess.cgi -t [FENGame] : test unitaire */
-/*   ./chess.cgi -p [FENGame] [profondeur] [exp] : play mode CLI */
 /*   ./chess.cgi -h : help */
 /*   sans parametre ni option :  CGI gérant une API restful (GET) avec les réponses au format JSON */
 /*   fichiers associes : chess.log, chessB.fen, chessW.fen, chessUtil.c, syzygy.c, tbprobes.c tbcore.c et .h associes  */
@@ -495,8 +496,9 @@ inline uint64_t doMove (TGAME sq64, TMOVE move, register uint64_t zobrist) { /* 
    /* execute le deplacement */
    /* renvoie le nouveau zobrist */
 
-inline void doMove0 (TGAME sq64, TMOVE move) { /* */
+inline int doMove0 (TGAME sq64, TMOVE move) { /* */
    /* execute le deplacement */
+   /* renvoie la position du roi qui a bouge sous forme l * 8 + c sinon -1*/
 
 int buildListEnPassant (TGAME refJeu, int who, char *epGamer, TLISTMOVE listMove, int nextL) { /* */
    /* apporte le complement de positions a buildList prenant en compte en Passant suggere par le joueur */
@@ -507,12 +509,9 @@ int buildList (TGAME refJeu, register int who, bool kingSide, bool queenSide, TL
    /* kingSide vrai si roque autorise cote roi */
    /* quenSide vrai si roque autorise cote roi */
 
-inline bool fKingInCheck (TGAME sq64, register int who) { /* */
-   /* retourne vrai si le roi "who" est en echec */
-
-bool kingCannotMove (TGAME sq64, register int who) { /* */
+bool LCkingCannotMove (TGAME sq64, register int who, register int l, register int c) { /* */
    /* vrai si le roi du joueur "who" ne peut plus bouger sans se mettre echec au roi */
-   /* "who" est la couleur du roi qui est attaque */
+   /* "who" est la couleur du roi qui est attaque, l et c sa position */
    /* on essaye tous les jeux possibles. Si dans tous les cas on est echec au roi */
    /* c'est perdu. Noter que si le roi a le trait et qu'il n'est pas echec au roi il est Pat */
    /* si le roi est echec au roi il est mat */
