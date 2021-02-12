@@ -68,20 +68,8 @@ Sauf cas particulier, utiliser la requête 1.
 
 <h3>fen </h3>
 
-Le jeu dans les échanges externes (API) est représenté par la notation FEN (Forsyth–Edwards Notation). 
+Le jeu dans les échanges externes (API) est représenté par la notation FEN (Forsyth–Edwards Notation). Voir annexe.
 Le codage est le suivant :
-
-<p>
-<table>
-   <tbody><tr><th>Pièce</th><th>Noirs</th><th>Blancs</th></tr>
-   <tr><td>Pawn</td><td>p</td><td>P</td></tr>
-   <tr><td>kNight</td><td>n</td><td>N</td></tr>
-   <tr><td>Bishop</td><td>b</td><td>B</td></tr>         
-   <tr><td>Rook</td><td>r</td><td>R</td></tr>      
-   <tr><td>Queen</td><td>q</td><td>Q</td></tr>
-   <tr><td>King</td><td>k</td><td>K</td></tr>
-   </tbody>
-</table>
 
 <h3>level </h3>
 level=x
@@ -90,7 +78,9 @@ level=x
 <h3>exp </h3>
 exp=n
 <p>
-La taille des tables de transposition est égale à : 2 <sup>n</sup>. 
+La taille des tables de transposition est égale à : 2 <sup>n</sup>.
+<p>
+Si absent la taille par défaut est 2 <sup>24</sup>.
 
 <h3>alea</h3>
 alea=-1|0|1
@@ -103,14 +93,14 @@ un paramètre dont la valeur est -1 ou 0 ou 1.
 </ul>
 
 <h3>notrans </h3>
-Pas de parametre.
+Pas de paramètre.
 <p>
-si absent, utilisation des tables de transpositions.
+si absent, utilisation des tables de transpositions. Si présent pas de tables de transposition.
 
 <h3>nomulti </h3>
-Pas de parametre.
+Pas de paramètre.
 <p>
-Si absent, fonctonnement en multitread.
+Si absent, fonctonnement en multitread. Si présent, un seul thread.
 <p>
 <h2>Exemple de requête complète</h2>
 <pre>
@@ -121,7 +111,7 @@ Note : les espaces sont remplacés par des "+".
 
 <h2> Réponses</h2>
 
-Le format Jason est utilisé.
+Le format JSON est utilisé.
 Les paires (attribut, valeur) sont les suivantes :
 <p>
 <table>
@@ -182,10 +172,6 @@ Seuls trois attributs sont présent : description, compilation-date et version.
    "Pb2-b3",     0, "Pc2-c4",     0, "Pc2-c3",     0, "Pd2-d4",     0, "Pd2-d3",     0, "Pe2-e4",     0, "Pe2-e3",     0, 
    "Pf2-f4",     0, "Pf2-f3",     0, "Pg2-g4",     0, "Pg2-g3",     0, "Ph2-h4",     0, "Ph2-h3",     0
 ],
-"dump" : {
-   "maxDepth" : 5, "nEvalCall" : 1, "nAlphaBeta" : 0, "nBestNote" : 0, "nValidGamerPos" : 20, "nValidComputerPos" : 20,
-   "nDoMove" : 0, "nTrTa" : 0, "nMatchTrans" : 0, "nCollision" : 0, "nCallfHash" : 0, "nLCKingInCheck" : 0, "nBuildList" : 0
-}
 }
 
 </pre>
@@ -226,7 +212,7 @@ L'attribut dump est ajouté.
 <h1 id="Serveur">3. L'application côté serveur </h1>
 <h2>Introduction </h2>
 L'application est écrite uniquement en langage C et compatible cgi.
-Elle est multiphread et tire partie des architectures à plusieurs cœurs afin de paralléliser la recherche.
+Elle est multithread et tire partie des architectures à plusieurs cœurs afin de paralléliser la recherche.
 Elle est basée sur la méthode du Minimax consistant à construire l'arbre des possibilités à une profondeur définie.
 Au niveau de chaque feuille de l'arbre, la fonction d'évaluation est appelée. Elle se base sur quelques heuristiques et retourne une valeur qualifiant la position choisie. 
 Afin de réduire la recherche aux seuls cas pertinents, la méthode Alpha-Bêta est utilisée.
@@ -234,10 +220,10 @@ Afin de réduire la recherche aux seuls cas pertinents, la méthode Alpha-Bêta 
 <p>Conventions :
 <ul>
    <li>Les blancs sont identifiés par des valeurs négatives et des caractères en majuscules,</li>
-   <li>les noirs sont identifiés par des valeurs positive et des caractères en minuscules,</li>
+   <li>les noirs sont identifiés par des valeurs positives et des caractères en minuscules,</li>
    <li>les cases vides ont une valeur nulle (0),</li>
    <li>le jeu est représenté par un tableau de 64 octets,</li>
-   <li>la liste des jeux est représentée par un tableau de jeux et un entier qui est l'index du prochain jeu à stocker,</li>
+   <li>la liste des déplacements est représentée par un tableau de déplacements et un entier qui est l'index du prochain déplacement à stocker,</li>
    <li>les lignes et colonnes d’une pièces sont représentées par un couple d'entiers (l, c) en interne,</li>
    <li>la notation algébrique complète est utilisée pour préciser les déplacements. </li>
 </ul>
@@ -245,13 +231,14 @@ Afin de réduire la recherche aux seuls cas pertinents, la méthode Alpha-Bêta 
 <h2>Structures de données essentielles</h2>
 <ul>
    <li>Le jeu est représenté dans un tableau à 2 dimensions de type TGAME,</li>
-   <li>une liste de jeux est un tableau de jeux. Type TLIST,</li>
-   <li>nextL est un entier pointant sur le prochain jeux a insérer dans la liste,</li>
-   <li>info est la structure rassemblant un ensemble de données de contrôles et d’état du jeux.</li>
+   <li>une liste de déplacements est un tableau. Type TMOVELIST,</li>
+   <li>nextL est un entier pointant sur le prochain déplacement a insérer dans la liste,</li>
+   <li>info est une structure rassemblant un ensemble de données de contrôles et d’état du jeux.</li>
+   <li>gamer (resp. computer) est une structure rassemblant un ensemble de données de contrôles et d’état du joueur (resp. computer).</li>
 </ul>
 
 <h2>La recherche</h2>
-La fonction buildList construit la liste de toutes les positions possibles jouables.
+La fonction buildList construit la liste de tous les déplacements possibles jouables.
 <p>La fonction computerPlay part du sommet de l'arbre (position courante du jeu) et appelle buildList.
 <p> Trois comportements :
 
@@ -330,7 +317,7 @@ Avant de lancer la recherche dans l'arbre, une bibliothèque d'ouverture est uti
 <p> Les fichiers utilisés sont placés dans un répertoire spécifique
 <p> Il sont évalués dans l'ordre alphabétique. Ceci signifie que si deux configurations éligibles sont situées
 dans des fichiers différents, seule celle appartenant au premier fichier dans l'ordre alphabétique sera considérée. 
-<p>Les fichiers suffixés par ".b.fen" et ".w.fen" sont des fichierx textes CSV et contiennent la liste des ouvertures au format FEN vus des noirs et vus des blancs.
+<p>Les fichiers suffixés par ".b.fen" et ".w.fen" sont des fichiers textes CSV et contiennent la liste des ouvertures au format FEN vus des noirs et vus des blancs.
 <p> Format CSV : FENstring ; dep ; commentaires
 <p> dep contient le déplacement en notation algébrique complète Xe2:e4[=Y] | O-O | O-O-O
 <p> X : pièce joue. Y : promotion,  O-O : petit roque,  O-O-O : grand roque
@@ -343,7 +330,8 @@ rnbqkbnr/pppppppp8/8/3P4/8/PPP1PPPP/RNBQKBNR b Pd7-d5; Classique-ferme-Coup1; RR
 
 <h2>Gestion En Passant </h2>
 
-La notion de En Passant est gérée dans l'API et dans la fonction différence qui sait reconnaître si la case "en passant" fournie par le joueur 
+La notion de En Passant est gérée dans l'API.
+<p>
 (epGamer) est utilisable pour une prise et si il est nécessaire de renseigner en passant par l'ordinateur (epComputer).
 La fonction buildList a un complément pour énumérer les prises potentielles associées au "en passant". 
 Par contre, l'arbre (au dessous du premier niveau) ne prend pas en compte les possibilités offertes par En Passant. Il est donc possible que la proposition de jeu calculéesoit sous optimale.  
@@ -360,7 +348,7 @@ Les 50 coups sont en théorie gérée pour la fin de partie (Syzygy).
 La fonction syzygy renvoie la meilleure solution dès lors que le nombre de pièces restant sur le jeu est inférieur ou égal à 6.
 Voir documentation sur les tables de fin de partie sur le Web.
 La solution choisie est basée sur les tables syzygy stockées en local sur le serveur.
-L'API donne un commentaire "endgame" incluant les valeurs de :
+L'API donne un commentaire incluant les valeurs de :
 <ul>
 <li>WIN : 0-1 ou 1-0 ou 1/2-1/2 selon que le résultat attendu est victoire noire, blanche ou nulle.</li>
 <li>WDL : valeur de 0 à 4</li>
@@ -374,7 +362,7 @@ conduisant à des séquences longues. Mais il est efficace.
 
 Les tables de transpositions permettent en théorie de réduire le temps de recherche. Chaque nouveau noeud de l'arbre créé par la fonction Alphabeta est indexé par un hashcode. Chaque entrée dans la table inclu notamment la profondeur du noeud indexé et le résultat de la fonction d'évaluation sur ce noeud.
 <p>
-L'alogorithme de Zobrist est utilisé pour générer la table de transposition. Chaque nouveau coup recalcule le hascode Zobrist en se basant sur des xor (ou exclusif).
+L'alogrithme de Zobrist est utilisé pour générer la table de transposition. Chaque nouveau coup recalcule le hascode Zobrist en se basant sur des xor (ou exclusif).
 <p>
 Le gain obtenu n'est pas très important.
 
@@ -395,7 +383,8 @@ On utilise "getenv" avec "QUERY_STRING" en paramètre pour lire les paramètres 
 </pre>
 
 <h3>Envoi du jeu </h3>
-Dans sendGame, on formate le JSON avec printf...
+La fonction sendGame produit sur la sortie standard le résultat du jeu au format JSON avec des printf...
+<p>
 Ne pas oublier (très important) l'envoi de
 <pre>Access-Control-Allow-Origin: *</pre>
 Extrait de la fonction "SendGame" :
@@ -410,14 +399,14 @@ Extrait de la fonction "SendGame" :
 Pour compiler, l'option pthread" est nécessaire pour la gestion multithread.
 Il est possible de lancer chess en mode CLI (Command Line Interface) à partir de la console.
 <p/>
-Lancer help pour liste des options.
+Lancer help pour liste les options.
 <pre>
-exemple mode CLI: sudo ./chess.cgi -v [&lt;jeuAFormatFEN&gt;] [profondeur]
+exemple mode CLI: sudo ./chess.cgi -v [&lt;jeuAFormatFEN&gt;] [profondeur] [exposant]
 help : sudo ./chess.cgi -h
 </pre>
-Les pièces ordinateurs, noires sont positives en interne et représentées par des caractères minuscule pour l'API.
+Les pièces ordinateurs, noires sont positives en interne et représentées par des caractères minuscule dans la chaîne FEN transmise dans l'API.
 <br>
-Les pièces joueurs, blanches, sont négatives en internes et représentées par des caractères majuscules pour l'API.
+Les pièces joueurs, blanches, sont négatives en internes et représentées par des caractères majuscules.
 <p>
 
 <table>
@@ -440,10 +429,12 @@ main ()
          whereKings ()                       
          fThread ()
             alphaBeta ()
+               buildList ()
+               doMove ()
                evaluation ()
                   buildList ()
-                     pushList ()
                   LCkingInCheck ()
+                  LCCannotMove ()
 </pre>
 <h2>Les fonctions et les commentaires associés </h2>
 <pre>
@@ -798,7 +789,6 @@ function display ()
 function main ()
 
 </pre> 
-  
 
 <h1 id="Annexe">5. Annexe </h1>
 
@@ -854,6 +844,17 @@ Un enregistrement FEN définit une position particulière, il est écrit sur une
 L'extension du fichier est « .fen ».
 <p>
 Cette notation est en anglais, les pièces sont nommées rook (tour), knight (cavalier), bishop (fou), queen (dame), king (roi) et pawn (pion).
+<p>
+<table>
+   <tbody><tr><th>Pièce</th><th>Noirs</th><th>Blancs</th></tr>
+   <tr><td>Pawn</td><td>p</td><td>P</td></tr>
+   <tr><td>kNight</td><td>n</td><td>N</td></tr>
+   <tr><td>Bishop</td><td>b</td><td>B</td></tr>         
+   <tr><td>Rook</td><td>r</td><td>R</td></tr>      
+   <tr><td>Queen</td><td>q</td><td>Q</td></tr>
+   <tr><td>King</td><td>k</td><td>K</td></tr>
+   </tbody>
+</table>
 <p>
 Un enregistrement contient 6 champs. Le séparateur est l'espace. 
 
