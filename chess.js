@@ -44,8 +44,8 @@ let responseServer = {};      // objet JSON
 
 let info = {
    testState: false, // moveRead simplifie pour test
-   alea: 1,          // 1 : choix aleatoire d'un jeu parmi ceux ayant la meilleure evaluation. 0 premier de la liste -1 fernier
-   trans: false,     // vrai si utilisation des table de transpositions
+   alea: 1,          // 1 : choix aleatoire d'un jeu parmi ceux ayant la meilleure evaluation. 0 premier de la liste -1 dernier
+   trans: true,      // vrai si utilisation des table de transpositions
    nb: 1,            // numero du coup complet en cours
    cpt50: 0,         // compteur pour regle des 50 coups 
    level: 4,         // niveau demande au serveur
@@ -750,6 +750,7 @@ function moveRead (nom) {
       if (prise == 'x' || pawnMove) 
          info.cpt50 = 0;
       else info.cpt50 += 1; 
+      computer.lastPlayC = ""; // pour arreter le marquage evec mark ()
       fullDisplay ();
       clearInterval (gamer.count);
       if (info.cpt50 > CINQUANTE)
@@ -873,8 +874,8 @@ function displayUpdate () {
    document.getElementById ('epComputer').value = computer.ep;
    if (responseServer.gameFEN != null)
       document.getElementById ('FEN').value = responseServer.gameFEN;
-   if (responseServer.dump != null)
-      document.getElementById ('dump').innerHTML = JSON.stringify (responseServer.dump).replaceAll (',', '\n') ;
+   //if (responseServer.dump != null)
+   //   document.getElementById ('dump').innerHTML = JSON.stringify (responseServer.dump).replaceAll (',', '\n') ;
    if (responseServer.eval != null) {
       document.getElementById ('eval').value = parseInt (responseServer.eval);
    }
@@ -1015,7 +1016,7 @@ function display () {
 function main () {
    for (let i = 0; i < N; i++) jeu [i] = [0,0,0,0,0,0,0,0];  // creer 8 cases pour les 8 lignes
    fenToGame (initFen, jeu);
-   let rep = prompt ("Tu veux les blanc O/N ?",  "O");
+   let rep = prompt ("Tu veux les blancs O/N ?",  "O");
    gamer.color = (rep[0] == "O" || rep[0] == "o") ? -1 : 1; // blancs -1, noirs 1
    if (gamer.color == 1) { // le joueur a les noirs. Le serveur joue...
       info.normal = !info.normal;

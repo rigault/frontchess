@@ -230,8 +230,8 @@ Afin de réduire la recherche aux seuls cas pertinents, la méthode Alpha-Bêta 
 
 <h2>Structures de données essentielles</h2>
 <ul>
-   <li>Le jeu est représenté dans un tableau à 2 dimensions de type TGAME,</li>
-   <li>une liste de déplacements est un tableau. Type TMOVELIST,</li>
+   <li>Le jeu est représenté dans un tableau à 2 dimensions de type tGame_t,</li>
+   <li>une liste de déplacements est un tableau. Type tMoveList_t,</li>
    <li>nextL est un entier pointant sur le prochain déplacement a insérer dans la liste,</li>
    <li>info est une structure rassemblant un ensemble de données de contrôles et d’état du jeux.</li>
    <li>gamer (resp. computer) est une structure rassemblant un ensemble de données de contrôles et d’état du joueur (resp. computer).</li>
@@ -436,6 +436,7 @@ main ()
                   LCkingInCheck ()
                   LCCannotMove ()
 </pre>
+<img src="diagrammeAppelsFonctionC.png" alt="Diagramme d'appel des fobction C">
 <h2>Les fonctions et les commentaires associés </h2>
 <pre>
 
@@ -452,7 +453,7 @@ Fichier chess.c
 /*   sans parametre ni option :  CGI gérant une API restful (GET) avec les réponses au format JSON */
 /*   fichiers associes : chess.log, chessB.fen, chessW.fen, chessUtil.c, syzygy.c, tbprobes.c tbcore.c et .h associes  */
 /*   Structures de donnees essentielles */
-/*     - jeu represente dans un table a 2 dimensions : TGAME sq64 */
+/*     - jeu represente dans un table a 2 dimensions : tGame_t sq64 */
 /*     - liste des deplacement qui est un tableau de move : */
 /*     - nextL est un entier pointant sur le prochain move a inserer dans la liste */
 /*   Noirs : positifs  (Minuscules) */
